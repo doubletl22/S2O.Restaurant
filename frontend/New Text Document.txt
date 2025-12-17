@@ -1,0 +1,17 @@
+# 2. Tạo Admin Portal (Web cho quản lý)
+npm create vite@latest frontend/admin-portal -- --template react-ts
+# (Chọn y để cài đặt nếu được hỏi)
+
+# 3. Tạo Guest Web App (Web quét QR)
+npm create vite@latest frontend/guest-webapp -- --template react-ts
+
+# 4. Cài đặt các thư viện cần thiết cho cả 2 (ví dụ: Router, Axios)
+cd frontend/admin-portal
+npm install
+npm install react-router-dom axios
+cd ../../
+
+cd frontend/guest-webapp
+npm install
+npm install react-router-dom axios
+cd ../../
