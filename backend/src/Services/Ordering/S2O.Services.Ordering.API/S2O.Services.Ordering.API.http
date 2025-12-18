@@ -1,0 +1,6 @@
+@S2O.Services.Ordering.API_HostAddress = http://localhost:5057
+
+GET {{S2O.Services.Ordering.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
