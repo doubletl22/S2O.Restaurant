@@ -1,0 +1,375 @@
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --line:#eef0f4;
+
+  /* giống video mobile (cam -> đỏ) */
+  --g1:#f97316;
+  --g2:#ef4444;
+
+  --shadow: 0 8px 24px rgba(17,24,39,.08);
+  --r16:16px;
+  --r20:20px;
+}
+
+*{ box-sizing:border-box; }
+html,body{ padding:0; margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; color:var(--text); background:var(--bg); }
+a{ color:inherit; text-decoration:none; }
+
+.app-shell{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+.phone{
+  width:min(420px, 100%);
+  min-height:calc(100vh - 32px);
+  background:var(--bg);
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow: var(--shadow);
+  position:relative;
+}
+
+/* vùng an toàn + padding tổng */
+.safe{
+  min-height:100vh;
+  padding-bottom: calc(88px + env(safe-area-inset-bottom));
+}
+
+/* ===== Header gradient giống mobile ===== */
+.m-header{
+  background: linear-gradient(90deg, var(--g1), var(--g2));
+  color:#fff;
+  padding: 18px 16px 14px;
+  border-bottom-left-radius: 22px;
+  border-bottom-right-radius: 22px;
+}
+.m-header-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.m-back{
+  width:34px; height:34px;
+  border-radius:999px;
+  background: rgba(255,255,255,.20);
+  border: 1px solid rgba(255,255,255,.25);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+}
+.m-title{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.m-title b{ font-size:18px; line-height:1.1; }
+.m-title span{ font-size:12.5px; opacity:.9; }
+.m-spacer{ flex:1; }
+.m-icon{
+  width:34px; height:34px;
+  border-radius:999px;
+  background: rgba(255,255,255,.20);
+  border: 1px solid rgba(255,255,255,.25);
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ===== Search bar giống mobile ===== */
+.m-search-wrap{
+  margin-top:12px;
+  background:#fff;
+  border-radius: 14px;
+  padding: 10px 12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.10);
+}
+.m-search-ico{ opacity:.55; }
+.m-search{
+  flex:1;
+  border:none;
+  outline:none;
+  font-size:14px;
+}
+.m-filter{
+  width:34px; height:34px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#fff;
+  cursor:pointer;
+}
+
+/* ===== Chips (lọc danh mục) ===== */
+.chips{
+  display:flex;
+  gap:10px;
+  padding: 14px 14px 0;
+  overflow:auto;
+  scrollbar-width:none;
+}
+.chips::-webkit-scrollbar{ display:none; }
+.chip{
+  flex:0 0 auto;
+  border:none;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background:#fff;
+  color: #111827;
+  box-shadow: 0 8px 18px rgba(17,24,39,.06);
+  cursor:pointer;
+  font-size:13px;
+  white-space:nowrap;
+}
+.chip.active{
+  background: linear-gradient(90deg, var(--g1), var(--g2));
+  color:#fff;
+}
+
+/* ===== Section + card menu giống video ===== */
+.section{
+  padding: 14px 14px 0;
+}
+.section h3{
+  margin: 10px 2px 10px;
+  font-size:14px;
+  color:#111827;
+}
+.menu-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.food-card{
+  background: var(--card);
+  border-radius: 16px;
+  padding: 10px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  box-shadow: 0 10px 24px rgba(17,24,39,.06);
+  border: 1px solid rgba(238,240,244,.9);
+}
+.food-img{
+  width:64px;
+  height:64px;
+  border-radius: 14px;
+  background: #e5e7eb;
+  flex:0 0 auto;
+  overflow:hidden;
+}
+.food-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+.food-mid{
+  flex:1;
+  min-width:0;
+}
+.food-name{
+  font-size:14px;
+  font-weight:700;
+  margin:0;
+}
+.food-desc{
+  margin:3px 0 0;
+  font-size:12.5px;
+  color: var(--muted);
+  overflow:hidden;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+}
+.food-price{
+  margin-top:6px;
+  font-weight:800;
+  color: #f97316;
+  font-size:13.5px;
+}
+.food-plus{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  border:none;
+  background: rgba(249,115,22,.12);
+  color:#f97316;
+  font-weight:900;
+  font-size:18px;
+  cursor:pointer;
+  flex:0 0 auto;
+}
+
+/* ===== Panel / card cho cart, tracking, payment ===== */
+.panel{
+  margin: 14px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(17,24,39,.06);
+  border: 1px solid rgba(238,240,244,.9);
+  padding: 14px;
+}
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.row:last-child{ border-bottom:none; }
+.k{ color: var(--muted); font-size:13px; }
+
+/* ===== Buttons ===== */
+.btn{
+  width:100%;
+  border:none;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight:800;
+  cursor:pointer;
+}
+.btn-primary{
+  background: linear-gradient(90deg, var(--g1), var(--g2));
+  color:#fff;
+}
+.btn-ghost{
+  background:#fff;
+  border:1px solid var(--line);
+  color:#111827;
+}
+
+/* ===== Bottom nav giống mobile (nút giữa nổi) ===== */
+.bottom-nav{
+  position:fixed;
+  left:50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width:min(420px, 100%);
+  background:#fff;
+  border-top: 1px solid var(--line);
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  z-index:50;
+}
+.nav-item{
+  width:44px; height:44px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius: 14px;
+  color:#9ca3af;
+  font-size:18px;
+}
+.nav-item.active{ color:#f97316; background: rgba(249,115,22,.10); }
+
+.nav-center{
+  width:56px; height:56px;
+  border-radius: 999px;
+  margin-top:-28px;
+  background: linear-gradient(90deg, var(--g1), var(--g2));
+  display:flex; align-items:center; justify-content:center;
+  color:#fff;
+  box-shadow: 0 14px 28px rgba(239,68,68,.25);
+  border: 6px solid #fff;
+}
+
+/* ===== Product page ===== */
+.product-wrap{ padding: 14px; }
+.product-hero{
+  background:#fff;
+  border-radius: 18px;
+  overflow:hidden;
+  box-shadow: 0 10px 24px rgba(17,24,39,.06);
+  border:1px solid rgba(238,240,244,.9);
+}
+.product-img{ width:100%; height:220px; background:#e5e7eb; }
+.product-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+.product-body{ padding: 14px; }
+.product-name{ margin:0; font-size:18px; font-weight:900; }
+.rating-line{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:10px;
+  color: var(--muted);
+  font-size:13px;
+}
+.stepper{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+.stepper button{
+  width:30px; height:30px;
+  border-radius:999px;
+  border:none;
+  background: rgba(249,115,22,.12);
+  color:#f97316;
+  font-size:18px;
+  cursor:pointer;
+  font-weight:900;
+}
+.product-sub{ margin:10px 0 0; color: var(--muted); font-size:13px; }
+
+.toppings{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.topping{
+  border:none;
+  border-radius: 999px;
+  padding:10px 12px;
+  background:#fff;
+  border:1px solid var(--line);
+  cursor:pointer;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  font-size:13px;
+}
+.topping.active{
+  background: rgba(249,115,22,.10);
+  border-color: rgba(249,115,22,.35);
+}
+.t-dot{
+  width:26px; height:26px;
+  border-radius:999px;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(249,115,22,.12);
+}
+
+.order-bar{
+  position:fixed;
+  left:50%;
+  transform: translateX(-50%);
+  bottom: calc(78px + env(safe-area-inset-bottom));
+  width:min(420px, 100%);
+  padding: 10px 14px;
+  display:flex;
+  gap:10px;
+  z-index:60;
+}
+.price-pill{
+  flex:0 0 auto;
+  background:#fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-weight:900;
+}
+.order-btn{
+  flex:1;
+  border:none;
+  border-radius: 14px;
+  background: linear-gradient(90deg, var(--g1), var(--g2));
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
