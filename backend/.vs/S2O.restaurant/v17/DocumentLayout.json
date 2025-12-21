@@ -1,46 +1,70 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\",
+  "WorkspaceRootPath": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\primitives\\aggregateroot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\primitives\\aggregateroot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\controllers\\rolecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\controllers\\rolecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DC2682ED-0E5D-49B3-8D86-DB7F28C872D4}|src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.infra\\interceptors\\auditableentityinterceptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DC2682ED-0E5D-49B3-8D86-DB7F28C872D4}|src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.infra\\interceptors\\auditableentityinterceptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\dtos\\assignroledto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\dtos\\assignroledto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DC2682ED-0E5D-49B3-8D86-DB7F28C872D4}|src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.infra\\s2o.shared.infra.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{DC2682ED-0E5D-49B3-8D86-DB7F28C872D4}|src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.infra\\s2o.shared.infra.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\cqrs\\iqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\cqrs\\iqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\cqrs\\icommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\cqrs\\icommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\interfaces\\itokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\interfaces\\itokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\cqrs\\iquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\cqrs\\iquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\cqrs\\icommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\cqrs\\icommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\wrapper\\result.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\wrapper\\result.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\configurations\\jwtsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\configurations\\jwtsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\primitives\\idomainevent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\primitives\\idomainevent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\dtos\\registerdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\dtos\\registerdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\primitives\\ientity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BE095A67-3BCC-4E13-8726-9631A5F1D010}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\primitives\\ientity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\dtos\\tokenrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\dtos\\tokenrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\dtos\\logindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\dtos\\logindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\dtos\\tokenresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\dtos\\tokenresponsedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\userrole.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\userrole.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\permission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\permission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\refreshtoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\refreshtoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -50,145 +74,363 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 10,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RoleController.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\RoleController.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\RoleController.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\RoleController.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\RoleController.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAtwB4AAABBAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T19:47:45.425Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "WeatherForecastController.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\WeatherForecastController.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\WeatherForecastController.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\WeatherForecastController.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\WeatherForecastController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T19:46:44.032Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ITokenService.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\ITokenService.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\ITokenService.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\ITokenService.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\ITokenService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAwAAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:41:48.351Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TokenService.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
+              "ViewState": "AgIAACoAAAAAAAAAAAAtwCEAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:42:03.139Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-12-21T14:29:01.804Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AssignRoleDTO.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\AssignRoleDTO.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\AssignRoleDTO.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\AssignRoleDTO.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\AssignRoleDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:40:07.852Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "JwtSettings.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Configurations\\JwtSettings.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Configurations\\JwtSettings.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Configurations\\JwtSettings.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Configurations\\JwtSettings.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T18:35:10.026Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "LoginDTO.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\LoginDTO.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\LoginDTO.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\LoginDTO.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\LoginDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:37:55.212Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "TokenRequestDTO.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\TokenRequestDTO.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\TokenRequestDTO.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\TokenRequestDTO.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\TokenRequestDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:38:40.942Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Program.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Program.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Program.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Program.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAgwDIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T14:29:01.134Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "RegisterDTO.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\RegisterDTO.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\RegisterDTO.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\RegisterDTO.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\RegisterDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:37:07.87Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "TokenResponseDTO.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\TokenResponseDTO.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\TokenResponseDTO.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\TokenResponseDTO.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\TokenResponseDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:39:23.192Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "User.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAwAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:58:53.524Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "UserRole.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\UserRole.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\UserRole.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\UserRole.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\UserRole.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:58:44.247Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "RefreshToken.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:19:47.293Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Permission.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Permission.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Permission.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Permission.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Permission.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-21T16:19:46.123Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
             },
             {
               "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{26341fe2-71dd-46fd-bb1b-2e51a92a0d64}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
               "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "S2O.Shared.Infra.csproj",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-12-18T14:24:13.402Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AuditableEntityInterceptor.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Infra\\Interceptors\\AuditableEntityInterceptor.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Infra\\Interceptors\\AuditableEntityInterceptor.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Infra\\Interceptors\\AuditableEntityInterceptor.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Infra\\Interceptors\\AuditableEntityInterceptor.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T14:21:15.571Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Result.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Wrapper\\Result.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Wrapper\\Result.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Wrapper\\Result.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Wrapper\\Result.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAiwCQAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T14:19:16.75Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "IQueryHandler.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T14:18:49.496Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:135:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ICommandHandler.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T14:18:39.004Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:134:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "IQuery.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T14:18:22.746Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:136:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ICommand.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T14:17:53.822Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:137:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "IDomainEvent.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T14:16:57.376Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:139:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AggregateRoot.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAQAAAAPAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T14:16:27.117Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:141:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "IEntity.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IEntity.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IEntity.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IEntity.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IEntity.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-18T14:16:04.18Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:142:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:138:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:140:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:146:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:143:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:144:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:145:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:148:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:150:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:147:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:149:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:151:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:153:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:152:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             }
           ]
         }
