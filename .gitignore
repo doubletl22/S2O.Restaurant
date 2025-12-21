@@ -1,0 +1,42 @@
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+.vscode/
+.vs/
+# ===== Mobile =====
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Expo / React Native
+.expo/
+.expo-shared/
+
+# iOS
+ios/Pods/
+ios/build/
+*.xcworkspace
+*.xcuserstate
+*.xcuserdata/
+
+# Android / Gradle
+.gradle/
+build/
+local.properties
+
+# ===== IDE =====
+.vs/
+.idea/
+*.suo
+*.user
+*.log
