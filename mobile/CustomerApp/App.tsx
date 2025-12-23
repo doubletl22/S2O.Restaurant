@@ -1,11 +1,17 @@
+// App.tsx
 import React from 'react';
-import { Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AuthNavigator from './src/navigation/AuthNavigator'; // Gọi file vừa tạo
 
 const App = () => {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ fontSize: 30, color: 'red' }}>Xin chào Thanh Hải!</Text>
-    </View>
+    <SafeAreaProvider>
+      <NavigationContainer>
+         {/* Tạm thời chạy AuthNavigator trước để test Login */}
+        <AuthNavigator />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 };
 
