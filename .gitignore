@@ -4,18 +4,9 @@
 *.user
 *.userosscache
 *.sln.docstates
-*.suo
-*.cache
-*.dtbcache.v2
-*.futdcache.v2
-DocumentLayout.json
-
-.vscode/
-riderModule.iml
-/_ReSharper.Caches/
 
 /packages/
-node_modules/
-
-*.log
-*.tmp
+riderModule.iml
+/_ReSharper.Caches/
+.vscode/
+.vs/
