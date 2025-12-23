@@ -1,76 +1,7 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\dtos\\logindtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\dtos\\logindtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\interfaces\\irolerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\interfaces\\irolerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\interfaces\\itokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\interfaces\\itokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\interfaces\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\interfaces\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\controllers\\rolecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\controllers\\rolecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\configurations\\jwtsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\configurations\\jwtsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\userrole.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\userrole.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\role.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\role.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\rolepermission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\rolepermission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\refreshtoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\refreshtoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\permission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\permission.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\s2o.services.identity.api.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
-      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\s2o.services.identity.api.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -78,7 +9,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 42,
+          "SelectedChildIndex": -1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -102,11 +33,11 @@
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
               "$type": "Bookmark",
@@ -118,11 +49,19 @@
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:133:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+              "Name": "ST:135:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:139:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
               "$type": "Bookmark",
@@ -167,10 +106,6 @@
             {
               "$type": "Bookmark",
               "Name": "ST:138:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:140:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
               "$type": "Bookmark",
@@ -229,223 +164,36 @@
               "Name": "ST:129:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "RoleController.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\RoleController.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\RoleController.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\RoleController.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\RoleController.cs",
-              "ViewState": "AgIAACwAAAAAAAAAAAAwwA0AAAA3AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T19:47:45.425Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "WeatherForecastController.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\WeatherForecastController.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\WeatherForecastController.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\WeatherForecastController.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Controllers\\WeatherForecastController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T19:46:44.032Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "IUserRepository.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IUserRepository.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IUserRepository.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IUserRepository.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IUserRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-22T10:25:58.344Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:143:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "ITokenService.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\ITokenService.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\ITokenService.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\ITokenService.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\ITokenService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAsAAABIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T16:41:48.351Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:140:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "IRoleRepository.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IRoleRepository.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IRoleRepository.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IRoleRepository.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IRoleRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-22T10:26:24.906Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:141:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "LoginDTOs.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\LoginDTOs.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\LoginDTOs.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\LoginDTOs.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\DTOs\\LoginDTOs.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-22T13:14:19.239Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:142:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "JwtSettings.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Configurations\\JwtSettings.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Configurations\\JwtSettings.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Configurations\\JwtSettings.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Configurations\\JwtSettings.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAA7AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T18:35:10.026Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:136:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "User.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAA6AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T16:58:53.524Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "UserRole.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\UserRole.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\UserRole.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\UserRole.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\UserRole.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T16:58:44.247Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Role.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Role.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Role.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Role.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Role.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwBAAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T21:40:05.331Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "RolePermission.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RolePermission.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RolePermission.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RolePermission.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RolePermission.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-22T10:32:45.29Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "RefreshToken.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T16:19:47.293Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "Permission.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Permission.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Permission.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Permission.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\Permission.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T16:19:46.123Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "TokenService.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
-              "ViewState": "AgIAAD0AAAAAAAAAAAAowE4AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T16:42:03.139Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "Program.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Program.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Program.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Program.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Program.cs",
-              "ViewState": "AgIAAC8AAAAAAAAAAAAowDsAAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-21T14:29:01.134Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "S2O.Services.Identity.API.http",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.http",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.http",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.http",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.http",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
-              "WhenOpened": "2025-12-22T10:04:04.869Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-12-21T14:29:01.804Z"
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             }
           ]
         }
