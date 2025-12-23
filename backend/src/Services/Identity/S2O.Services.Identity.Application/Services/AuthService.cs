@@ -105,6 +105,7 @@ namespace S2O.Services.Identity.Application.Services
                 CreatedAt = DateTime.UtcNow,
             };
 
+            throw new Exception();
 
         }
     }
