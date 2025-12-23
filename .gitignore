@@ -4,14 +4,18 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.suo
+*.cache
+*.dtbcache.v2
+*.futdcache.v2
+DocumentLayout.json
 
-/packages/
+.vscode/
 riderModule.iml
 /_ReSharper.Caches/
-.vscode/
-.vs/
-/frontend/admin-portal/index.html
-/frontend/admin-portal/index.html
-/backend/.vs/S2O.restaurant/v17/.suo
-/backend/.vs/S2O.restaurant/v17/.suo
-/backend/.vs/S2O.restaurant/v17/DocumentLayout.json
+
+/packages/
+node_modules/
+
+*.log
+*.tmp
