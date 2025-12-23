@@ -14,4 +14,7 @@ namespace S2O.Services.Identity.Domain.Entities
         public List<RolePermission> RolePermissions{ get; set; } = new List<RolePermission>();
     }
 }
+<<<<<<< HEAD
  
+=======
+>>>>>>> 1f4ad3f4fda89f4fe8f6f98a1e5c632ecec42cc7

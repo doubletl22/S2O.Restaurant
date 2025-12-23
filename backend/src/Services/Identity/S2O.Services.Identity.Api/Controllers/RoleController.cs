@@ -29,7 +29,11 @@ namespace S2O.Services.Identity.Api.Controllers
                 return BadRequest($"Role '{roleName}' already exit");
             }
 
+<<<<<<< HEAD
             var result = await roleManager.CreateAsync(role: new Role(roleName));
+=======
+            var result = await roleManager.CreateAsync(new Role {Name = roleName });
+>>>>>>> 1f4ad3f4fda89f4fe8f6f98a1e5c632ecec42cc7
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
@@ -41,7 +45,11 @@ namespace S2O.Services.Identity.Api.Controllers
         [HttpPost("assign")]
         public async Task<IActionResult> AssignRoleDTO([FromBody] AssignRoleDTO dto)
         {
+<<<<<<< HEAD
             var user = await userManager.FindByEmailAsync(dto.Email);
+=======
+            var user = await userManager.FindByIdAsync(dto.Email);
+>>>>>>> 1f4ad3f4fda89f4fe8f6f98a1e5c632ecec42cc7
             if (user == null)
             {
                 return NotFound($"User with email '{dto.Email}' not found");
