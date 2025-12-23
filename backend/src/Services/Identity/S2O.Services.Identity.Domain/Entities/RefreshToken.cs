@@ -15,6 +15,7 @@ namespace S2O.Services.Identity.Domain.Entities
 
         public bool IsExpired => DateTime.UtcNow >= Expires;
         public bool IsActive => Revoked == null && !IsExpired;
+        public bool isExpired => DateTime.UtcNow >= Expires;
 
         public Guid UserId { get; set; } 
         public User User { get; set; } = null!;
