@@ -1,11 +1,14 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Services.Identity.Application.Configurations;
 using S2O.Services.Identity.Application.Interfaces;
 using S2O.Services.Identity.Application.Services;
 using S2O.Services.Identity.Infrastructure.Data;
+using S2O.Services.Identity.Infrastructure.Repositories;
+using S2O.Services.Identity.Infrastructure.Security;
 
 namespace S2O.Services.Identity.Api
 {
@@ -49,8 +52,13 @@ namespace S2O.Services.Identity.Api
                 builder.Configuration.GetSection("JwtSettings"));
 
             builder.Services.AddScoped<ITokenService, TokenService>();
-
-
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+            builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
             var app = builder.Build();
 

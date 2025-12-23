@@ -11,8 +11,8 @@ namespace S2O.Services.Identity.Application.Interfaces
     {
         //Task<Role> GetById(int id);
         //Task<Role> GetByName(string name);
-        Task<Role> GetRoleByIdAsync(int id);
-        Task<Role> GetRoleByNameAsync(string name);
+        Task<Role?> GetRoleByIdAsync(Guid id);
+        Task<Role?> GetRoleByNameAsync(string name);
         Task<IEnumerable<Role>> GetAllRolesAsync();
     }
 }

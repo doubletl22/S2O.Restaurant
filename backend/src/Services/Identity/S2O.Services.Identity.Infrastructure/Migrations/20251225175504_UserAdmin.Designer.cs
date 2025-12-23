@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using S2O.Services.Identity.Infrastructure.Data;
@@ -11,9 +12,11 @@ using S2O.Services.Identity.Infrastructure.Data;
 namespace S2O.Services.Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251225175504_UserAdmin")]
+    partial class UserAdmin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,14 +109,8 @@ namespace S2O.Services.Identity.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Code = "ADMIN",
+                            Code = "",
                             Name = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Code = "CUSTOMER",
-                            Name = "CUSTOMER"
                         });
                 });
 
@@ -162,6 +159,18 @@ namespace S2O.Services.Identity.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("dbe0ce4e-c1e0-4e9c-a91f-68a30ec58428"),
+                            CreatedAt = new DateTime(2025, 12, 25, 17, 55, 3, 256, DateTimeKind.Utc).AddTicks(805),
+                            Email = "vinh@gmail.com",
+                            IsActive = true,
+                            PasswordHash = "432005",
+                            TenantId = new Guid("fcf137bd-2967-4242-bfd3-55dd3a1d42c3"),
+                            UserName = ""
+                        });
                 });
 
             modelBuilder.Entity("S2O.Services.Identity.Domain.Entities.UserRole", b =>
