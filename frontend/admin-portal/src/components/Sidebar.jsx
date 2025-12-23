@@ -41,7 +41,7 @@ const Sidebar = () => {
     <div className="sidebar">
       <div className="logo-container">
         <div className="logo-icon">FS</div>
-        <h1>FoodScan</h1>
+        <h1>TheSix</h1>
       </div>
       <div className="menu-container">
         {menuItems.map((section, index) => (
