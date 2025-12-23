@@ -13,9 +13,9 @@ namespace S2O.Services.Identity.Api
     {
         public static void Main(string[] args)
         {
-var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+            // Add services to the container.
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -52,28 +52,28 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 
-var app = builder.Build();
+            var app = builder.Build();
 
 
-if (app.Environment.IsDevelopment())
-{
+            if (app.Environment.IsDevelopment())
+            {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-}
+            }
 
-app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseAuthentication();
 
             app.UseAuthorization();
 
-var summaries = new[]
-{
+            var summaries = new[]
+            {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
             app.MapControllers();
 
-app.Run();
+            app.Run();
         }
     }
 }
