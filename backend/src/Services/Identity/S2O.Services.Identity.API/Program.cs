@@ -1,12 +1,10 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Services.Identity.Application.Configurations;
 using S2O.Services.Identity.Application.Interfaces;
 using S2O.Services.Identity.Application.Services;
-using S2O.Services.Identity.Domain.Entities;
 using S2O.Services.Identity.Infrastructure.Data;
 
 namespace S2O.Services.Identity.Api
