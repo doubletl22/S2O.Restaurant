@@ -10,7 +10,7 @@ namespace S2O.Services.Identity.Application.DTOs
     {
         public Guid UserId { get; set; }
         public string UserName { get; set; } = string.Empty;
-        public Guid TenantId { get; set; }
+        public Guid? TenantId { get; set; }
         public IList<string> Roles { get; set; } = new List<string>();
         public IList<string> Permissions { get; set; } = new List<string>();
         public string AccessToken { get; set; } = string.Empty;
