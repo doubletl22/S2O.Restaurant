@@ -104,7 +104,6 @@ namespace S2O.Services.Identity.Application.Services
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
             };
-
             throw new Exception();
 
         }

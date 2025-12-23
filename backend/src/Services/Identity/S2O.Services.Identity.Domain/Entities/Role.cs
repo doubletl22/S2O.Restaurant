@@ -15,3 +15,4 @@ namespace S2O.Services.Identity.Domain.Entities
     }
 }
  
+
