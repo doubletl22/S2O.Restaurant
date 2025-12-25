@@ -30,7 +30,7 @@ const Revenue = () => {
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="uv" fill="#8884d8" barSize={50} />
+            <Bar dataKey="uv" fill="#bd5b5bff" barSize={50} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -38,4 +38,3 @@ const Revenue = () => {
   );
 };
 export default Revenue;
-    

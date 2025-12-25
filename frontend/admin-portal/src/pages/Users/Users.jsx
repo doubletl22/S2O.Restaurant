@@ -10,7 +10,7 @@ const Users = () => {
 
   return (
     <div className="page-container">
-      <h2>Quản lý Người dùng</h2>
+      <h2>Quản lý người dùng</h2>
       <div className="table-container">
         <table>
           <thead>

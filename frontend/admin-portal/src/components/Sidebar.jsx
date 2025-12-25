@@ -1,4 +1,6 @@
 import React from "react";
+import logoImg from "../assets/Logo.png";
+import "./Sidebar.css";
 import {
   LayoutDashboard,
   Store,
@@ -40,8 +42,9 @@ const Sidebar = () => {
   return (
     <div className="sidebar">
       <div className="logo-container">
-        <div className="logo-icon">FS</div>
-        <h1>TheSix</h1>
+        <div className="logo-icon">
+          <img src={logoImg} alt="Logo" />
+        </div>
       </div>
       <div className="menu-container">
         {menuItems.map((section, index) => (

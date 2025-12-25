@@ -6,7 +6,7 @@
 }
 .top-header {
   height: 70px;
-  background: #fff;
+  background: #dadada;
   padding: 0 30px;
   display: flex;
   align-items: center;
@@ -28,7 +28,7 @@
 .avatar {
   width: 35px;
   height: 35px;
-  background: #e5e7eb;
+  background: #979eab;
   border-radius: 50%;
   display: flex;
   align-items: center;
