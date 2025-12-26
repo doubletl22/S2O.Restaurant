@@ -26,29 +26,20 @@ namespace S2O.Services.Identity.Application.Services
             this.jwtSettings = options.Value;
         }
 
-        public string CreateAccessToken(User user, IList<string> roles, IList<string> permissions)
+        public string CreateAccessToken(User user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecurityKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim("tenant_id", user.TenantId?.ToString() ?? ""),
-                new Claim("preferred_username", user.UserName ?? ""),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            };
+{
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim("username", user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
 
 
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            foreach (var permission in permissions)
-            {
-                claims.Add(new Claim("permission", permission));
-            }
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings.Issuer,
@@ -74,15 +65,6 @@ namespace S2O.Services.Identity.Application.Services
                 Created = DateTime.UtcNow,
                 CreatedByIp = ipAddress
             };
-        }
-
-
-        private static string GenerateRefreshToken()
-        {
-            var randomBytes = new byte[64];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomBytes);
-            return Convert.ToBase64String(randomBytes);
         }
     }
 }

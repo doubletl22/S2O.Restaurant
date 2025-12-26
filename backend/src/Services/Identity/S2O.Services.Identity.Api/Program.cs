@@ -53,11 +53,8 @@ namespace S2O.Services.Identity.Api
 
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-            builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
-            builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<IRoleRepository, RoleRepository>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
             var app = builder.Build();

@@ -28,14 +28,12 @@ namespace S2O.Services.Identity.Infrastructure.Repositories
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await context.Users
-                .Include(x => x.UserRoles)
                 .FirstOrDefaultAsync(x => x.Email == email);
         }
 
         public async Task<User?> GetByIdAsync(Guid id)
         {
             return await context.Users
-                .Include (x => x.UserRoles)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
     }
