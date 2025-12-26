@@ -10,7 +10,7 @@ namespace S2O.Services.Identity.Application.DTOs
 {
     public class LoginRequest
     {
-        [Required (ErrorMessage = "Email")]
+        [Required]
         [EmailAddress]
         public required string Email { get; set; } 
 

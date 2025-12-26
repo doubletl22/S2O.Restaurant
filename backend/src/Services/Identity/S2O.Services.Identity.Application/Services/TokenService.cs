@@ -75,5 +75,14 @@ namespace S2O.Services.Identity.Application.Services
                 CreatedByIp = ipAddress
             };
         }
+
+
+        private static string GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
+        }
     }
 }
