@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using S2O.Services.Identity.Domain.Entities;
 using System;
@@ -55,6 +56,24 @@ namespace S2O.Services.Identity.Infrastructure.Data
                 .HasOne(rp => rp.Permission)
                 .WithMany()
                 .HasForeignKey(rp => rp.PermissionId);
+
+            var adminRoleId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+            var customerRoleId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+
+            builder.Entity<Role>().HasData(
+                new Role
+                {
+                    Id = adminRoleId,
+                    Name = "ADMIN",
+                    Code = "ADMIN"
+                },
+                new Role
+                {
+                    Id = customerRoleId,
+                    Name = "CUSTOMER",
+                    Code = "CUSTOMER"
+                }
+            );
         }
     }
 }
