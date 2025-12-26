@@ -10,4 +10,8 @@ riderModule.iml
 /_ReSharper.Caches/
 .vscode/
 .vs/
+<<<<<<< HEAD
 /backend/.vs/S2O.restaurant/v17/.suo
+=======
+/backend/src/Services/Identity/S2O.Services.Identity.Infrastructure/Repositories/RoleRepository.cs
+>>>>>>> b6136e036fc676c4b81d4adbb0e4f55082d26efd
