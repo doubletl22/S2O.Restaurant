@@ -18,6 +18,5 @@ namespace S2O.Services.Identity.Application.DTOs
         [PasswordPropertyText]
         public required string Password { get; set; }
 
-        public required Guid TenantId { get; set; }
     }
 }

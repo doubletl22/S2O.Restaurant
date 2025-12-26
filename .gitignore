@@ -10,3 +10,4 @@ riderModule.iml
 /_ReSharper.Caches/
 .vscode/
 .vs/
+/backend/src/Services/Identity/S2O.Services.Identity.Infrastructure/Repositories/RoleRepository.cs
