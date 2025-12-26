@@ -1,11 +1,14 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Services.Identity.Application.Configurations;
 using S2O.Services.Identity.Application.Interfaces;
 using S2O.Services.Identity.Application.Services;
 using S2O.Services.Identity.Infrastructure.Data;
+using S2O.Services.Identity.Infrastructure.Repositories;
+using S2O.Services.Identity.Infrastructure.Security;
 
 namespace S2O.Services.Identity.Api
 {
@@ -13,9 +16,9 @@ namespace S2O.Services.Identity.Api
     {
         public static void Main(string[] args)
         {
-var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+            // Add services to the container.
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -49,31 +52,33 @@ var builder = WebApplication.CreateBuilder(args);
                 builder.Configuration.GetSection("JwtSettings"));
 
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+            var app = builder.Build();
 
 
-
-var app = builder.Build();
-
-
-if (app.Environment.IsDevelopment())
-{
+            if (app.Environment.IsDevelopment())
+            {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-}
+            }
 
-app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseAuthentication();
 
             app.UseAuthorization();
 
-var summaries = new[]
-{
+            var summaries = new[]
+            {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
             app.MapControllers();
 
-app.Run();
+            app.Run();
         }
     }
 }

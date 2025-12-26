@@ -9,7 +9,7 @@ namespace S2O.Services.Identity.Application.Interfaces
 {
     public interface ITokenService
     {
-        public string CreateAccessToken(User user, IList<string> roles, IList<string> permissions);
+        public string CreateAccessToken(User user);
         RefreshToken CreateRefreshToken(string ipAddress);
 
     }

@@ -1,58 +1,54 @@
-﻿using Microsoft.Extensions.Logging;
-using S2O.Services.Identity.Application.DTOs;
+﻿using S2O.Services.Identity.Application.DTOs;
 using S2O.Services.Identity.Application.Interfaces;
 using S2O.Services.Identity.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace S2O.Services.Identity.Application.Services
 {
-    public class AuthService(
-        IUserRepository userRepository,
-        IRoleRepository roleRepository,
-        IUserRoleRepository userRoleRepository,
-        IPermissionRepository permissionRepository,
-        ITenantRepository tenantRepository,
-        ITokenService tokenService,
-        IPasswordHasher passwordHasher,
-        IRefreshTokenRepository refreshTokenRepository
-            ) : IAuthService
+    public class AuthService : IAuthService
     {
-        private readonly IUserRepository userRepository = userRepository;
-        private readonly IRoleRepository roleRepository = roleRepository;
-        private readonly IUserRoleRepository userRoleRepository = userRoleRepository;
-        private readonly IPermissionRepository permissionRepository = permissionRepository;
-        private readonly ITenantRepository tenantRepository = tenantRepository;
-        private readonly ITokenService tokenService = tokenService;
-        private readonly IPasswordHasher passwordHasher = passwordHasher;
-        private readonly IRefreshTokenRepository refreshTokenRepository = refreshTokenRepository;
+        private const string DEFAULT_CUSTOMER_ROLE = "CUSTOMER";
 
-        public async Task<AuthResponse> LoginAsync(LoginRequest request, string ipAddress)
+        private readonly IUserRepository userRepository;
+        private readonly IRefreshTokenRepository refreshTokenRepository;
+        private readonly IPasswordHasher passwordHasher;
+        private readonly ITokenService tokenService;
+
+        public AuthService(
+            IUserRepository userRepository,
+            IRefreshTokenRepository refreshTokenRepository,
+            IPasswordHasher passwordHasher,
+            ITokenService tokenService)
         {
-            var user = await userRepository.FindByEmailAsync(request.Email);
-            if (user == null || !user.IsActive || !passwordHasher.Verify(request.Password, user.PasswordHash))
+            this.userRepository = userRepository;
+            this.refreshTokenRepository = refreshTokenRepository;
+            this.passwordHasher = passwordHasher;
+            this.tokenService = tokenService;
+        }
+
+        // ===================== REGISTER (CUSTOMER ONLY) =====================
+        public async Task<AuthResponse> RegisterAsync(RegisterRequest request, string ip)
+        {
+            if (request.Password != request.ConfirmPassword)
+                throw new Exception("Mật khẩu xác nhận không khớp");
+
+            var existingUser = await userRepository.GetByEmailAsync(request.Email);
+            if (existingUser != null)
+                throw new Exception("Email đã được sử dụng");
+
+            var user = new User
             {
-                throw new Exception("Email hoặc mật khẩu không đúng");
-            }
+                Id = Guid.NewGuid(),
+                UserName = request.UserName,
+                Email = request.Email,
+                PasswordHash = passwordHasher.Hash(request.Password),
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
 
-            var roles = await userRoleRepository.GetRolesAsync(user.Id, request.TenantId);
+            await userRepository.AddAsync(user);
 
-            if (!roles.Any())
-            {
-                throw new Exception("User chưa được gán role");
-            }
-
-            var rolesName = roles.Select(r => r.Name).ToList();
-
-            var permissions = await permissionRepository.GetPermissionsByRolesIdAsync(roles.Select(r => r.Id).ToList());
-
-            var accessToken = tokenService.CreateAccessToken(user, rolesName, permissions);
-
-            var refreshToken = tokenService.CreateRefreshToken(ipAddress);
-
+            var accessToken = tokenService.CreateAccessToken(user);
+            var refreshToken = tokenService.CreateRefreshToken(ip);
             refreshToken.UserId = user.Id;
 
             await refreshTokenRepository.AddAsync(refreshToken);
@@ -61,51 +57,81 @@ namespace S2O.Services.Identity.Application.Services
             {
                 UserId = user.Id,
                 UserName = user.UserName,
-                TenantId = request.TenantId,
-                Roles = rolesName,
-                Permissions = permissions,
                 AccessToken = accessToken,
-                RefreshToken = refreshToken.Token,
-                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(60)
+                RefreshToken = refreshToken.Token
             };
         }
 
-        public Task LogoutAsync(string refreshToken)
+
+
+        // ===================== LOGIN =====================
+        public async Task<AuthResponse> LoginAsync(LoginRequest request, string ip)
         {
-            throw new NotImplementedException();
-        }
+            var user = await userRepository.GetByEmailAsync(request.Email);
 
-        public Task<AuthResponse> RefreshTokenAsync(string refreshToken, string ipAddress)
-        {
-            throw new NotImplementedException();
-        }
+            if (user == null || !passwordHasher.Verify(request.Password, user.PasswordHash))
+                throw new Exception("Email hoặc mật khẩu không đúng");
 
-        public async Task<AuthResponse> RegisterAsync(RegisterRequest request, string ipAddress)
-        {
-            var tenant = await tenantRepository.GetByIdAsync(request.TenantId);
-            if (tenant == null || tenant.Status != "Active")
+            var accessToken = tokenService.CreateAccessToken(user);
+            var refreshToken = tokenService.CreateRefreshToken(ip);
+            refreshToken.UserId = user.Id;
+
+            await refreshTokenRepository.AddAsync(refreshToken);
+
+            return new AuthResponse
             {
-                throw new Exception("Tenant không hợp lệ");
-            }
-
-            var exitingUser = await userRepository.FindByEmailAsync(request.Email);
-            if (exitingUser == null)
-            {
-                throw new Exception("Email đã tồn tại");
-            }
-
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                UserName = request.UserName,
-                Email = request.Email,
-                PasswordHash = passwordHasher.Hash(request.Password),
-                TenantId = request.TenantId,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
+                UserId = user.Id,
+                UserName = user.UserName,
+                AccessToken = accessToken,
+                RefreshToken = refreshToken.Token
             };
-            throw new Exception();
+        }
 
+
+        // ===================== REFRESH TOKEN =====================
+        public async Task<AuthResponse> RefreshTokenAsync(string token, string ipAddress)
+        {
+            var oldToken = await refreshTokenRepository.GetByTokenAsync(token);
+            if (oldToken == null || !oldToken.IsActive)
+                throw new Exception("Refresh token không hợp lệ");
+
+            var user = await userRepository.GetByIdAsync(oldToken.UserId);
+            if (user == null || !user.IsActive)
+                throw new Exception("User không hợp lệ");
+
+
+            var newAccessToken = tokenService.CreateAccessToken(user );
+
+            oldToken.Revoked = DateTime.UtcNow;
+            oldToken.RevokedByIp = ipAddress;
+
+            var newRefreshToken = tokenService.CreateRefreshToken(ipAddress);
+            newRefreshToken.UserId = user.Id;
+            oldToken.ReplacedByToken = newRefreshToken.Token;
+
+            await refreshTokenRepository.UpdateAsync(oldToken);
+            await refreshTokenRepository.AddAsync(newRefreshToken);
+
+            return new AuthResponse
+            {
+                UserId = user.Id,
+                UserName = user.UserName,
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken.Token,
+            };
+        }
+
+        // ===================== LOGOUT =====================
+        public async Task LogoutAsync(string refreshToken, string ipAddress)
+        {
+            var token = await refreshTokenRepository.GetByTokenAsync(refreshToken);
+            if (token == null || !token.IsActive)
+                return;
+
+            token.Revoked = DateTime.UtcNow;
+            token.RevokedByIp = ipAddress;
+
+            await refreshTokenRepository.UpdateAsync(token);
         }
     }
 }

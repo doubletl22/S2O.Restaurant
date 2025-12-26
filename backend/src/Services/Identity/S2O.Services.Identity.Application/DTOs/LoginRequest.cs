@@ -10,7 +10,7 @@ namespace S2O.Services.Identity.Application.DTOs
 {
     public class LoginRequest
     {
-        [Required (ErrorMessage = "Email")]
+        [Required]
         [EmailAddress]
         public required string Email { get; set; } 
 
@@ -18,6 +18,5 @@ namespace S2O.Services.Identity.Application.DTOs
         [PasswordPropertyText]
         public required string Password { get; set; }
 
-        public required Guid TenantId { get; set; }
     }
 }
