@@ -26,4 +26,8 @@
     <ProjectReference Include="..\S2O.Services.Identity.Application\S2O.Services.Identity.Application.csproj" />
     <ProjectReference Include="..\S2O.Services.Identity.Domain\S2O.Services.Identity.Domain.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
 </Project>

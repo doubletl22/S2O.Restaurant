@@ -12,7 +12,7 @@ using S2O.Services.Identity.Infrastructure.Data;
 namespace S2O.Services.Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251226183054_Auth")]
+    [Migration("20251227054605_Auth")]
     partial class Auth
     {
         /// <inheritdoc />
