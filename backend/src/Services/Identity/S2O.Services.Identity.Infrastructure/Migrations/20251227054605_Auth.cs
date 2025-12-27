@@ -12,7 +12,7 @@ namespace S2O.Services.Identity.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "Users", 
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
