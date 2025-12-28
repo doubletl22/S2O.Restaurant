@@ -1,69 +1,173 @@
+/* Container chính của trang */
+.page-container {
+  padding: 20px 30px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Header: Tiêu đề + Nút thêm */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
-.btn-primary {
-  background: #3b82f6;
+.page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #111827;
+}
+
+.btn-add {
+  background-color: #3b82f6;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 10px 16px;
   border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
   cursor: pointer;
-  font-weight: 600;
+  transition: background 0.2s;
 }
+.btn-add:hover {
+  background-color: #2563eb;
+}
+
+/* Toolbar: Tìm kiếm + Filter */
+.toolbar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  flex: 1; /* Dài ra hết cỡ */
+  position: relative;
+  max-width: 400px;
+}
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+.search-box input {
+  width: 100%;
+  padding: 10px 10px 10px 40px; /* Chừa chỗ cho icon */
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  outline: none;
+  transition: border 0.2s;
+}
+.search-box input:focus {
+  border-color: #3b82f6;
+}
+
+.btn-filter {
+  background: white;
+  border: 1px solid #e5e7eb;
+  padding: 10px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #374151;
+}
+
+/* --- TABLE STYLE (Phần quan trọng nhất) --- */
 .table-container {
   background: white;
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  overflow: hidden; /* Bo tròn góc bảng */
+  border: 1px solid #f3f4f6;
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
-}
-th {
   text-align: left;
-  padding: 15px;
-  border-bottom: 2px solid #f3f4f6;
+}
+
+th {
+  background-color: #f9fafb;
+  padding: 16px 24px;
+  font-size: 13px;
+  font-weight: 600;
   color: #6b7280;
-  font-size: 14px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e5e7eb;
 }
+
 td {
-  padding: 15px;
-  border-bottom: 1px solid #f3f4f6;
-  color: #374151;
+  padding: 16px 24px;
   font-size: 14px;
+  color: #4b5563;
+  border-bottom: 1px solid #f3f4f6;
 }
+
+tr:hover {
+  background-color: #f9fafb;
+} /* Hiệu ứng khi di chuột vào dòng */
+
+/* Status Badges */
 .status-badge {
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
 .status-badge.active {
-  background: #dcfce7;
+  background-color: #dcfce7;
   color: #166534;
 }
 .status-badge.blocked {
-  background: #fee2e2;
+  background-color: #fee2e2;
   color: #991b1b;
 }
-.actions {
+.status-badge.pending {
+  background-color: #fef9c3;
+  color: #854d0e;
+}
+
+/* Action Buttons */
+.action-buttons {
   display: flex;
   gap: 8px;
 }
-.icon-btn {
-  background: none;
+.btn-icon {
   border: none;
+  background: transparent;
+  padding: 6px;
+  border-radius: 6px;
   cursor: pointer;
   color: #6b7280;
-  padding: 5px;
+  transition: all 0.2s;
 }
-.icon-btn:hover {
+.btn-icon:hover {
+  background-color: #f3f4f6;
+}
+.btn-icon.view:hover {
   color: #3b82f6;
 }
-.icon-btn.delete:hover {
+.btn-icon.edit:hover {
+  color: #f59e0b;
+}
+.btn-icon.delete:hover {
   color: #ef4444;
+}
+
+/* Animation nhẹ lúc tải trang */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
