@@ -1,39 +1,198 @@
-.main-content {
-  margin-left: 260px;
-  min-height: 100vh;
+/* --- BỐ CỤC CHUNG (Fix lỗi vỡ giao diện cũ) --- */
+.admin-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f3f4f6;
+  overflow: hidden;
+}
+
+.main-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
-.top-header {
-  height: 70px;
-  background: #dadada;
-  padding: 0 30px;
+
+/* --- HEADER --- */
+.header {
+  background-color: white;
+  padding: 10px 30px;
   display: flex;
+  justify-content: space-between; /* Đẩy nội dung sang 2 bên */
   align-items: center;
-  justify-content: space-between;
   border-bottom: 1px solid #e5e7eb;
 }
-.welcome-text {
-  font-size: 18px;
-  font-weight: bold;
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Khoảng cách giữa các nút */
+  margin-left: auto; /* Đẩy toàn bộ cụm này sang phải cùng */
+}
+
+/* Các nút phụ (Tiếng Anh, Chat...) */
+.icon-btn {
+  border: none;
+  background: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
   color: #374151;
 }
-.user-profile {
+.square-btn {
+  padding: 10px;
+  background: #fff4e5; /* Màu nền cam nhạt giống mẫu */
+  color: #d97706;
+}
+.language-btn {
+  background: #e0f2fe; /* Màu xanh nhạt */
+  color: #0284c7;
+}
+
+/* --- NÚT PROFILE TRÊN HEADER --- */
+.profile-container {
+  position: relative; /* Để neo cái dropdown vào đây */
+}
+
+.user-info-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
-  font-weight: 600;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 }
-.avatar {
-  width: 35px;
-  height: 35px;
-  background: #979eab;
+
+.avatar-small {
+  width: 40px;
+  height: 40px;
+  background: #10b981; /* Màu xanh ngọc giống mẫu */
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-info {
+  display: flex;
+  flex-direction: column;
+}
+.sub-text {
+  font-size: 11px;
+  color: #6b7280;
+}
+.main-text {
+  font-size: 14px;
+  font-weight: bold;
+  color: #111;
+}
+
+/* --- DROPDOWN MENU (Bảng thả xuống) --- */
+.custom-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 280px; /* Độ rộng bảng */
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  padding: 20px;
+  border: 1px solid #f0f0f0;
+}
+
+/* Phần thông tin cá nhân trong Dropdown */
+.dropdown-header-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.big-avatar {
+  width: 70px;
+  height: 70px;
+  background: #e5e7eb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  position: relative;
+  border: 3px solid white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.edit-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #111827;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.page-content {
-  padding: 30px;
+
+.dropdown-header-profile h3 {
+  margin: 5px 0;
+  font-size: 16px;
+}
+.email {
+  color: #6b7280;
+  font-size: 13px;
+  margin: 2px 0;
+}
+.phone {
+  color: #6b7280;
+  font-size: 13px;
+  margin: 2px 0;
+}
+.balance {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #111;
+}
+
+/* Danh sách nút bấm phía dưới */
+.dropdown-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+.dropdown-list li {
+  margin-bottom: 5px;
+}
+.dropdown-list button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #374151;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.dropdown-list button:hover {
+  background-color: #f9fafb;
+}
+.logout-item {
+  color: #ef4444 !important; /* Màu đỏ cho nút đăng xuất */
+}
+.logout-item:hover {
+  background-color: #fee2e2 !important;
 }
