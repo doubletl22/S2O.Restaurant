@@ -7,6 +7,8 @@ using Microsoft.VisualBasic.FileIO;
 using S2O.Services.Identity.Application.Configurations;
 using S2O.Services.Identity.Application.Interfaces;
 using S2O.Services.Identity.Domain.Entities;
+using S2O.Services.Tenants.Domain.Entities;
+using S2O.Services.Tenants.Infrastructure.Migrations;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -38,7 +40,6 @@ namespace S2O.Services.Identity.Application.Services
                     new Claim("username", user.UserName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
-
 
 
             var token = new JwtSecurityToken(

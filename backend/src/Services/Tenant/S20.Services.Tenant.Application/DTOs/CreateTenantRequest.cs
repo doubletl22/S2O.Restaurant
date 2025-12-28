@@ -13,6 +13,6 @@ namespace S20.Services.Tenants.Application.DTOs
         public string Name { get; set; } = string.Empty;
         [Required]
         public string Code { get; set; } = string.Empty;
-        public Guid TenantAdminUserId { get; set; }
+        public Guid OwnerUserId { get; set; }
     }
 }

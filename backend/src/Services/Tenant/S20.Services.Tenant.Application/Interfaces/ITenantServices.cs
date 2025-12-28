@@ -9,6 +9,8 @@ namespace S20.Services.Tenants.Application.Interfaces
 {
     public interface ITenantServices
     {
-        Task<TenantResponse> CreateTenantAsync(CreateTenantRequest request, Guid systemAdminUserId);
+        Task<TenantResponse> CreateTenantAsync(CreateTenantRequest request);
+        Task<IEnumerable<UserTenantDto>> GetUserTenantsAsync(Guid userId);
+        Task<bool> ToggleTenantStatusAsync(Guid tenantId, bool isActive);
     }
 }
