@@ -3,12 +3,36 @@
   "WorkspaceRootPath": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{F04F713A-F70A-4193-BC5F-C5FDFCC56080}|src\\Services\\Tenant\\S20.Services.Tenant.Api\\S20.Services.Tenants.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s20.services.tenant.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{F04F713A-F70A-4193-BC5F-C5FDFCC56080}|src\\Services\\Tenant\\S20.Services.Tenant.Api\\S20.Services.Tenants.Api.csproj|solutionrelative:src\\services\\tenant\\s20.services.tenant.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s2o.service.tenant.infrustructure\\data\\tenantdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|solutionrelative:src\\services\\tenant\\s2o.service.tenant.infrustructure\\data\\tenantdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|solutionrelative:src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantunitofwork.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|solutionrelative:src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantunitofwork.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|solutionrelative:src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F04F713A-F70A-4193-BC5F-C5FDFCC56080}|src\\Services\\Tenant\\S20.Services.Tenant.Api\\S20.Services.Tenants.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s20.services.tenant.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{F04F713A-F70A-4193-BC5F-C5FDFCC56080}|src\\Services\\Tenant\\S20.Services.Tenant.Api\\S20.Services.Tenants.Api.csproj|solutionrelative:src\\services\\tenant\\s20.services.tenant.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F04F713A-F70A-4193-BC5F-C5FDFCC56080}|src\\Services\\Tenant\\S20.Services.Tenant.Api\\S20.Services.Tenants.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s20.services.tenant.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F04F713A-F70A-4193-BC5F-C5FDFCC56080}|src\\Services\\Tenant\\S20.Services.Tenant.Api\\S20.Services.Tenants.Api.csproj|solutionrelative:src\\services\\tenant\\s20.services.tenant.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2EDE4C41-8898-4BC9-9901-CAB4E1724F82}|src\\Services\\Tenant\\S20.Services.Tenant.Application\\S20.Services.Tenants.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s20.services.tenant.application\\services\\tenantprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -27,28 +51,8 @@
       "RelativeMoniker": "D:0:0:{2EDE4C41-8898-4BC9-9901-CAB4E1724F82}|src\\Services\\Tenant\\S20.Services.Tenant.Application\\S20.Services.Tenants.Application.csproj|solutionrelative:src\\services\\tenant\\s20.services.tenant.application\\services\\tenantservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|solutionrelative:src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantunitofwork.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|solutionrelative:src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantunitofwork.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|solutionrelative:src\\services\\tenant\\s2o.service.tenant.infrustructure\\repository\\tenantrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{2EDE4C41-8898-4BC9-9901-CAB4E1724F82}|src\\Services\\Tenant\\S20.Services.Tenant.Application\\S20.Services.Tenants.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s20.services.tenant.application\\interfaces\\repositories\\itenantuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2EDE4C41-8898-4BC9-9901-CAB4E1724F82}|src\\Services\\Tenant\\S20.Services.Tenant.Application\\S20.Services.Tenants.Application.csproj|solutionrelative:src\\services\\tenant\\s20.services.tenant.application\\interfaces\\repositories\\itenantuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{F04F713A-F70A-4193-BC5F-C5FDFCC56080}|src\\Services\\Tenant\\S20.Services.Tenant.Api\\S20.Services.Tenants.Api.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s20.services.tenant.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -92,10 +96,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{2EDE4C41-8898-4BC9-9901-CAB4E1724F82}|src\\Services\\Tenant\\S20.Services.Tenant.Application\\S20.Services.Tenants.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s20.services.tenant.application\\interfaces\\itenantmembershipservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2EDE4C41-8898-4BC9-9901-CAB4E1724F82}|src\\Services\\Tenant\\S20.Services.Tenant.Application\\S20.Services.Tenants.Application.csproj|solutionrelative:src\\services\\tenant\\s20.services.tenant.application\\interfaces\\itenantmembershipservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\tenant\\s2o.service.tenant.infrustructure\\data\\tenantdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A90F4D0F-3380-4708-A656-0D11908E0DFA}|src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\S2O.Services.Tenants.Infrastructure.csproj|solutionrelative:src\\services\\tenant\\s2o.service.tenant.infrustructure\\data\\tenantdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|e:\\codecntt\\du_an\\s20restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -193,7 +193,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 45,
+          "SelectedChildIndex": 44,
           "Children": [
             {
               "$type": "Bookmark",
@@ -365,98 +365,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "TenantProvider.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantProvider.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantProvider.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantProvider.cs",
-              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantProvider.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAkwBgAAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-29T04:03:28.412Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "TenantServices.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantServices.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantServices.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantServices.cs",
-              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantServices.cs",
-              "ViewState": "AgIAADAAAAAAAAAAAAAcwDsAAAAOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-29T04:06:55.854Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "TenantResponse.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\TenantResponse.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\TenantResponse.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\TenantResponse.cs",
-              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\TenantResponse.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-29T04:05:29.197Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\Program.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Api\\Program.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\Program.cs",
-              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Api\\Program.cs",
-              "ViewState": "AgIAADcAAAAAAAAAAAAUwEgAAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-28T09:38:27.419Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
               "Title": "appsettings.json",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\appsettings.json",
-              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Api\\appsettings.json",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\appsettings.json",
-              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Api\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAACAAAAAAAAAA==",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-12-28T10:08:38.146Z",
+              "WhenOpened": "2025-12-29T09:47:40.696Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "ITenantProvider.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantProvider.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantProvider.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantProvider.cs",
-              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantProvider.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-29T04:05:10.8Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "TenantUserRepository.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantUserRepository.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantUserRepository.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantUserRepository.cs",
-              "RelativeToolTip": "src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantUserRepository.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAABgAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-29T10:24:11.001Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
               "Title": "TenantRepository.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantRepository.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantRepository.cs",
@@ -469,20 +391,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "ITenantUserRepository.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantUserRepository.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantUserRepository.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantUserRepository.cs",
-              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantUserRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAwAAAAmAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "TenantDbContext.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Data\\TenantDbContext.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Data\\TenantDbContext.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Data\\TenantDbContext.cs",
+              "RelativeToolTip": "src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Data\\TenantDbContext.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA4AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-29T04:01:22.023Z",
+              "WhenOpened": "2025-12-28T09:17:58.687Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 2,
               "Title": "TenantUnitOfWork.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantUnitOfWork.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantUnitOfWork.cs",
@@ -495,20 +417,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Api\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAASAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-12-29T09:47:40.696Z",
+              "DocumentIndex": 1,
+              "Title": "TenantUserRepository.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantUserRepository.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantUserRepository.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantUserRepository.cs",
+              "RelativeToolTip": "src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Repository\\TenantUserRepository.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T10:24:11.001Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 5,
               "Title": "Program.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\Program.cs",
               "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\Program.cs",
@@ -521,7 +443,98 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 6,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\appsettings.json",
+              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Api\\appsettings.json",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\appsettings.json",
+              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Api\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-12-28T10:08:38.146Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\Program.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Api\\Program.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\Program.cs",
+              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Api\\Program.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAUwCcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-28T09:38:27.419Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ITenantProvider.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantProvider.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantProvider.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantProvider.cs",
+              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantProvider.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T04:05:10.8Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "TenantResponse.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\TenantResponse.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\TenantResponse.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\TenantResponse.cs",
+              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\TenantResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T04:05:29.197Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "TenantServices.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantServices.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantServices.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantServices.cs",
+              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantServices.cs",
+              "ViewState": "AgIAADAAAAAAAAAAAAAcwDsAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T04:06:55.854Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "TenantProvider.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantProvider.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantProvider.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantProvider.cs",
+              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantProvider.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAkwBgAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T04:03:28.412Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "ITenantUserRepository.cs",
+              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantUserRepository.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantUserRepository.cs",
+              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantUserRepository.cs",
+              "RelativeToolTip": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantUserRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAwAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-29T04:01:22.023Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
               "Title": "TenantController.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\Controllers\\TenantController.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Api\\Controllers\\TenantController.cs",
@@ -534,7 +547,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\nguye\\AppData\\Local\\SourceServer\\7712827b8c9240fb6b4feafabd1d94be94b6ccf451577397217b6e8a6807b402\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\Program.cs",
               "ToolTip": "C:\\Users\\nguye\\AppData\\Local\\SourceServer\\7712827b8c9240fb6b4feafabd1d94be94b6ccf451577397217b6e8a6807b402\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\Program.cs [Read Only]",
@@ -545,7 +558,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "WeatherForecastController.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Api\\Controllers\\WeatherForecastController.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Api\\Controllers\\WeatherForecastController.cs",
@@ -558,7 +571,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 17,
               "Title": "UserTenantDto.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\UserTenantDto.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\UserTenantDto.cs",
@@ -571,7 +584,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "S2O.Services.Identity.API.http",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.http",
               "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.http",
@@ -584,7 +597,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 20,
               "Title": "CreateTenantRequest.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\CreateTenantRequest.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\DTOs\\CreateTenantRequest.cs",
@@ -597,7 +610,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 18,
               "Title": "TenantMembershipService.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantMembershipService.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Services\\TenantMembershipService.cs",
@@ -610,7 +623,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 19,
               "Title": "ITenantServices.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantServices.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantServices.cs",
@@ -623,7 +636,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 21,
               "Title": "ITenantRepository.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantRepository.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantRepository.cs",
@@ -636,7 +649,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 22,
               "Title": "ITenantUnitOfWork.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantUnitOfWork.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\Repositories\\ITenantUnitOfWork.cs",
@@ -648,7 +661,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 23,
               "Title": "ITenantMembershipService.cs",
               "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantMembershipService.cs",
               "RelativeDocumentMoniker": "src\\Services\\Tenant\\S20.Services.Tenant.Application\\Interfaces\\ITenantMembershipService.cs",
@@ -657,18 +670,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-29T04:06:36.883Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 23,
-              "Title": "TenantDbContext.cs",
-              "DocumentMoniker": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Data\\TenantDbContext.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Data\\TenantDbContext.cs",
-              "ToolTip": "E:\\CODECNTT\\DU_AN\\S20Restaurant\\backend\\src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Data\\TenantDbContext.cs",
-              "RelativeToolTip": "src\\Services\\Tenant\\S2O.Service.Tenant.Infrustructure\\Data\\TenantDbContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-28T09:17:58.687Z"
             },
             {
               "$type": "Document",
