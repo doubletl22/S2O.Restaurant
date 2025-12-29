@@ -1,0 +1,77 @@
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: #fff;
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+}
+.logo-container {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #9e3030;
+}
+.logo-icon {
+  /* Đây là màu nền ĐỎ bạn muốn */
+  background-color: #9e3030; /* Bạn có thể thay bằng 'red' hoặc mã màu khác */
+
+  /* Tạo kích thước cho khung đỏ */
+  height: 100%; /* Chiều cao tùy chỉnh */
+  width: 100%; /* Chiều rộng tự động hoặc cố định tùy ý */
+  padding: 10px; /* Khoảng cách từ viền đỏ vào đến ảnh logo */
+  border-radius: 8px; /* Bo tròn góc khung đỏ cho đẹp (tùy chọn) */
+
+  /* Căn giữa ảnh logo bên trong khung đỏ */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Đảm bảo ảnh không bị méo khi nằm trong khung */
+.logo-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Ẩn hoặc xóa style của h1 vì bạn đã thay bằng ảnh */
+.logo-container h1 {
+  display: none; /* Ẩn chữ đi */
+}
+.menu-container {
+  padding: 20px;
+  flex: 1;
+  background-color: #9e3030;
+}
+.menu-title {
+  font-size: 14px;
+  color: #7eabf8;
+  text-transform: uppercase;
+  margin: 15px 0 10px;
+  font-weight: 600;
+}
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  color: #dfe0e1;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+.menu-item:hover {
+  background: #f3f4f6;
+  color: #3b82f6;
+}
+.menu-item.active {
+  background: #eff6ff;
+  color: #3b82f6;
+  font-weight: 600;
+}
