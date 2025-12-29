@@ -1,0 +1,39 @@
+.main-content {
+  margin-left: 260px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.top-header {
+  height: 70px;
+  background: #dadada;
+  padding: 0 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+}
+.welcome-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #374151;
+}
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.avatar {
+  width: 35px;
+  height: 35px;
+  background: #979eab;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.page-content {
+  padding: 30px;
+}
