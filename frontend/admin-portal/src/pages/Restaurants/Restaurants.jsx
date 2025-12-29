@@ -1,9 +1,14 @@
 import React, { useState } from "react";
+// 1. Import thêm useNavigate từ thư viện router
+import { useNavigate } from "react-router-dom";
 import { Eye, Edit, Trash2, Search, Plus, Filter } from "lucide-react";
 import "./Restaurants.css";
 
 const Restaurants = () => {
-  // 1. Dữ liệu giả (Sau này sẽ gọi API lấy từ database thật)
+  // 2. Khai báo hook chuyển trang
+  const navigate = useNavigate();
+
+  // Dữ liệu giả
   const [restaurants, setRestaurants] = useState([
     {
       id: 1,
@@ -47,10 +52,8 @@ const Restaurants = () => {
     },
   ]);
 
-  // State cho ô tìm kiếm
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Hàm lọc danh sách theo từ khóa tìm kiếm
   const filteredRestaurants = restaurants.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -60,7 +63,12 @@ const Restaurants = () => {
       {/* --- PHẦN TIÊU ĐỀ & CÔNG CỤ --- */}
       <div className="page-header">
         <h2 className="page-title">Quản lý Nhà hàng</h2>
-        <button className="btn-add">
+
+        {/* 3. Thêm sự kiện onClick vào nút này */}
+        <button
+          className="btn-add"
+          onClick={() => navigate("/restaurants/add")}
+        >
           <Plus size={18} /> Thêm nhà hàng
         </button>
       </div>
@@ -106,7 +114,6 @@ const Restaurants = () => {
                 <td>{item.owner}</td>
                 <td style={{ fontWeight: "bold" }}>{item.revenue}</td>
                 <td>
-                  {/* Hiển thị badge màu sắc dựa theo trạng thái */}
                   <span className={`status-badge ${item.status.toLowerCase()}`}>
                     {item.status === "Active" && "Hoạt động"}
                     {item.status === "Blocked" && "Đã khóa"}

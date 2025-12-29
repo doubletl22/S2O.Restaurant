@@ -4,6 +4,8 @@ import AdminLayout from "./layouts/AdminLayout";
 import Login from "./pages/Login/Login";
 // 1. Import PrivateRoute
 import PrivateRoute from "./components/PrivateRoute";
+// 2. Import trang thêm nhà hàng
+import AddRestaurant from "./pages/Restaurants/AddRestaurant";
 
 // ... Các import trang Admin giữ nguyên ...
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -32,6 +34,7 @@ function App() {
                   <Route path="/revenue" element={<Revenue />} />
                   <Route path="/users" element={<Users />} />
                   <Route path="/ai-config" element={<AIConfig />} />
+                  <Route path="/restaurants/add" element={<AddRestaurant />} />
 
                   <Route
                     path="*"
