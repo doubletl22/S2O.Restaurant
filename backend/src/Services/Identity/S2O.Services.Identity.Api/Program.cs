@@ -1,6 +1,4 @@
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Services.Identity.Application.Configurations;
@@ -63,10 +61,13 @@ namespace S2O.Services.Identity.Api
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "S2O Identity API V1");
+                });
             }
 
-            app.UseHttpsRedirection();
+                app.UseHttpsRedirection();
             app.UseAuthentication();
 
             app.UseAuthorization();
