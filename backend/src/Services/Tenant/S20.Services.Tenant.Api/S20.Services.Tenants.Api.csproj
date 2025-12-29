@@ -8,11 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,9 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\S2O.Services.Identity.Application\S2O.Services.Identity.Application.csproj" />
-    <ProjectReference Include="..\S2O.Services.Identity.Domain\S2O.Services.Identity.Domain.csproj" />
-    <ProjectReference Include="..\S2O.Services.Identity.Infrastructure\S2O.Services.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\S2O.Service.Tenant.Infrustructure\S2O.Services.Tenants.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
