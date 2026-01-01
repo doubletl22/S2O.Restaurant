@@ -1,10 +1,12 @@
-// src/screens/Home/HomeScreen.tsx
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // <--- Import
 import { COLORS } from '../../constants/colors';
 import { RESTAURANTS } from '../../data/mockData';
 
 const HomeScreen = () => {
+  const navigation = useNavigation<any>(); // <--- Khai báo biến điều hướng
+
   // Banner AI Gợi ý
   const renderAiSuggestion = () => (
     <View style={styles.aiCard}>
@@ -12,7 +14,12 @@ const HomeScreen = () => {
         <Text style={{fontSize: 10, fontWeight: 'bold'}}>✨ AI SUGGESTION</Text>
       </View>
       <Text style={{marginVertical: 5}}>Trời đang mưa, The Six Premium có món lẩu ngon tuyệt!</Text>
-      <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
+
+      {/* Bấm vào gợi ý AI cũng nhảy sang trang chi tiết */}
+      <TouchableOpacity
+        style={{flexDirection: 'row', alignItems: 'center'}}
+        onPress={() => navigation.navigate('RestaurantDetail', { restaurant: RESTAURANTS[0] })}
+      >
         <Image source={{uri: RESTAURANTS[0].image}} style={{width: 50, height: 50, borderRadius: 5}}/>
         <View style={{marginLeft: 10}}>
             <Text style={{fontWeight: 'bold'}}>{RESTAURANTS[0].name}</Text>
@@ -30,7 +37,6 @@ const HomeScreen = () => {
       </View>
 
       <ScrollView contentContainerStyle={{padding: 20}}>
-        {/* Thanh tìm kiếm */}
         <View style={styles.searchBar}>
             <Text style={{color: 'gray'}}>🔍 Tìm nhà hàng, món ăn...</Text>
         </View>
@@ -38,9 +44,15 @@ const HomeScreen = () => {
         {renderAiSuggestion()}
 
         <Text style={styles.sectionTitle}>Nhà hàng nổi bật</Text>
-        {/* Render danh sách nhà hàng */}
+
+        {/* Danh sách nhà hàng */}
         {RESTAURANTS.map(item => (
-            <TouchableOpacity key={item.id} style={styles.restCard}>
+            <TouchableOpacity
+                key={item.id}
+                style={styles.restCard}
+                // <--- SỰ KIỆN QUAN TRỌNG: Bấm vào thì chuyển trang và gửi kèm dữ liệu item
+                onPress={() => navigation.navigate('RestaurantDetail', { restaurant: item })}
+            >
                 <Image source={{uri: item.image}} style={styles.restImage}/>
                 <View style={{padding: 10}}>
                     <Text style={styles.restName}>{item.name}</Text>
