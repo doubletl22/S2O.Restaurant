@@ -14,7 +14,7 @@ const LoginScreen = () => {
 
   const handleLogin = () => {
     if (!email || !password) return Alert.alert('Lỗi', 'Vui lòng nhập đủ thông tin!');
-    login(); // Gọi hàm đăng nhập
+    login();
   };
 
   return (
