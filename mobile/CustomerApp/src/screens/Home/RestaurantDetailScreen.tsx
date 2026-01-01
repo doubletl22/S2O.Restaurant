@@ -1,9 +1,11 @@
+// src/screens/Home/RestaurantDetailScreen.tsx
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { COLORS } from '../../constants/colors';
-import { PRODUCTS } from '../../data/mockData';
+
+// (Không cần import PRODUCTS nữa vì ta dùng menu bên trong restaurant)
 
 const RestaurantDetailScreen = () => {
   const navigation = useNavigation();
@@ -12,14 +14,18 @@ const RestaurantDetailScreen = () => {
   // Lấy dữ liệu nhà hàng được gửi từ màn hình Home
   const { restaurant } = route.params || {};
 
+  // Phòng hờ trường hợp chưa có dữ liệu
+  if (!restaurant) return null;
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <ScrollView contentContainerStyle={{paddingBottom: 100}}>
         {/* 1. Ảnh bìa & Nút Back */}
         <View>
-          <Image source={{ uri: restaurant?.image }} style={styles.coverImage} />
-          {/* Lớp phủ đen mờ để nút back dễ nhìn hơn */}
+          {/* 👇 SỬA QUAN TRỌNG: source={restaurant.image} vì data đã là object {uri:...} */}
+          <Image source={restaurant.image} style={styles.coverImage} />
+
           <View style={styles.overlay} />
 
           <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
@@ -29,11 +35,11 @@ const RestaurantDetailScreen = () => {
 
         {/* 2. Thông tin chính */}
         <View style={styles.infoContainer}>
-          <Text style={styles.name}>{restaurant?.name}</Text>
-          <Text style={styles.address}>📍 {restaurant?.address}</Text>
+          <Text style={styles.name}>{restaurant.name}</Text>
+          <Text style={styles.address}>📍 {restaurant.address}</Text>
           <View style={styles.ratingRow}>
-            <Text style={{ color: '#FFD700', fontWeight:'bold' }}>★ {restaurant?.rating}</Text>
-            <Text style={{ color: 'gray', marginLeft: 10 }}>• {restaurant?.distance} • 15-20 min</Text>
+            <Text style={{ color: '#FFD700', fontWeight:'bold' }}>★ {restaurant.rating}</Text>
+            <Text style={{ color: 'gray', marginLeft: 10 }}>• {restaurant.distance} • 15-20 min</Text>
           </View>
         </View>
 
@@ -47,19 +53,32 @@ const RestaurantDetailScreen = () => {
         {/* 4. Thực đơn (Menu) */}
         <View style={styles.menuSection}>
           <Text style={styles.sectionTitle}>Thực đơn nổi bật</Text>
-          {PRODUCTS.map((item) => (
-            <View key={item.id} style={styles.menuItem}>
-              <Image source={{ uri: item.image }} style={styles.menuImage} />
-              <View style={{ flex: 1, marginLeft: 10, justifyContent: 'center' }}>
-                <Text style={styles.menuName}>{item.name}</Text>
-                <Text style={styles.menuDesc} numberOfLines={2}>{item.description}</Text>
-                <Text style={styles.menuPrice}>{item.price.toLocaleString()}đ</Text>
-              </View>
-              <TouchableOpacity style={styles.addBtn}>
-                  <Ionicons name="add" size={20} color="white" />
-              </TouchableOpacity>
-            </View>
-          ))}
+
+          {/* 👇 SỬA: Lấy menu từ chính nhà hàng đó (restaurant.menu) */}
+          {restaurant.menu && restaurant.menu.length > 0 ? (
+            restaurant.menu.map((item: any) => (
+                <View key={item.id} style={styles.menuItem}>
+                  {/* Ảnh món ăn */}
+                  <Image source={item.image} style={styles.menuImage} />
+
+                  <View style={{ flex: 1, marginLeft: 10, justifyContent: 'center' }}>
+                    <Text style={styles.menuName}>{item.name}</Text>
+                    {/* Giả lập mô tả nếu chưa có */}
+                    <Text style={styles.menuDesc} numberOfLines={2}>
+                        {item.description || 'Món ăn đặc biệt được chế biến từ nguyên liệu tươi ngon.'}
+                    </Text>
+                    <Text style={styles.menuPrice}>{item.price.toLocaleString()}đ</Text>
+                  </View>
+
+                  <TouchableOpacity style={styles.addBtn}>
+                      <Ionicons name="add" size={20} color="white" />
+                  </TouchableOpacity>
+                </View>
+            ))
+          ) : (
+             <Text style={{color: 'gray', fontStyle: 'italic'}}>Đang cập nhật thực đơn...</Text>
+          )}
+
         </View>
       </ScrollView>
 
@@ -67,6 +86,7 @@ const RestaurantDetailScreen = () => {
       <View style={styles.footer}>
         <TouchableOpacity
             style={styles.bookBtn}
+            // Chuyển sang Tab Booking
             onPress={() => navigation.navigate('Booking' as never)}
         >
             <Text style={styles.bookText}>ĐẶT BÀN NGAY</Text>

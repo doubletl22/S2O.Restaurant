@@ -1,33 +1,48 @@
+// src/screens/Home/HomeScreen.tsx
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, Image, TouchableOpacity, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // <--- Import
+import { useNavigation } from '@react-navigation/native'; // 👈 1. Import hook điều hướng
 import { COLORS } from '../../constants/colors';
-import { RESTAURANTS } from '../../data/mockData';
+
+// 👇 2. Import đúng tên biến MOCK_RESTAURANTS
+import { MOCK_RESTAURANTS } from '../../data/mockData';
 
 const HomeScreen = () => {
-  const navigation = useNavigation<any>(); // <--- Khai báo biến điều hướng
+  const navigation = useNavigation(); // 👈 3. Khởi tạo navigation
+
+  // Hàm xử lý khi bấm vào nhà hàng
+  const handlePress = (item: any) => {
+    // @ts-ignore
+    navigation.navigate('RestaurantDetail', { restaurant: item });
+  };
 
   // Banner AI Gợi ý
-  const renderAiSuggestion = () => (
-    <View style={styles.aiCard}>
-      <View style={{backgroundColor: COLORS.secondary, padding: 5, borderRadius: 5, alignSelf: 'flex-start'}}>
-        <Text style={{fontSize: 10, fontWeight: 'bold'}}>✨ AI SUGGESTION</Text>
-      </View>
-      <Text style={{marginVertical: 5}}>Trời đang mưa, The Six Premium có món lẩu ngon tuyệt!</Text>
+  const renderAiSuggestion = () => {
+    const suggestedRestaurant = MOCK_RESTAURANTS[0]; // Lấy nhà hàng đầu tiên làm mẫu
 
-      {/* Bấm vào gợi ý AI cũng nhảy sang trang chi tiết */}
-      <TouchableOpacity
-        style={{flexDirection: 'row', alignItems: 'center'}}
-        onPress={() => navigation.navigate('RestaurantDetail', { restaurant: RESTAURANTS[0] })}
-      >
-        <Image source={{uri: RESTAURANTS[0].image}} style={{width: 50, height: 50, borderRadius: 5}}/>
-        <View style={{marginLeft: 10}}>
-            <Text style={{fontWeight: 'bold'}}>{RESTAURANTS[0].name}</Text>
-            <Text style={{color: COLORS.primary}}>Đặt ngay ➔</Text>
+    return (
+      <View style={styles.aiCard}>
+        <View style={{backgroundColor: COLORS.secondary, padding: 5, borderRadius: 5, alignSelf: 'flex-start'}}>
+          <Text style={{fontSize: 10, fontWeight: 'bold'}}>✨ AI SUGGESTION</Text>
         </View>
-      </TouchableOpacity>
-    </View>
-  );
+        <Text style={{marginVertical: 5}}>Trời đang mưa, {suggestedRestaurant.name} có món lẩu ngon tuyệt!</Text>
+
+        <TouchableOpacity
+          style={{flexDirection: 'row', alignItems: 'center'}}
+          onPress={() => handlePress(suggestedRestaurant)}
+        >
+          <Image
+            source={suggestedRestaurant.image} // 👈 Sửa lại cách gọi ảnh
+            style={{width: 50, height: 50, borderRadius: 5}}
+          />
+          <View style={{marginLeft: 10}}>
+             <Text style={{fontWeight: 'bold'}}>{suggestedRestaurant.name}</Text>
+             <Text style={{color: COLORS.primary}}>Đặt ngay ➔</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -37,6 +52,7 @@ const HomeScreen = () => {
       </View>
 
       <ScrollView contentContainerStyle={{padding: 20}}>
+        {/* Thanh tìm kiếm */}
         <View style={styles.searchBar}>
             <Text style={{color: 'gray'}}>🔍 Tìm nhà hàng, món ăn...</Text>
         </View>
@@ -45,15 +61,17 @@ const HomeScreen = () => {
 
         <Text style={styles.sectionTitle}>Nhà hàng nổi bật</Text>
 
-        {/* Danh sách nhà hàng */}
-        {RESTAURANTS.map(item => (
+        {/* Render danh sách nhà hàng */}
+        {MOCK_RESTAURANTS.map(item => (
             <TouchableOpacity
-                key={item.id}
-                style={styles.restCard}
-                // <--- SỰ KIỆN QUAN TRỌNG: Bấm vào thì chuyển trang và gửi kèm dữ liệu item
-                onPress={() => navigation.navigate('RestaurantDetail', { restaurant: item })}
+              key={item.id}
+              style={styles.restCard}
+              onPress={() => handlePress(item)} // 👈 Thêm sự kiện bấm vào đây
             >
-                <Image source={{uri: item.image}} style={styles.restImage}/>
+                <Image
+                  source={item.image} // 👈 Sửa lại cách gọi ảnh cho đúng format
+                  style={styles.restImage}
+                />
                 <View style={{padding: 10}}>
                     <Text style={styles.restName}>{item.name}</Text>
                     <Text style={{color: 'gray'}}>{item.address}</Text>
