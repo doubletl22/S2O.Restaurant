@@ -16,8 +16,7 @@ namespace S2O.Services.Identity.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddSharedInfra(builder.Configuration);
-
+            builder.Services.AddSharedInfra<ApplicationDbContext>(builder.Configuration);
             // Add services to the container.
 
             builder.Services.AddControllers();
