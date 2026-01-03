@@ -1,39 +1,48 @@
-﻿namespace S2O.Shared.Kernel.Wrapper;
+﻿using System;
 
-public class Result
+namespace S2O.Shared.Kernel.Wrapper
 {
-    public bool IsSuccess { get; }
-    public string Error { get; }
-    public bool IsFailure => !IsSuccess;
-
-    protected Result(bool isSuccess, string error)
+    public class Result
     {
-        if (isSuccess && error != string.Empty)
-            throw new InvalidOperationException();
-        if (!isSuccess && error == string.Empty)
-            throw new InvalidOperationException();
+        public bool IsSuccess { get; }
+        public string Error { get; }
+        public bool IsFailure => !IsSuccess;
 
-        IsSuccess = isSuccess;
-        Error = error;
+        protected Result(bool isSuccess, string error)
+        {
+            if (isSuccess && error != string.Empty)
+                throw new InvalidOperationException();
+            if (!isSuccess && error == string.Empty)
+                throw new InvalidOperationException();
+
+            IsSuccess = isSuccess;
+            Error = error;
+        }
+
+        public static Result Success() => new(true, string.Empty);
+        public static Result Failure(string error) => new(false, error);
+
+        public static Result<T> Failure<T>(string error) => Result<T>.Failure(error);
+        public static Result<T> Success<T>(T value) => Result<T>.Success(value);
     }
 
-    public static Result Success() => new(true, string.Empty);
-    public static Result Failure(string error) => new(false, error);
-
-    // Helper để tạo Result<T> nhanh
-    public static Result<T> Success<T>(T value) => new(value, true, string.Empty);
-    public static Result<T> Failure<T>(string error) => new(default, false, error);
-}
-
-public class Result<T> : Result
-{
-    public T Value { get; }
-
-    protected internal Result(T value, bool isSuccess, string error)
-        : base(isSuccess, error)
+    public class Result<T> : Result
     {
-        Value = value;
+        public T Value { get; }
+
+        protected internal Result(T value, bool isSuccess, string error)
+            : base(isSuccess, error)
+        {
+            Value = value;
+        }
+
+        public static Result<T> Success(T value) => new(value, true, string.Empty);
+
+        public static new Result<T> Failure(string error)
+        {
+#pragma warning disable CS8604 
+            return new Result<T>(default!, false, error);
+#pragma warning restore CS8604
+        }
     }
-    public static new Result<T> Success(T value) => new(value, true, string.Empty);
-    public static new Result<T> Failure(string error) => new(default!, false, error);
 }
