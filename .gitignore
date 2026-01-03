@@ -13,3 +13,5 @@ _ReSharper.Caches/
 
 Thumbs.db
 desktop.ini
+# Firebase private key
+**/firebase-adminsdk.json

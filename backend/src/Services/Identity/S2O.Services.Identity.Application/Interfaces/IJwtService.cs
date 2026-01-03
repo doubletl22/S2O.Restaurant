@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace S2O.Services.Identity.Application.Interfaces
 {
-    public interface IUserRepository
+    public interface IJwtService
     {
-        Task<User?> GetByEmailAsync(string email);
-        Task AddAsync(User user);
+        string GenerateToken(User user);
     }
 }

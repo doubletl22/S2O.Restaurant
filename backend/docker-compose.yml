@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  db-identity:
+    image: postgres:latest
+    container_name: s2o-postgres-identity
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 432005
+      POSTGRES_DB: S2O_Identity
+    ports:
+      - "5432:5432"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: s2o-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"                                              
