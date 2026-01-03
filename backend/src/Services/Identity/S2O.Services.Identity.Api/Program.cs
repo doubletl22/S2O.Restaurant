@@ -1,7 +1,10 @@
-﻿using FirebaseAdmin;
+﻿
+using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using S2O.Services.Identity.Application;
 using S2O.Services.Identity.Infrastructure;
+using S2O.Services.Identity.Infrastructure.Security;
+
 
 namespace S2O.Services.Identity.Api;
 
@@ -16,13 +19,13 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
-        // Clean Architecture
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
+        builder.Services.AddJwtAuthentication(builder.Configuration);
 
-        FirebaseApp.Create(new AppOptions
+        FirebaseApp.Create(new AppOptions 
         {
-            Credential = GoogleCredential.FromFile("firebase-adminsdk.json")
+            Credential = GoogleCredential.FromFile("firebase-adminsdk.json") 
         });
 
         var app = builder.Build();
@@ -35,8 +38,10 @@ public class Program
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
-
+        //app.UseHttpsRedirection();
+        app.UseCors("AllowAll");
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapControllers();
         app.Run();
     }

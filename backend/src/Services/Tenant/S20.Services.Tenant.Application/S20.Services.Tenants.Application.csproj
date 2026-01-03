@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Share.Library\S20.Share.Libary\S20.Share.Libary.csproj" />
     <ProjectReference Include="..\S2O.Services.Tenant.Domain\S2O.Services.Tenants.Domain.csproj" />
   </ItemGroup>
 
