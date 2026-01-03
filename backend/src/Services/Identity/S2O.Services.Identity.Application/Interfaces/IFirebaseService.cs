@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S2O.Services.Identity.Infrastructure.Firebase;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace S2O.Services.Identity.Application.Interfaces
 {
-    public interface IPasswordHasher
+    public interface IFirebaseService
     {
-        public string Hash(string password);
-        public bool Verify(string password, string passwordHash);
+        Task<FirebaseUserInfo> VerifyTokenAsync(string idToken);
     }
 }

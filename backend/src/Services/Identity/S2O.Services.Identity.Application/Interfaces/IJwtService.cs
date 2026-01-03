@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace S2O.Services.Identity.Application.Interfaces
 {
-    public interface IRefreshTokenRepository
+    public interface IJwtService
     {
-        Task<RefreshToken?> GetByTokenAsync(string token);
-        Task AddAsync(RefreshToken refreshToken);
-        Task UpdateAsync(RefreshToken refreshToken);
+        string GenerateToken(User user);
     }
 }

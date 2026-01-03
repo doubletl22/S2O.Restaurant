@@ -1,0 +1,19 @@
+﻿services:
+  db-identity:
+    image: postgres:16-alpine
+    container_name: s2o-postgres-identity
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: S2O_Identity
+    ports:
+      - "5432:5432"
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: s2o-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: always
