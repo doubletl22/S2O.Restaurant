@@ -3,12 +3,48 @@
   "WorkspaceRootPath": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{119CAED8-74F5-BB4B-EA02-A96E208401D9}|src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.infra\\s2o.shared.infra.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{119CAED8-74F5-BB4B-EA02-A96E208401D9}|src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.infra\\s2o.shared.infra.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\s2o.services.identity.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\s2o.services.identity.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4759EDC-B8E9-4732-8F9E-7FA5F1CA2D71}|src\\Services\\Identity\\S2O.Services.Identity.Infrastructure\\S2O.Services.Identity.Infrastructure.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.infrastructure\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4759EDC-B8E9-4732-8F9E-7FA5F1CA2D71}|src\\Services\\Identity\\S2O.Services.Identity.Infrastructure\\S2O.Services.Identity.Infrastructure.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.infrastructure\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{119CAED8-74F5-BB4B-EA02-A96E208401D9}|src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.infra\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{119CAED8-74F5-BB4B-EA02-A96E208401D9}|src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.infra\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{119CAED8-74F5-BB4B-EA02-A96E208401D9}|src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.infra\\interceptors\\auditableentityinterceptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{119CAED8-74F5-BB4B-EA02-A96E208401D9}|src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.infra\\interceptors\\auditableentityinterceptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\s2o.services.identity.domain.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\s2o.services.identity.domain.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\wrapper\\result.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\wrapper\\result.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\primitives\\aggregateroot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\primitives\\aggregateroot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\primitives\\ientity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\primitives\\ientity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\interfaces\\iauthservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -29,10 +65,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\s2o.services.identity.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\s2o.services.identity.application.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\s2o.services.identity.domain.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\s2o.services.identity.domain.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\behaviors\\validationbehavior.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -59,20 +91,8 @@
       "RelativeMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\cqrs\\icommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\primitives\\aggregateroot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\primitives\\aggregateroot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\primitives\\ientity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\primitives\\ientity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\buildingblocks\\s2o.shared.kernel\\primitives\\idomainevent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{13859F95-D2B1-5E23-1502-B3213F48BB32}|src\\BuildingBlocks\\S2O.Shared.Kernel\\S2O.Shared.Kernel.csproj|solutionrelative:src\\buildingblocks\\s2o.shared.kernel\\primitives\\idomainevent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\s2o.services.identity.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\s2o.services.identity.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\DependencyInjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -86,7 +106,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -98,33 +118,85 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "IAuthService.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IAuthService.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IAuthService.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IAuthService.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IAuthService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-03T01:27:46.241Z",
+              "DocumentIndex": 0,
+              "Title": "S2O.Shared.Infra",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Infra\\S2O.Shared.Infra.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAABNAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-01-03T01:47:22.796Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.API\\Program.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.API\\Program.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.API\\Program.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.API\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-03T01:40:50.221Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Infrastructure\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Infrastructure\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Infrastructure\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Infrastructure\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAywCoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-03T01:40:34.241Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DependencyInjection.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Infra\\DependencyInjection.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Infra\\DependencyInjection.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Infra\\DependencyInjection.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Infra\\DependencyInjection.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-03T01:39:55.944Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AuditableEntityInterceptor.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Infra\\Interceptors\\AuditableEntityInterceptor.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Infra\\Interceptors\\AuditableEntityInterceptor.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Infra\\Interceptors\\AuditableEntityInterceptor.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Infra\\Interceptors\\AuditableEntityInterceptor.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAUwCgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-03T01:29:47.515Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "Result.cs",
               "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Wrapper\\Result.cs",
               "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Wrapper\\Result.cs",
               "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Wrapper\\Result.cs",
               "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Wrapper\\Result.cs",
-              "ViewState": "AgIAABcAAAAAAAAAAAA8wCUAAABVAAAAAAAAAA==",
+              "ViewState": "AgIAABgAAAAAAAAAAIAwwCQAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-02T13:36:26.234Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 10,
               "Title": "AuthService.cs",
               "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\AuthService.cs",
               "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\AuthService.cs",
@@ -137,182 +209,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "DependencyInjection.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\DependencyInjection.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\DependencyInjection.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\DependencyInjection.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\DependencyInjection.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:35:39.078Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "DependencyInjection.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\DependencyInjection.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\DependencyInjection.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\DependencyInjection.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\DependencyInjection.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:34:42.339Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "S2O.Services.Identity.Application",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-01-02T13:33:27.914Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ValidationBehavior.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\ValidationBehavior.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\ValidationBehavior.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\ValidationBehavior.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\ValidationBehavior.cs",
-              "ViewState": "AgIAACcAAAAAAAAAAAAowDQAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:02:15.609Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 9,
-              "Title": "LoggingBehavior.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\LoggingBehavior.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\LoggingBehavior.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\LoggingBehavior.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\LoggingBehavior.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwB8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:02:15.066Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "AggregateRoot.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:00:59.572Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "User.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAAAswBkAAAAeAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T12:36:29.329Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "ICommand.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:01:12.719Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
               "Title": "IEntity.cs",
               "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IEntity.cs",
               "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IEntity.cs",
               "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IEntity.cs",
               "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IEntity.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:00:47.837Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "IQuery.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:01:17.99Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "IDomainEvent.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:00:38.647Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "S2O.Services.Identity.Domain.csproj",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj",
-              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj",
-              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-01-02T12:36:13.882Z",
+              "WhenOpened": "2026-01-02T13:00:47.837Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "ICommandHandler.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 8,
+              "Title": "AggregateRoot.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\AggregateRoot.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAUwB8AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:01:24.15Z"
+              "WhenOpened": "2026-01-02T13:00:59.572Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "IQueryHandler.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
-              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
-              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T13:01:35.158Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 1,
               "Title": "S2O.Services.Identity.Api.csproj",
               "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj",
               "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.Api.csproj",
@@ -325,7 +248,171 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "IAuthService.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IAuthService.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IAuthService.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IAuthService.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Interfaces\\IAuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-03T01:27:46.241Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "S2O.Services.Identity.Domain.csproj",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-01-02T12:36:13.882Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "DependencyInjection.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\DependencyInjection.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\DependencyInjection.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\DependencyInjection.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\DependencyInjection.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T13:35:39.078Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "DependencyInjection.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\DependencyInjection.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\DependencyInjection.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\DependencyInjection.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\DependencyInjection.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T13:34:42.339Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "S2O.Services.Identity.Application",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-01-02T13:33:27.914Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "ValidationBehavior.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\ValidationBehavior.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\ValidationBehavior.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\ValidationBehavior.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\ValidationBehavior.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAAAowDQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T13:02:15.609Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "LoggingBehavior.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\LoggingBehavior.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\LoggingBehavior.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\LoggingBehavior.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Behaviors\\LoggingBehavior.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwB8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T13:02:15.066Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\User.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAswBkAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T12:36:29.329Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "ICommand.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T13:01:12.719Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "IQuery.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQuery.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T13:01:17.99Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "IDomainEvent.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\Primitives\\IDomainEvent.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T13:00:38.647Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "ICommandHandler.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\ICommandHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T13:01:24.15Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 18,
+              "Title": "IQueryHandler.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
+              "RelativeDocumentMoniker": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
+              "RelativeToolTip": "src\\BuildingBlocks\\S2O.Shared.Kernel\\CQRS\\IQueryHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-02T13:01:35.158Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
               "Title": "DependencyInjection.cs",
               "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\DependencyInjection.cs",
               "RelativeDocumentMoniker": "DependencyInjection.cs",
