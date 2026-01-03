@@ -1,14 +1,18 @@
-﻿namespace S2O.Shared.Kernel.Primitives;
+﻿using System;
 
+namespace S2O.Shared.Kernel.Primitives;
+
+// 1. Interface phi Generic (Dùng để Audit log chung mà không cần biết kiểu ID)
 public interface IEntity
 {
-    public DateTime? CreatedAt { get; set; }
-    public string? CreatedBy { get; set; }
-    public DateTime? LastModified { get; set; }
-    public string? LastModifiedBy { get; set; }
+    DateTime? CreatedAt { get; set; }
+    string? CreatedBy { get; set; }
+    DateTime? LastModified { get; set; }
+    string? LastModifiedBy { get; set; }
 }
 
-public interface IEntity<T> : IEntity
+// 2. Interface Generic (Kế thừa cái trên, thêm ID)
+public interface IEntity<TId> : IEntity
 {
-    public T Id { get; set; }
+    TId Id { get; set; }
 }
