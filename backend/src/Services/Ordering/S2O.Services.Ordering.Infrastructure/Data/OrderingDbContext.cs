@@ -41,6 +41,17 @@ namespace S2O.Services.Ordering.Infrastructure.Data
                  .HasForeignKey(x => x.OrderId)
                  .OnDelete(DeleteBehavior.Cascade);
             });
+
+            modelBuilder.Entity<OrderItem>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.UnitPrice).HasColumnType("decimal(18,2)");
+                e.Property(x => x.Note).HasMaxLength(255); // Thêm giới hạn độ dài cho Note
+                e.HasOne(x => x.Order)
+                    .WithMany(o => o.Items)
+                    .HasForeignKey(x => x.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
         }
     }
 }

@@ -117,5 +117,32 @@ namespace S2O.Services.Customer.Domain.Entities
                 CreatedAt = DateTime.UtcNow
             });
         }
+
+        public List<string> Preferences { get; private set; } = new();
+
+        public void UpdatePreferences(List<string> newPreferences)
+        {
+            Preferences = newPreferences;
+        }
+
+        // Bổ sung Logic sửa/xóa feedback
+        public Result EditFeedback(Guid feedbackId, int newRating, string newComment)
+        {
+            var feedback = _feedbacks.FirstOrDefault(f => f.Id == feedbackId);
+            if (feedback == null) return Result.Failure("Feedback not found");
+
+            feedback.Rating = newRating;
+            feedback.Comment = newComment;
+            feedback.LastModified = DateTime.UtcNow;
+            return Result.Success();
+        }
+
+        public Result DeleteFeedback(Guid feedbackId)
+        {
+            var feedback = _feedbacks.FirstOrDefault(f => f.Id == feedbackId);
+            if (feedback == null) return Result.Failure("Feedback not found");
+            _feedbacks.Remove(feedback);
+            return Result.Success();
+        }
     }
 }

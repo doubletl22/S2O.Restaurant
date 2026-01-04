@@ -8,10 +8,8 @@ namespace S2O.Services.Identity.Domain.Entities
         public Guid Id { get; set; }
         public string Token { get; set; } = string.Empty;
 
-        // --- SỬA Ở ĐÂY: Đổi string thành Guid ---
         public Guid UserId { get; set; }
 
-        // Thêm Navigation Property để EF hiểu rõ mối quan hệ (Optional nhưng nên làm)
         [ForeignKey("UserId")]
         public User? User { get; set; }
 
