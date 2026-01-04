@@ -1,14 +1,15 @@
-﻿# 1. Build Stage
+﻿
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj
 COPY ["src/Services/Customer/S2O.Services.Customer.API/S2O.Services.Customer.API.csproj", "src/Services/Customer/S2O.Services.Customer.API/"]
 COPY ["src/Services/Customer/S2O.Services.Customer.Application/S2O.Services.Customer.Application.csproj", "src/Services/Customer/S2O.Services.Customer.Application/"]
 COPY ["src/Services/Customer/S2O.Services.Customer.Domain/S2O.Services.Customer.Domain.csproj", "src/Services/Customer/S2O.Services.Customer.Domain/"]
 COPY ["src/Services/Customer/S2O.Services.Customer.Infrastructure/S2O.Services.Customer.Infrastructure.csproj", "src/Services/Customer/S2O.Services.Customer.Infrastructure/"]
-# Nếu có Shared Kernel
+COPY ["src/BuildingBlocks/S2O.Shared.Infra/S2O.Shared.Infra.csproj", "src/BuildingBlocks/S2O.Shared.Infra/"]
 COPY ["src/BuildingBlocks/S2O.Shared.Kernel/S2O.Shared.Kernel.csproj", "src/BuildingBlocks/S2O.Shared.Kernel/"]
+
+
 RUN dotnet restore "src/Services/Customer/S2O.Services.Customer.API/S2O.Services.Customer.API.csproj"
 
 # Copy code
