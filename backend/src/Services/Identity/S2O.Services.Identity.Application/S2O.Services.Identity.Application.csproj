@@ -20,9 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Tenant\S2O.Service.Tenant.Infrustructure\S2O.Services.Tenants.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\Tenant\S2O.Services.Tenant.Domain\S2O.Services.Tenants.Domain.csproj" />
     <ProjectReference Include="..\S2O.Services.Identity.Domain\S2O.Services.Identity.Domain.csproj" />
+	<ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared.Kernel\S2O.Shared.Kernel.csproj" />
   </ItemGroup>
 
 </Project>
