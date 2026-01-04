@@ -1,28 +1,29 @@
-﻿using System.Reflection;
-using FluentValidation;
+﻿using Microsoft.Extensions.DependencyInjection;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+using FluentValidation;
+using System.Reflection;
 using S2O.Shared.Kernel.Behaviors;
 
-namespace S2O.Shared.Kernel;
-
-public static class KernelDependencyInjection
+namespace S2O.Shared.Kernel
 {
-    public static IServiceCollection AddSharedKernel(this IServiceCollection services, Assembly assembly)
+    public static class DependencyInjection
     {
-        // 1. Đăng ký MediatR
-        services.AddMediatR(config =>
+        public static IServiceCollection AddSharedKernel(this IServiceCollection services, Assembly assembly)
         {
-            config.RegisterServicesFromAssembly(assembly);
+            // Đăng ký MediatR
+            services.AddMediatR(config =>
+            {
+                config.RegisterServicesFromAssembly(assembly);
 
-            // 2. Đăng ký Behaviors (Thứ tự quan trọng: Log trước -> Validate sau)
-            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-        });
+                // Đăng ký Pipeline Behavior (Thứ tự quan trọng: Log trước -> Validate sau)
+                config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+                config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            });
 
-        // 3. Đăng ký Validators (FluentValidation)
-        services.AddValidatorsFromAssembly(assembly);
+            // Đăng ký tất cả Validator có trong Assembly gọi tới
+            services.AddValidatorsFromAssembly(assembly);
 
-        return services;
+            return services;
+        }
     }
 }

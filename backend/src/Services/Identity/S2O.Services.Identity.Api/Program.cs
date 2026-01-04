@@ -7,6 +7,7 @@ using S2O.Services.Identity.Application.Services;
 using S2O.Services.Identity.Infrastructure.Data;
 using S2O.Services.Identity.Infrastructure.Repositories;
 using S2O.Services.Identity.Infrastructure.Security;
+using S2O.Shared.Infra;
 
 namespace S2O.Services.Identity.Api
 {
@@ -15,16 +16,15 @@ namespace S2O.Services.Identity.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddSharedInfra<ApplicationDbContext>(builder.Configuration);
             // Add services to the container.
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("AuthDb")));
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
             builder.Services.AddAuthentication(options =>

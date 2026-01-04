@@ -1,36 +1,32 @@
-﻿using System.Diagnostics;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
-namespace S2O.Shared.Kernel.Behaviors;
-
-public class LoggingBehavior<TRequest, TResponse>
-    : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : notnull
+namespace S2O.Shared.Kernel.Behaviors
 {
-    private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
-
-    public LoggingBehavior(ILogger<LoggingBehavior<TRequest, TResponse>> logger)
+    public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : notnull
     {
-        _logger = logger;
-    }
+        private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
 
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
-    {
-        var requestName = typeof(TRequest).Name;
-        _logger.LogInformation("[START] Handling command {RequestName}", requestName);
-
-        var timer = Stopwatch.StartNew();
-        var response = await next();
-        timer.Stop();
-
-        if (timer.ElapsedMilliseconds > 500) // Cảnh báo nếu chạy quá 500ms
+        public LoggingBehavior(ILogger<LoggingBehavior<TRequest, TResponse>> logger)
         {
-            _logger.LogWarning("[PERFORMANCE] Long running request: {RequestName} ({ElapsedMilliseconds}ms)",
-                requestName, timer.ElapsedMilliseconds);
+            _logger = logger;
         }
 
-        _logger.LogInformation("[END] Handled {RequestName}", requestName);
-        return response;
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        {
+            var requestName = typeof(TRequest).Name;
+            _logger.LogInformation("S2O Request: {Name} {@Request}", requestName, request);
+
+            var timer = Stopwatch.StartNew();
+            var response = await next();
+            timer.Stop();
+
+            if (timer.ElapsedMilliseconds > 500) // Cảnh báo nếu xử lý chậm > 500ms
+                _logger.LogWarning("S2O Long Request: {Name} ({ElapsedMilliseconds}ms) {@Request}", requestName, timer.ElapsedMilliseconds, request);
+
+            return response;
+        }
     }
 }

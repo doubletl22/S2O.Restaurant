@@ -1,65 +1,53 @@
 ﻿using FluentValidation;
 using MediatR;
-using S2O.Shared.Kernel.CQRS;
 using S2O.Shared.Kernel.Wrapper;
 
-namespace S2O.Shared.Kernel.Behaviors;
-
-public class ValidationBehavior<TRequest, TResponse>
-    : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : ICommand<TResponse> // Chỉ áp dụng cho Command (Ghi)
-    where TResponse : Result
+namespace S2O.Shared.Kernel.Behaviors
 {
-    private readonly IEnumerable<IValidator<TRequest>> _validators;
-
-    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
+    public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest<TResponse>
+        where TResponse : Result // Ràng buộc: Chỉ áp dụng nếu Response là Result
     {
-        _validators = validators;
-    }
+        private readonly IEnumerable<IValidator<TRequest>> _validators;
 
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
-    {
-        if (!_validators.Any())
+        public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
         {
+            _validators = validators;
+        }
+
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        {
+            if (!_validators.Any()) return await next();
+
+            var context = new ValidationContext<TRequest>(request);
+
+            var validationResults = await Task.WhenAll(
+                _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+
+            var failures = validationResults
+                .SelectMany(r => r.Errors)
+                .Where(f => f != null)
+                .ToList();
+
+            if (failures.Count != 0)
+            {
+                // Gom lỗi lại thành một chuỗi hoặc object lỗi tùy ý
+                var errorMessage = string.Join("; ", failures.Select(f => f.ErrorMessage));
+
+                // Dùng Reflection để tạo đối tượng Result.Failure<T> vì TResponse là Generic
+                // (Cách đơn giản hơn: ném ValidationException và dùng Middleware bắt ở API, 
+                // nhưng ở đây ta muốn trả về Result pattern)
+                var method = typeof(TResponse).GetMethod("Failure", new[] { typeof(string) });
+                if (method != null)
+                {
+                    return (TResponse)method.Invoke(null, new object[] { errorMessage })!;
+                }
+
+                // Fallback nếu không tìm thấy method (thường không xảy ra nếu tuân thủ Result)
+                throw new ValidationException(failures);
+            }
+
             return await next();
         }
-
-        var context = new ValidationContext<TRequest>(request);
-
-        var validationResults = await Task.WhenAll(
-            _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
-
-        var failures = validationResults
-            .Where(r => r.Errors.Any())
-            .SelectMany(r => r.Errors)
-            .ToList();
-
-        if (failures.Any())
-        {
-            // Gom tất cả lỗi lại thành 1 chuỗi
-            var errorMsg = string.Join("; ", failures.Select(f => f.ErrorMessage));
-
-            // Trả về Result.Failure thay vì throw Exception (Code sạch hơn)
-            // Lưu ý: Cần dùng Reflection hoặc dynamic vì TResponse là Generic
-            // Ở đây mình giả định TResponse kế thừa Result
-
-            // Cách đơn giản nhất để cast về Result pattern của chúng ta:
-            var method = typeof(Result).GetMethods()
-                .FirstOrDefault(m => m.Name == "Failure" && m.IsGenericMethod == (typeof(TResponse).IsGenericType));
-
-            if (typeof(TResponse).IsGenericType) // Result<T>
-            {
-                var genericType = typeof(TResponse).GetGenericArguments()[0];
-                var failureMethod = typeof(Result).GetMethod(nameof(Result.Failure), 1, [typeof(string)])!
-                    .MakeGenericMethod(genericType);
-                return (TResponse)failureMethod.Invoke(null, [errorMsg])!;
-            }
-            else // Result thường
-            {
-                return (TResponse)(object)Result.Failure(errorMsg);
-            }
-        }
-
-        return await next();
     }
 }

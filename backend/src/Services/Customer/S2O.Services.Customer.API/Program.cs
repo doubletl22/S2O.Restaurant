@@ -1,41 +1,37 @@
+﻿using S2O.Services.Customer.Application.Interfaces;
+using S2O.Services.Customer.Application.Services;
+using S2O.Services.Customer.Infrastructure.Data;
+using S2O.Services.Customer.Infrastructure.Repositories;
+using S2O.Shared.Infra; // Để dùng AddSharedInfra
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// 1. Add Services to the container.
+builder.Services.AddControllers(); // Bật Controllers
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(); // Dùng Swagger của .NET 8
+
+// 2. Database & Shared Infra (Tương tự Identity Service)
+// Lưu ý: Đảm bảo appsettings.json đã có ConnectionStrings:DefaultConnection
+builder.Services.AddSharedInfra<CustomerDbContext>(builder.Configuration);
+
+// 3. Dependency Injection (Đăng ký các lớp của Customer)
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 4. Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseAuthorization(); // Nếu có Auth
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapControllers(); // Map các Controller
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
