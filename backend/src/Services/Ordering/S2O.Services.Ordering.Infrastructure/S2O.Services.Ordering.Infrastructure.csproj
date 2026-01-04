@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\S2O.Services.Ordering.Application\S2O.Services.Ordering.Application.csproj" />
+		<ProjectReference Include="..\S2O.Services.Ordering.Domain\S2O.Services.Ordering.Domain.csproj" />
+		<ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared.Infra\S2O.Shared.Infra.csproj" />
+	</ItemGroup>
+</Project>
