@@ -11,5 +11,9 @@ namespace S2O.Services.Customer.Application.Interfaces
         Task<Result> RedeemPointsAsync(Guid identityId, RedeemVoucherRequest request);
         Task<Result<List<VoucherDto>>> GetMyVouchersAsync(Guid identityId);
         Task<Result> SubmitFeedbackAsync(Guid identityId, SubmitFeedbackRequest request);
+
+        Task<Result> UpdateFeedbackAsync(Guid identityId, Guid feedbackId, int rating, string comment);
+        Task<Result> DeleteFeedbackAsync(Guid identityId, Guid feedbackId);
+        Task<Result> AddLoyaltyPointsAsync(Guid customerId, int points);
     }
 }

@@ -107,5 +107,39 @@ namespace S2O.Services.Customer.Application.Services
 
             return Result.Success(vouchers);
         }
+
+        public async Task<Result> AddLoyaltyPointsAsync(Guid customerId, int points)
+        {
+            var customer = await _customerRepository.GetByIdAsync(customerId); // Lưu ý: Dùng Id thay vì IdentityId nếu gọi nội bộ
+            if (customer == null) return Result.Failure("Customer not found.");
+
+            customer.AddLoyaltyPoints(points);
+            await _customerRepository.UpdateAsync(customer);
+            return Result.Success();
+        }
+
+        // 2. Implement Update Feedback
+        public async Task<Result> UpdateFeedbackAsync(Guid identityId, Guid feedbackId, int rating, string comment)
+        {
+            var customer = await _customerRepository.GetByIdentityIdAsync(identityId);
+            if (customer == null) return Result.Failure("Customer not found.");
+
+            var result = customer.EditFeedback(feedbackId, rating, comment);
+            if (result.IsSuccess) await _customerRepository.UpdateAsync(customer);
+
+            return result;
+        }
+
+        // 3. Implement Delete Feedback
+        public async Task<Result> DeleteFeedbackAsync(Guid identityId, Guid feedbackId)
+        {
+            var customer = await _customerRepository.GetByIdentityIdAsync(identityId);
+            if (customer == null) return Result.Failure("Customer not found.");
+
+            var result = customer.DeleteFeedback(feedbackId);
+            if (result.IsSuccess) await _customerRepository.UpdateAsync(customer);
+
+            return result;
+        }
     }
 }
