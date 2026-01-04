@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S2O.Services.Identity.Appli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S2O.Services.Identity.Infrastructure", "src\Services\Identity\S2O.Services.Identity.Infrastructure\S2O.Services.Identity.Infrastructure.csproj", "{F4759EDC-B8E9-4732-8F9E-7FA5F1CA2D71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S2O.Services.Identity.Api", "src\Services\Identity\S2O.Services.Identity.Api\S2O.Services.Identity.Api.csproj", "{4EB62529-609F-4D50-BA5C-5067F42B5530}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S2O.Services.Identity.API", "src\Services\Identity\S2O.Services.Identity.Api\S2O.Services.Identity.API.csproj", "{4EB62529-609F-4D50-BA5C-5067F42B5530}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "S2O.Share", "S2O.Share", "{132FF951-1073-4E27-B789-5BF171FAEDAB}"
 EndProject
