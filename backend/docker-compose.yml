@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # 1. Database PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: s2o_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_DB=S2O_RestaurantDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - s2o-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Identity Service
+  identity-api:
+    build:
+      context: .
+      dockerfile: src/Services/Identity/S2O.Services.Identity.API/Dockerfile
+    container_name: s2o_identity_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=S2O_IdentityDb;Username=postgres;Password=admin123
+      - JwtSettings__Secret=Chuoi_Bi_Mat_Nay_Phai_Dai_It_Nhat_32_Ky_Tu_!!!
+      - JwtSettings__Issuer=S2O_IdentityService
+      - JwtSettings__Audience=S2O_ClientApp
+    ports:
+      - "5050:8080" 
+    depends_on:
+      - postgres
+    networks:
+      - s2o-network
+
+  customer-api:
+    build:
+      context: .
+      dockerfile: src/Services/Customer/S2O.Services.Customer.API/Dockerfile
+    container_name: s2o_customer_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=S2O_CustomerDb;Username=postgres;Password=admin123
+      - JwtSettings__Secret=Chuoi_Bi_Mat_Nay_Phai_Dai_It_Nhat_32_Ky_Tu_!!!
+      - JwtSettings__Issuer=S2O_IdentityService
+      - JwtSettings__Audience=S2O_ClientApp
+    ports:
+      - "5100:8080" 
+    depends_on:
+      - postgres
+    networks:
+      - s2o-network
+
+volumes:
+  postgres_data:
+
+networks:
+  s2o-network:
+    driver: bridge

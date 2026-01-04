@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics; // Cần cho Interceptor
+using Microsoft.EntityFrameworkCore.Diagnostics; 
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using S2O.Services.Customer.API.Configurations;
 using S2O.Services.Customer.Application.Interfaces;
 using S2O.Services.Customer.Application.Services;
 using S2O.Services.Customer.Infrastructure.Data;
-using S2O.Services.Customer.Infrastructure.Interceptors; // Cần cho AuditableEntityInterceptor
-using S2O.Services.Customer.Infrastructure.Repositories; // Cần cho CustomerRepository
+using S2O.Services.Customer.Infrastructure.Interceptors; 
+using S2O.Services.Customer.Infrastructure.Repositories; 
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,12 +41,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// --- PHẦN SỬA LỖI DI (QUAN TRỌNG) ---
-
-// 3. Đăng ký Interceptor (Sửa lỗi 1: Unable to resolve ISaveChangesInterceptor)
 builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-
-// 4. Database (Inject Interceptor vào DbContext)
 builder.Services.AddDbContext<CustomerDbContext>((sp, options) =>
 {
     var interceptor = sp.GetService<ISaveChangesInterceptor>();
@@ -54,13 +49,8 @@ builder.Services.AddDbContext<CustomerDbContext>((sp, options) =>
            .AddInterceptors(interceptor!);
 });
 
-// 5. Đăng ký Services & Repositories (Sửa lỗi 2: Unable to resolve ICustomerRepository)
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>(); // <-- Dòng này đang thiếu
 builder.Services.AddScoped<ICustomerService, CustomerService>();
-
-// -------------------------------------
-
-// 6. JWT Authentication
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddAuthentication(options =>
 {
@@ -83,7 +73,20 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-// 7. Pipeline
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<CustomerDbContext>();
+        context.Database.Migrate(); 
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Lỗi migration: " + ex.Message);
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
