@@ -2,7 +2,7 @@
 using S2O.Services.Customer.Application.Interfaces;
 using S2O.Services.Customer.Infrastructure.Data;
 
-namespace S2O.Services.Customer.Infrastructure.Repositories // Namespace này phải khớp với dòng using bên API
+namespace S2O.Services.Customer.Infrastructure.Repositories
 {
     public class CustomerRepository : ICustomerRepository
     {
@@ -19,15 +19,18 @@ namespace S2O.Services.Customer.Infrastructure.Repositories // Namespace này ph
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Domain.Entities.Customer?> GetByIdentityIdAsync(Guid identityId)
-        {
-            return await _context.Customers.FirstOrDefaultAsync(c => c.IdentityId == identityId);
-        }
-
         public async Task UpdateAsync(Domain.Entities.Customer customer)
         {
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Domain.Entities.Customer?> GetByIdentityIdAsync(Guid identityId)
+        {
+            // Quan trọng: Phải Include Favorites để lấy danh sách yêu thích
+            return await _context.Customers
+                .Include(c => c.Favorites)
+                .FirstOrDefaultAsync(c => c.IdentityId == identityId);
         }
     }
 }

@@ -1,32 +1,32 @@
-﻿using S2O.Shared.Kernel.Primitives;
+﻿using S2O.Services.Customer.Domain.Enums;
+using S2O.Shared.Kernel.Primitives;
 using S2O.Shared.Kernel.Wrapper;
 
 namespace S2O.Services.Customer.Domain.Entities
 {
     public class Customer : AggregateRoot<Guid>
     {
-        public Guid IdentityId { get; private set; } // Link với tài khoản login
+        public Guid IdentityId { get; private set; }
         public string FirstName { get; private set; } = default!;
         public string LastName { get; private set; } = default!;
         public string Email { get; private set; } = default!;
         public string PhoneNumber { get; private set; } = default!;
-        public string Address { get; private set; } = default!;
 
-        // Hạng thành viên & Điểm tích lũy (Yêu cầu đồ án)
+        // --- Nghiệp vụ: Tích điểm & Hạng ---
         public int LoyaltyPoints { get; private set; } = 0;
-        public string MembershipTier { get; private set; } = "Standard";
+        public MembershipTier Tier { get; private set; } = MembershipTier.Standard;
 
-        // Constructor private cho EF Core
+        // --- Nghiệp vụ: Yêu thích ---
+        private readonly List<CustomerFavorite> _favorites = new();
+        public IReadOnlyCollection<CustomerFavorite> Favorites => _favorites.AsReadOnly();
+
         private Customer() { }
 
-        // Factory Method: Tạo mới khách hàng
         public static Result<Customer> Create(Guid identityId, string firstName, string lastName, string email, string phoneNumber)
         {
-            // Validate dữ liệu ngay tại nguồn
-            if (string.IsNullOrWhiteSpace(firstName)) return Result.Failure<Customer>("First name is required.");
             if (string.IsNullOrWhiteSpace(email)) return Result.Failure<Customer>("Email is required.");
 
-            var customer = new Customer
+            return Result.Success(new Customer
             {
                 Id = Guid.NewGuid(),
                 IdentityId = identityId,
@@ -35,21 +35,10 @@ namespace S2O.Services.Customer.Domain.Entities
                 Email = email,
                 PhoneNumber = phoneNumber,
                 LoyaltyPoints = 0,
-                MembershipTier = "Standard"
-            };
-
-            // Có thể thêm Event: AddDomainEvent(new CustomerCreatedEvent(customer.Id));
-            return Result.Success(customer);
+                Tier = MembershipTier.Standard
+            });
         }
 
-        // Method nghiệp vụ: Cập nhật thông tin
-        public void UpdateProfile(string address, string phoneNumber)
-        {
-            if (!string.IsNullOrEmpty(address)) Address = address;
-            if (!string.IsNullOrEmpty(phoneNumber)) PhoneNumber = phoneNumber;
-        }
-
-        // Method nghiệp vụ: Tích điểm
         public void AddLoyaltyPoints(int points)
         {
             if (points <= 0) return;
@@ -59,8 +48,28 @@ namespace S2O.Services.Customer.Domain.Entities
 
         private void UpdateTier()
         {
-            if (LoyaltyPoints > 1000) MembershipTier = "Gold";
-            else if (LoyaltyPoints > 500) MembershipTier = "Silver";
+            var oldTier = Tier;
+            Tier = LoyaltyPoints switch
+            {
+                >= 5000 => MembershipTier.Diamond,
+                >= 2000 => MembershipTier.Gold,
+                >= 500 => MembershipTier.Silver,
+                _ => MembershipTier.Standard
+            };
+
+            // Có thể bắn Event Domain nếu muốn: if (Tier > oldTier) AddDomainEvent(...)
+        }
+
+        public void AddFavorite(Guid restaurantId)
+        {
+            if (_favorites.Any(x => x.RestaurantId == restaurantId)) return;
+            _favorites.Add(new CustomerFavorite { CustomerId = Id, RestaurantId = restaurantId });
+        }
+
+        public void RemoveFavorite(Guid restaurantId)
+        {
+            var item = _favorites.FirstOrDefault(x => x.RestaurantId == restaurantId);
+            if (item != null) _favorites.Remove(item);
         }
     }
 }

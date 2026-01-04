@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using S2O.Services.Customer.Domain.Entities;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 
 namespace S2O.Services.Customer.Infrastructure.Data
 {
@@ -10,30 +8,35 @@ namespace S2O.Services.Customer.Infrastructure.Data
     {
         private readonly ISaveChangesInterceptor _auditableEntityInterceptor;
 
-        public CustomerDbContext(
-            DbContextOptions<CustomerDbContext> options,
-            ISaveChangesInterceptor auditableEntityInterceptor) : base(options)
+        public CustomerDbContext(DbContextOptions<CustomerDbContext> options, ISaveChangesInterceptor interceptor) : base(options)
         {
-            _auditableEntityInterceptor = auditableEntityInterceptor;
+            _auditableEntityInterceptor = interceptor;
         }
 
         public DbSet<Domain.Entities.Customer> Customers { get; set; }
+        public DbSet<CustomerFavorite> CustomerFavorites { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.AddInterceptors(_auditableEntityInterceptor);
-        }
+            => optionsBuilder.AddInterceptors(_auditableEntityInterceptor);
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Domain.Entities.Customer>(entity =>
+            modelBuilder.Entity<Domain.Entities.Customer>(e =>
             {
-                entity.HasKey(e => e.Id);
-                entity.HasIndex(e => e.IdentityId).IsUnique();
-                entity.Property(e => e.FirstName).HasMaxLength(50).IsRequired();
-                entity.Property(e => e.LastName).HasMaxLength(50).IsRequired();
+                e.HasKey(x => x.Id);
+                e.HasIndex(x => x.IdentityId).IsUnique();
+                e.Property(x => x.Tier).HasConversion<string>(); // Lưu Enum dạng chữ
+            });
+
+            modelBuilder.Entity<CustomerFavorite>(e =>
+            {
+                e.HasKey(x => new { x.CustomerId, x.RestaurantId }); // Khóa chính phức hợp
+                e.HasOne(x => x.Customer)
+                 .WithMany(c => c.Favorites)
+                 .HasForeignKey(x => x.CustomerId)
+                 .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }
