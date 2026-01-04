@@ -18,7 +18,7 @@
     public class VoucherDto
     {
         public Guid Id { get; set; }
-        public string Code { get; set; }
+        public string Code { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public DateTime ExpiryDate { get; set; }
     }
