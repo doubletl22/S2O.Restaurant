@@ -30,6 +30,8 @@ namespace S2O.Services.Customer.Infrastructure.Repositories
             // Quan trọng: Phải Include Favorites để lấy danh sách yêu thích
             return await _context.Customers
                 .Include(c => c.Favorites)
+                .Include(c => c.Vouchers)  
+                .Include(c => c.Feedbacks)
                 .FirstOrDefaultAsync(c => c.IdentityId == identityId);
         }
     }

@@ -61,5 +61,51 @@ namespace S2O.Services.Customer.Application.Services
                 FavoriteRestaurantIds = customer.Favorites.Select(f => f.RestaurantId).ToList()
             };
         }
+
+        // Thêm method: Đổi Voucher
+        public async Task<Result> RedeemPointsAsync(Guid identityId, RedeemVoucherRequest request)
+        {
+            var customer = await _customerRepository.GetByIdentityIdAsync(identityId);
+            if (customer == null) return Result.Failure("Customer not found.");
+
+            var result = customer.RedeemVoucher(request.VoucherCode, request.Desc, request.PointsCost, request.DiscountVal);
+
+            if (result.IsSuccess)
+            {
+                await _customerRepository.UpdateAsync(customer);
+            }
+            return result;
+        }
+
+        // Thêm method: Gửi Feedback
+        public async Task<Result> SubmitFeedbackAsync(Guid identityId, SubmitFeedbackRequest request)
+        {
+            var customer = await _customerRepository.GetByIdentityIdAsync(identityId);
+            if (customer == null) return Result.Failure("Customer not found.");
+
+            customer.AddFeedback(request.RestaurantId, request.Rating, request.Comment);
+
+            await _customerRepository.UpdateAsync(customer);
+            return Result.Success();
+        }
+
+        // Thêm method: Lấy danh sách Voucher của tôi
+        public async Task<Result<List<VoucherDto>>> GetMyVouchersAsync(Guid identityId)
+        {
+            var customer = await _customerRepository.GetByIdentityIdAsync(identityId);
+            if (customer == null) return Result.Failure<List<VoucherDto>>("Not found");
+
+            var vouchers = customer.Vouchers
+                .Where(v => !v.IsUsed && v.ExpiryDate > DateTime.UtcNow) // Chỉ lấy cái còn hạn
+                .Select(v => new VoucherDto
+                {
+                    Id = v.Id,
+                    Code = v.Code,
+                    Amount = v.DiscountAmount,
+                    ExpiryDate = v.ExpiryDate
+                }).ToList();
+
+            return Result.Success(vouchers);
+        }
     }
 }
