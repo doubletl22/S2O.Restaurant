@@ -34,5 +34,14 @@ namespace S2O.Services.Customer.Infrastructure.Repositories
                 .Include(c => c.Feedbacks)
                 .FirstOrDefaultAsync(c => c.IdentityId == identityId);
         }
+
+        public async Task<Domain.Entities.Customer?> GetByIdAsync(Guid id)
+        {
+            return await _context.Customers
+                .Include(c => c.Favorites)
+                .Include(c => c.Vouchers)
+                .Include(c => c.Feedbacks)
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
     }
 }

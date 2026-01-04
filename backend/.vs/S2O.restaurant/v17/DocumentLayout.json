@@ -3,20 +3,112 @@
   "WorkspaceRootPath": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{57879FB5-EA05-3F39-8640-55BA67BA9145}|src\\Services\\Customer\\S2O.Services.Customer.API\\S2O.Services.Customer.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\customer\\s2o.services.customer.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{57879FB5-EA05-3F39-8640-55BA67BA9145}|src\\Services\\Customer\\S2O.Services.Customer.API\\S2O.Services.Customer.API.csproj|solutionrelative:src\\services\\customer\\s2o.services.customer.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.api\\properties\\launchsettings.json||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.api\\properties\\launchsettings.json||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\properties\\launchsettings.json||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\properties\\launchsettings.json||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7B13BAB-8AB1-46FB-AC03-96C1E5E9F1E4}|src\\Services\\Ordering\\S2O.Services.Ordering.Application\\S2O.Services.Ordering.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.application\\services\\orderservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7B13BAB-8AB1-46FB-AC03-96C1E5E9F1E4}|src\\Services\\Ordering\\S2O.Services.Ordering.Application\\S2O.Services.Ordering.Application.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.application\\services\\orderservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.api\\controllers\\ordercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.api\\controllers\\ordercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{57879FB5-EA05-3F39-8640-55BA67BA9145}|src\\Services\\Customer\\S2O.Services.Customer.API\\S2O.Services.Customer.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\customer\\s2o.services.customer.api\\controllers\\customercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{57879FB5-EA05-3F39-8640-55BA67BA9145}|src\\Services\\Customer\\S2O.Services.Customer.API\\S2O.Services.Customer.API.csproj|solutionrelative:src\\services\\customer\\s2o.services.customer.api\\controllers\\customercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.api\\appsettings.json||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.api\\appsettings.json||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.api\\appsettings.development.json||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.api\\appsettings.development.json||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{57879FB5-EA05-3F39-8640-55BA67BA9145}|src\\Services\\Customer\\S2O.Services.Customer.API\\S2O.Services.Customer.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\customer\\s2o.services.customer.api\\dockerfile||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{57879FB5-EA05-3F39-8640-55BA67BA9145}|src\\Services\\Customer\\S2O.Services.Customer.API\\S2O.Services.Customer.API.csproj|solutionrelative:src\\services\\customer\\s2o.services.customer.api\\dockerfile||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.api\\dockerfile||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{64A59553-D11C-4FD3-BA7D-4F490EAED793}|src\\Services\\Ordering\\S2O.Services.Ordering.API\\S2O.Services.Ordering.API.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.api\\dockerfile||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00F76798-3FF9-4231-866A-7B3F8C3E363B}|src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\S2O.Services.Ordering.Infrastructure.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.infrastructure\\data\\orderingdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00F76798-3FF9-4231-866A-7B3F8C3E363B}|src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\S2O.Services.Ordering.Infrastructure.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.infrastructure\\data\\orderingdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{00F76798-3FF9-4231-866A-7B3F8C3E363B}|src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\S2O.Services.Ordering.Infrastructure.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.infrastructure\\repositories\\orderrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00F76798-3FF9-4231-866A-7B3F8C3E363B}|src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\S2O.Services.Ordering.Infrastructure.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.infrastructure\\repositories\\orderrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7B13BAB-8AB1-46FB-AC03-96C1E5E9F1E4}|src\\Services\\Ordering\\S2O.Services.Ordering.Application\\S2O.Services.Ordering.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.application\\interfaces\\iorderrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7B13BAB-8AB1-46FB-AC03-96C1E5E9F1E4}|src\\Services\\Ordering\\S2O.Services.Ordering.Application\\S2O.Services.Ordering.Application.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.application\\interfaces\\iorderrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A7B13BAB-8AB1-46FB-AC03-96C1E5E9F1E4}|src\\Services\\Ordering\\S2O.Services.Ordering.Application\\S2O.Services.Ordering.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.application\\dtos\\createorderrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A7B13BAB-8AB1-46FB-AC03-96C1E5E9F1E4}|src\\Services\\Ordering\\S2O.Services.Ordering.Application\\S2O.Services.Ordering.Application.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.application\\dtos\\createorderrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4882474-F3D1-46EC-8F1B-C11A7901C282}|src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\S2O.Services.Ordering.Domain.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.domain\\entities\\orderitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4882474-F3D1-46EC-8F1B-C11A7901C282}|src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\S2O.Services.Ordering.Domain.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.domain\\entities\\orderitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4882474-F3D1-46EC-8F1B-C11A7901C282}|src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\S2O.Services.Ordering.Domain.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\ordering\\s2o.services.ordering.domain\\entities\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4882474-F3D1-46EC-8F1B-C11A7901C282}|src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\S2O.Services.Ordering.Domain.csproj|solutionrelative:src\\services\\ordering\\s2o.services.ordering.domain\\entities\\order.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DD30B93B-4528-A9A4-4C26-0BBBEE65FC1D}|src\\Services\\Customer\\S2O.Services.Customer.Infrastructure\\S2O.Services.Customer.Infrastructure.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\customer\\s2o.services.customer.infrastructure\\repositories\\customerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DD30B93B-4528-A9A4-4C26-0BBBEE65FC1D}|src\\Services\\Customer\\S2O.Services.Customer.Infrastructure\\S2O.Services.Customer.Infrastructure.csproj|solutionrelative:src\\services\\customer\\s2o.services.customer.infrastructure\\repositories\\customerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{260848C7-FA8C-5F5C-E391-26142DFE3958}|src\\Services\\Customer\\S2O.Services.Customer.Application\\S2O.Services.Customer.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\customer\\s2o.services.customer.application\\services\\customerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{260848C7-FA8C-5F5C-E391-26142DFE3958}|src\\Services\\Customer\\S2O.Services.Customer.Application\\S2O.Services.Customer.Application.csproj|solutionrelative:src\\services\\customer\\s2o.services.customer.application\\services\\customerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{260848C7-FA8C-5F5C-E391-26142DFE3958}|src\\Services\\Customer\\S2O.Services.Customer.Application\\S2O.Services.Customer.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\customer\\s2o.services.customer.application\\interfaces\\icustomerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{260848C7-FA8C-5F5C-E391-26142DFE3958}|src\\Services\\Customer\\S2O.Services.Customer.Application\\S2O.Services.Customer.Application.csproj|solutionrelative:src\\services\\customer\\s2o.services.customer.application\\interfaces\\icustomerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{60892C18-66A4-5F81-C021-442EF5BBA6B3}|src\\Services\\Customer\\S2O.Services.Customer.Domain\\S2O.Services.Customer.Domain.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\customer\\s2o.services.customer.domain\\entities\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{60892C18-66A4-5F81-C021-442EF5BBA6B3}|src\\Services\\Customer\\S2O.Services.Customer.Domain\\S2O.Services.Customer.Domain.csproj|solutionrelative:src\\services\\customer\\s2o.services.customer.domain\\entities\\customer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{260848C7-FA8C-5F5C-E391-26142DFE3958}|src\\Services\\Customer\\S2O.Services.Customer.Application\\S2O.Services.Customer.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\customer\\s2o.services.customer.application\\interfaces\\icustomerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{260848C7-FA8C-5F5C-E391-26142DFE3958}|src\\Services\\Customer\\S2O.Services.Customer.Application\\S2O.Services.Customer.Application.csproj|solutionrelative:src\\services\\customer\\s2o.services.customer.application\\interfaces\\icustomerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.domain\\entities\\refreshtoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{77BCB6DD-EE5F-4A3F-92D6-0953E42C9087}|src\\Services\\Identity\\S2O.Services.Identity.Domain\\S2O.Services.Identity.Domain.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.domain\\entities\\refreshtoken.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.application\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A8EBEDEB-4F7F-4EA7-9B6F-4799B2970E59}|src\\Services\\Identity\\S2O.Services.Identity.Application\\S2O.Services.Identity.Application.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.application\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{57879FB5-EA05-3F39-8640-55BA67BA9145}|src\\Services\\Customer\\S2O.Services.Customer.API\\S2O.Services.Customer.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\customer\\s2o.services.customer.api\\controllers\\customercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{57879FB5-EA05-3F39-8640-55BA67BA9145}|src\\Services\\Customer\\S2O.Services.Customer.API\\S2O.Services.Customer.API.csproj|solutionrelative:src\\services\\customer\\s2o.services.customer.api\\controllers\\customercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{57879FB5-EA05-3F39-8640-55BA67BA9145}|src\\Services\\Customer\\S2O.Services.Customer.API\\S2O.Services.Customer.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\customer\\s2o.services.customer.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{57879FB5-EA05-3F39-8640-55BA67BA9145}|src\\Services\\Customer\\S2O.Services.Customer.API\\S2O.Services.Customer.API.csproj|solutionrelative:src\\services\\customer\\s2o.services.customer.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.csproj|c:\\users\\tthan\\onedrive - phongpham company\\documents\\github\\s2o.restaurant\\backend\\src\\services\\identity\\s2o.services.identity.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4EB62529-609F-4D50-BA5C-5067F42B5530}|src\\Services\\Identity\\S2O.Services.Identity.Api\\S2O.Services.Identity.API.csproj|solutionrelative:src\\services\\identity\\s2o.services.identity.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -29,25 +121,345 @@
           "SelectedChildIndex": 1,
           "Children": [
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.API\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.API\\Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.API\\Properties\\launchSettings.json",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.API\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAcwCgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-04T20:10:40.03Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\Properties\\launchSettings.json",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAcwCgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-04T20:10:26.353Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "OrderController.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\Controllers\\OrderController.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\Controllers\\OrderController.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\Controllers\\OrderController.cs",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\Controllers\\OrderController.cs",
+              "ViewState": "AgIAACMAAAAAAAAAAAAswEQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T20:07:50.393Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\appsettings.json",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\appsettings.json",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\appsettings.json",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-04T20:01:44.504Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "Dockerfile",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\Dockerfile",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\Dockerfile",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\Dockerfile",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\Dockerfile",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-01-04T19:54:04.005Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\appsettings.Development.json",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\appsettings.Development.json",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-01-04T19:52:29.571Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\Program.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\Program.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.API\\Program.cs",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.API\\Program.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAADMAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T19:51:21.327Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "OrderingDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\Data\\OrderingDbContext.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\Data\\OrderingDbContext.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\Data\\OrderingDbContext.cs",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\Data\\OrderingDbContext.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAcwDUAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T19:51:03.42Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Dockerfile",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.API\\Dockerfile",
+              "RelativeDocumentMoniker": "src\\Services\\Customer\\S2O.Services.Customer.API\\Dockerfile",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.API\\Dockerfile",
+              "RelativeToolTip": "src\\Services\\Customer\\S2O.Services.Customer.API\\Dockerfile",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-01-04T17:11:31.473Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "OrderRepository.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\Repositories\\OrderRepository.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\Repositories\\OrderRepository.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\Repositories\\OrderRepository.cs",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.Infrastructure\\Repositories\\OrderRepository.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAA7wCwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T19:50:53.102Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "OrderService.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Application\\Services\\OrderService.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.Application\\Services\\OrderService.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Application\\Services\\OrderService.cs",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.Application\\Services\\OrderService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADYAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T19:49:26.642Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "CustomerController.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.API\\Controllers\\CustomerController.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Customer\\S2O.Services.Customer.API\\Controllers\\CustomerController.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.API\\Controllers\\CustomerController.cs",
+              "RelativeToolTip": "src\\Services\\Customer\\S2O.Services.Customer.API\\Controllers\\CustomerController.cs",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAYwFIAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T16:18:56.981Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "IOrderRepository.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Application\\Interfaces\\IOrderRepository.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.Application\\Interfaces\\IOrderRepository.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Application\\Interfaces\\IOrderRepository.cs",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.Application\\Interfaces\\IOrderRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T19:49:04.43Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "CreateOrderRequest.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Application\\DTOs\\CreateOrderRequest.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.Application\\DTOs\\CreateOrderRequest.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Application\\DTOs\\CreateOrderRequest.cs",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.Application\\DTOs\\CreateOrderRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T18:19:16.403Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "OrderItem.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\Entities\\OrderItem.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\Entities\\OrderItem.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\Entities\\OrderItem.cs",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\Entities\\OrderItem.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAswC4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T18:13:47.263Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Order.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\Entities\\Order.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\Entities\\Order.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\Entities\\Order.cs",
+              "RelativeToolTip": "src\\Services\\Ordering\\S2O.Services.Ordering.Domain\\Entities\\Order.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAswEYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T18:11:11.349Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "CustomerRepository.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.Infrastructure\\Repositories\\CustomerRepository.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Customer\\S2O.Services.Customer.Infrastructure\\Repositories\\CustomerRepository.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.Infrastructure\\Repositories\\CustomerRepository.cs",
+              "RelativeToolTip": "src\\Services\\Customer\\S2O.Services.Customer.Infrastructure\\Repositories\\CustomerRepository.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAA3wCwAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T18:06:35.324Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "ICustomerRepository.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.Application\\Interfaces\\ICustomerRepository.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Customer\\S2O.Services.Customer.Application\\Interfaces\\ICustomerRepository.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.Application\\Interfaces\\ICustomerRepository.cs",
+              "RelativeToolTip": "src\\Services\\Customer\\S2O.Services.Customer.Application\\Interfaces\\ICustomerRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T18:04:54.122Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "CustomerService.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.Application\\Services\\CustomerService.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Customer\\S2O.Services.Customer.Application\\Services\\CustomerService.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.Application\\Services\\CustomerService.cs",
+              "RelativeToolTip": "src\\Services\\Customer\\S2O.Services.Customer.Application\\Services\\CustomerService.cs",
+              "ViewState": "AgIAAGAAAAAAAAAAAAAIwHAAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T18:02:29.346Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "ICustomerService.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.Application\\Interfaces\\ICustomerService.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Customer\\S2O.Services.Customer.Application\\Interfaces\\ICustomerService.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.Application\\Interfaces\\ICustomerService.cs",
+              "RelativeToolTip": "src\\Services\\Customer\\S2O.Services.Customer.Application\\Interfaces\\ICustomerService.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAqwA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T18:00:27.586Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "Customer.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.Domain\\Entities\\Customer.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Customer\\S2O.Services.Customer.Domain\\Entities\\Customer.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.Domain\\Entities\\Customer.cs",
+              "RelativeToolTip": "src\\Services\\Customer\\S2O.Services.Customer.Domain\\Entities\\Customer.cs",
+              "ViewState": "AgIAAH4AAAAAAAAAAAAUwJEAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T17:42:35.89Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "TokenService.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\TokenService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T17:28:59.26Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\AuthService.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\AuthService.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Application\\Services\\AuthService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T17:28:58.62Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "RefreshToken.cs",
+              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
+              "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
+              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
+              "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.Domain\\Entities\\RefreshToken.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-04T17:28:40.181Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.API\\Program.cs",
               "RelativeDocumentMoniker": "src\\Services\\Customer\\S2O.Services.Customer.API\\Program.cs",
               "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.API\\Program.cs",
               "RelativeToolTip": "src\\Services\\Customer\\S2O.Services.Customer.API\\Program.cs",
-              "ViewState": "AgIAADAAAAAAAAAAAAAAAAoAAAA5AAAAAAAAAA==",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAIwFEAAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-01-04T17:02:56.732Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 23,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.API\\Program.cs",
               "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.API\\Program.cs",
@@ -60,20 +472,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "CustomerController.cs",
-              "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.API\\Controllers\\CustomerController.cs",
-              "RelativeDocumentMoniker": "src\\Services\\Customer\\S2O.Services.Customer.API\\Controllers\\CustomerController.cs",
-              "ToolTip": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Customer\\S2O.Services.Customer.API\\Controllers\\CustomerController.cs",
-              "RelativeToolTip": "src\\Services\\Customer\\S2O.Services.Customer.API\\Controllers\\CustomerController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-04T16:18:56.981Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 26,
               "Title": "AuthController.cs",
               "DocumentMoniker": "C:\\Users\\tthan\\OneDrive - PhongPham Company\\Documents\\GitHub\\S2O.Restaurant\\backend\\src\\Services\\Identity\\S2O.Services.Identity.API\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "src\\Services\\Identity\\S2O.Services.Identity.API\\Controllers\\AuthController.cs",
@@ -81,8 +480,7 @@
               "RelativeToolTip": "src\\Services\\Identity\\S2O.Services.Identity.API\\Controllers\\AuthController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAD0AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-04T16:18:04.386Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-04T16:18:04.386Z"
             }
           ]
         }
