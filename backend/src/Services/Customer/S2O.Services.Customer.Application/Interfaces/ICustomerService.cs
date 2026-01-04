@@ -8,5 +8,8 @@ namespace S2O.Services.Customer.Application.Interfaces
         Task<Result<CustomerResponse>> GetCustomerProfileAsync(Guid identityId);
         Task<Result<CustomerResponse>> CreateCustomerAsync(Guid identityId, CreateCustomerRequest request);
         Task<Result<bool>> ToggleFavoriteAsync(Guid identityId, Guid restaurantId);
+        Task<Result> RedeemPointsAsync(Guid identityId, RedeemVoucherRequest request);
+        Task<Result<List<VoucherDto>>> GetMyVouchersAsync(Guid identityId);
+        Task<Result> SubmitFeedbackAsync(Guid identityId, SubmitFeedbackRequest request);
     }
 }

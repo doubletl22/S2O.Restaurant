@@ -57,5 +57,29 @@ namespace S2O.Services.Customer.API.Controllers
 
             return Ok(new { IsFavorite = result.Value, Message = result.Value ? "Added to favorites" : "Removed from favorites" });
         }
+
+        [HttpPost("vouchers/redeem")]
+        public async Task<IActionResult> RedeemVoucher([FromBody] RedeemVoucherRequest request)
+        {
+            var userId = GetCurrentUserId();
+            var result = await _customerService.RedeemPointsAsync(userId, request);
+            return result.IsSuccess ? Ok("Đổi voucher thành công") : BadRequest(result.Error);
+        }
+
+        [HttpGet("vouchers")]
+        public async Task<IActionResult> GetMyVouchers()
+        {
+            var userId = GetCurrentUserId();
+            var result = await _customerService.GetMyVouchersAsync(userId);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        }
+
+        [HttpPost("feedback")]
+        public async Task<IActionResult> SubmitFeedback([FromBody] SubmitFeedbackRequest request)
+        {
+            var userId = GetCurrentUserId();
+            var result = await _customerService.SubmitFeedbackAsync(userId, request);
+            return result.IsSuccess ? Ok("Cảm ơn đánh giá của bạn") : BadRequest(result.Error);
+        }
     }
 }

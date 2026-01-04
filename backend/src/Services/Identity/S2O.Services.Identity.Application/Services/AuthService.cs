@@ -1,140 +1,112 @@
-﻿using S2O.Services.Identity.Application.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using S2O.Services.Identity.Application.Common.Interfaces;
+using S2O.Services.Identity.Application.DTOs;
 using S2O.Services.Identity.Application.Interfaces;
 using S2O.Services.Identity.Domain.Entities;
 using S2O.Shared.Kernel.Wrapper;
+using LoginRequest = S2O.Services.Identity.Application.DTOs.LoginRequest;
+// Alias để tránh xung đột tên
+using RegisterRequest = S2O.Services.Identity.Application.DTOs.RegisterRequest;
 
 namespace S2O.Services.Identity.Application.Services
 {
     public class AuthService : IAuthService
     {
-        // 1. Khai báo Fields (Biến)
-        private readonly IUserRepository _userRepository;
-        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IApplicationDbContext _context;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenService _tokenService;
 
-        // 2. Constructor (Hàm khởi tạo để tiêm các dependencies vào)
-        public AuthService(
-            IUserRepository userRepository,
-            IRefreshTokenRepository refreshTokenRepository,
-            IPasswordHasher passwordHasher,
-            ITokenService tokenService)
+        public AuthService(IApplicationDbContext context, IPasswordHasher passwordHasher, ITokenService tokenService)
         {
-            _userRepository = userRepository;
-            _refreshTokenRepository = refreshTokenRepository;
+            _context = context;
             _passwordHasher = passwordHasher;
             _tokenService = tokenService;
         }
 
-        // ===================== REGISTER =====================
-        public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request, string ip)
+        public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request, string ipAddress)
         {
-            if (request.Password != request.ConfirmPassword)
-                return Result<AuthResponse>.Failure("Mật khẩu xác nhận không khớp");
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+                return Result<AuthResponse>.Failure("Email đã tồn tại.");
 
-            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
-            if (existingUser != null)
-                return Result<AuthResponse>.Failure("Email đã được sử dụng");
-
-            // Hash password
             var passwordHash = _passwordHasher.Hash(request.Password);
+            var roleToUse = string.IsNullOrEmpty(request.Role) ? "Customer" : request.Role;
 
-            // Tạo User bằng Factory Method (Domain Logic)
-            var userResult = User.Create(request.UserName, request.Email, passwordHash);
-            if (userResult.IsFailure)
-                return Result<AuthResponse>.Failure(userResult.Error);
+            var userResult = User.Create(request.UserName, request.Email, passwordHash, roleToUse);
+            if (userResult.IsFailure) return Result<AuthResponse>.Failure(userResult.Error);
 
             var user = userResult.Value;
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync(CancellationToken.None);
 
-            // Lưu vào DB
-            await _userRepository.AddAsync(user);
-
-            // Tạo Token
-            var accessToken = _tokenService.CreateAccessToken(user);
-            var refreshToken = _tokenService.CreateRefreshToken(ip);
-            refreshToken.UserId = user.Id;
-
-            await _refreshTokenRepository.AddAsync(refreshToken);
-
-            return Result<AuthResponse>.Success(new AuthResponse
-            {
-                UserId = user.Id,
-                UserName = user.UserName,
-                AccessToken = accessToken,
-                RefreshToken = refreshToken.Token
-            });
+            return await GenerateAuthResponseAsync(user, ipAddress);
         }
 
-        // ===================== LOGIN =====================
-        public async Task<Result<AuthResponse>> LoginAsync(LoginRequest request, string ip)
+        public async Task<Result<AuthResponse>> LoginAsync(LoginRequest request, string ipAddress)
         {
-            var user = await _userRepository.GetByEmailAsync(request.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
             if (user == null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
-                return Result<AuthResponse>.Failure("Email hoặc mật khẩu không đúng");
+                return Result<AuthResponse>.Failure("Email hoặc mật khẩu không đúng.");
 
+            return await GenerateAuthResponseAsync(user, ipAddress);
+        }
+
+        public async Task<Result<AuthResponse>> RefreshTokenAsync(string token, string ipAddress)
+        {
+            var oldToken = await _context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == token);
+
+            if (oldToken == null || !oldToken.IsActive)
+                return Result<AuthResponse>.Failure("Refresh token không hợp lệ hoặc đã hết hạn.");
+
+            // --- SỬA LỖI CS1503 TẠI ĐÂY ---
+            // Vì oldToken.UserId đã là Guid nên lấy trực tiếp, không cần TryParse
+            var userId = oldToken.UserId;
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return Result<AuthResponse>.Failure("User không tồn tại.");
+
+            oldToken.IsRevoked = true;
+            // oldToken.RevokedByIp = ipAddress; 
+
+            await _context.SaveChangesAsync(CancellationToken.None);
+            return await GenerateAuthResponseAsync(user, ipAddress);
+        }
+
+        public async Task<Result> LogoutAsync(string refreshToken, string ipAddress)
+        {
+            var token = await _context.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshToken);
+
+            if (token == null || !token.IsActive)
+                return Result.Failure("Token không tồn tại hoặc đã hết hạn.");
+
+            token.IsRevoked = true;
+            // token.RevokedByIp = ipAddress;
+
+            await _context.SaveChangesAsync(CancellationToken.None);
+            return Result.Success();
+        }
+
+        private async Task<Result<AuthResponse>> GenerateAuthResponseAsync(User user, string ip)
+        {
             var accessToken = _tokenService.CreateAccessToken(user);
             var refreshToken = _tokenService.CreateRefreshToken(ip);
+
+            // --- SỬA LỖI LOGIC GÁN ---
+            // Gán trực tiếp Guid, không dùng ToString() nữa
             refreshToken.UserId = user.Id;
 
-            await _refreshTokenRepository.AddAsync(refreshToken);
+            _context.RefreshTokens.Add(refreshToken);
+            await _context.SaveChangesAsync(CancellationToken.None);
 
             return Result<AuthResponse>.Success(new AuthResponse
             {
-                UserId = user.Id,
+                Id = user.Id,
                 UserName = user.UserName,
+                Email = user.Email,
+                Role = user.Role,
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.Token
             });
-        }
-
-        // ===================== REFRESH TOKEN =====================
-        public async Task<Result<AuthResponse>> RefreshTokenAsync(string token, string ipAddress)
-        {
-            var oldToken = await _refreshTokenRepository.GetByTokenAsync(token);
-            if (oldToken == null || !oldToken.IsActive)
-                return Result<AuthResponse>.Failure("Refresh token không hợp lệ");
-
-            var user = await _userRepository.GetByIdAsync(oldToken.UserId);
-            if (user == null || !user.IsActive)
-                return Result<AuthResponse>.Failure("User không hợp lệ");
-
-            var newAccessToken = _tokenService.CreateAccessToken(user);
-
-            // Revoke token cũ
-            oldToken.Revoked = DateTime.UtcNow;
-            oldToken.RevokedByIp = ipAddress;
-
-            // Tạo token mới
-            var newRefreshToken = _tokenService.CreateRefreshToken(ipAddress);
-            newRefreshToken.UserId = user.Id;
-            oldToken.ReplacedByToken = newRefreshToken.Token;
-
-            await _refreshTokenRepository.UpdateAsync(oldToken);
-            await _refreshTokenRepository.AddAsync(newRefreshToken);
-
-            return Result<AuthResponse>.Success(new AuthResponse
-            {
-                UserId = user.Id,
-                UserName = user.UserName,
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken.Token,
-            });
-        }
-
-        // ===================== LOGOUT =====================
-        public async Task<Result> LogoutAsync(string refreshToken, string ipAddress)
-        {
-            var token = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
-            if (token == null || !token.IsActive)
-                return Result.Failure("Token không tồn tại hoặc đã hết hạn");
-
-            token.Revoked = DateTime.UtcNow;
-            token.RevokedByIp = ipAddress;
-
-            await _refreshTokenRepository.UpdateAsync(token);
-
-            return Result.Success();
         }
     }
 }
