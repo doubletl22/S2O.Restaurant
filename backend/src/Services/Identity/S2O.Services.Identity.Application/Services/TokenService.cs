@@ -28,7 +28,7 @@ namespace S2O.Services.Identity.Application.Services
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = ipAddress,
 
-                UserId = Guid.Empty // UserId sẽ được gán sau khi lưu vào DB
+                UserId = Guid.Empty 
             };
         }
     }

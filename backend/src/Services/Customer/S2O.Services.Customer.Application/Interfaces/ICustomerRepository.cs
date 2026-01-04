@@ -8,5 +8,6 @@ namespace S2O.Services.Customer.Application.Interfaces
         Task<Domain.Entities.Customer?> GetByIdentityIdAsync(Guid identityId);
         Task AddAsync(Domain.Entities.Customer customer);
         Task UpdateAsync(Domain.Entities.Customer customer);
+        Task<Domain.Entities.Customer?> GetByIdAsync(Guid id);
     }
 }

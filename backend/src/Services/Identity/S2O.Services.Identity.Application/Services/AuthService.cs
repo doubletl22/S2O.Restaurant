@@ -5,7 +5,6 @@ using S2O.Services.Identity.Application.Interfaces;
 using S2O.Services.Identity.Domain.Entities;
 using S2O.Shared.Kernel.Wrapper;
 using LoginRequest = S2O.Services.Identity.Application.DTOs.LoginRequest;
-// Alias để tránh xung đột tên
 using RegisterRequest = S2O.Services.Identity.Application.DTOs.RegisterRequest;
 
 namespace S2O.Services.Identity.Application.Services
