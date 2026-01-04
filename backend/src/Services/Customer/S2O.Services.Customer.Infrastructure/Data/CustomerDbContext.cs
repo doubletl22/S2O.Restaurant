@@ -38,6 +38,23 @@ namespace S2O.Services.Customer.Infrastructure.Data
                  .HasForeignKey(x => x.CustomerId)
                  .OnDelete(DeleteBehavior.Cascade);
             });
+
+            modelBuilder.Entity<CustomerVoucher>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.HasOne(x => x.Customer)
+                 .WithMany(c => c.Vouchers)
+                 .HasForeignKey(x => x.CustomerId);
+            });
+
+            // Config CustomerFeedback
+            modelBuilder.Entity<CustomerFeedback>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.HasOne(x => x.Customer)
+                 .WithMany(c => c.Feedbacks)
+                 .HasForeignKey(x => x.CustomerId);
+            });
         }
     }
 }

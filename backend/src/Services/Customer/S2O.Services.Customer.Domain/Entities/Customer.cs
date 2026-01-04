@@ -12,6 +12,13 @@ namespace S2O.Services.Customer.Domain.Entities
         public string Email { get; private set; } = default!;
         public string PhoneNumber { get; private set; } = default!;
 
+        // --- Nghiệp vụ: Feedback & Voucher ---
+        private readonly List<CustomerFeedback> _feedbacks = new();
+        public IReadOnlyCollection<CustomerFeedback> Feedbacks => _feedbacks.AsReadOnly();
+
+        private readonly List<CustomerVoucher> _vouchers = new();
+        public IReadOnlyCollection<CustomerVoucher> Vouchers => _vouchers.AsReadOnly();
+
         // --- Nghiệp vụ: Tích điểm & Hạng ---
         public int LoyaltyPoints { get; private set; } = 0;
         public MembershipTier Tier { get; private set; } = MembershipTier.Standard;
@@ -70,6 +77,45 @@ namespace S2O.Services.Customer.Domain.Entities
         {
             var item = _favorites.FirstOrDefault(x => x.RestaurantId == restaurantId);
             if (item != null) _favorites.Remove(item);
+        }
+
+        public Result RedeemVoucher(string code, string description, int pointsCost, decimal discountAmount)
+        {
+            if (LoyaltyPoints < pointsCost)
+                return Result.Failure("Không đủ điểm tích lũy để đổi voucher này.");
+
+            // Trừ điểm
+            LoyaltyPoints -= pointsCost;
+            // (Lưu ý: Hạng thành viên thường tính trên tổng điểm tích lũy cả đời, 
+            // nhưng ở đây ta làm đơn giản là trừ điểm khả dụng).
+
+            // Thêm voucher vào ví
+            _vouchers.Add(new CustomerVoucher
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = this.Id,
+                Code = code,
+                Description = description,
+                DiscountAmount = discountAmount,
+                IsUsed = false,
+                ExpiryDate = DateTime.UtcNow.AddDays(30) // Hạn 30 ngày
+            });
+
+            return Result.Success();
+        }
+
+        // 2. Logic đánh giá
+        public void AddFeedback(Guid restaurantId, int rating, string comment)
+        {
+            _feedbacks.Add(new CustomerFeedback
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = this.Id,
+                RestaurantId = restaurantId,
+                Rating = rating,
+                Comment = comment,
+                CreatedAt = DateTime.UtcNow
+            });
         }
     }
 }

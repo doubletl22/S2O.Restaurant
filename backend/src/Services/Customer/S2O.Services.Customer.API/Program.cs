@@ -1,37 +1,101 @@
-﻿using S2O.Services.Customer.Application.Interfaces;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics; 
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using S2O.Services.Customer.API.Configurations;
+using S2O.Services.Customer.Application.Interfaces;
 using S2O.Services.Customer.Application.Services;
 using S2O.Services.Customer.Infrastructure.Data;
-using S2O.Services.Customer.Infrastructure.Repositories;
-using S2O.Shared.Infra; // Để dùng AddSharedInfra
+using S2O.Services.Customer.Infrastructure.Interceptors; 
+using S2O.Services.Customer.Infrastructure.Repositories; 
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Add Services to the container.
-builder.Services.AddControllers(); // Bật Controllers
+// 1. Add Services
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // Dùng Swagger của .NET 8
 
-// 2. Database & Shared Infra (Tương tự Identity Service)
-// Lưu ý: Đảm bảo appsettings.json đã có ConnectionStrings:DefaultConnection
-builder.Services.AddSharedInfra<CustomerDbContext>(builder.Configuration);
+// 2. Swagger Configuration
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "S2O Customer API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            new string[] {}
+        }
+    });
+});
 
-// 3. Dependency Injection (Đăng ký các lớp của Customer)
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+builder.Services.AddDbContext<CustomerDbContext>((sp, options) =>
+{
+    var interceptor = sp.GetService<ISaveChangesInterceptor>();
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .AddInterceptors(interceptor!);
+});
+
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>(); // <-- Dòng này đang thiếu
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+        ValidAudience = builder.Configuration["JwtSettings:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!))
+    };
+});
 
 var app = builder.Build();
 
-// 4. Configure the HTTP request pipeline.
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<CustomerDbContext>();
+        context.Database.Migrate(); 
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Lỗi migration: " + ex.Message);
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.UseAuthorization(); // Nếu có Auth
-
-app.MapControllers(); // Map các Controller
+app.MapControllers();
 
 app.Run();
