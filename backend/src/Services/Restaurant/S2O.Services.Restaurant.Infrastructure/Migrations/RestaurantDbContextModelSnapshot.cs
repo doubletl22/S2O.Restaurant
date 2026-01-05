@@ -22,15 +22,46 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("S2O.Services.Restaurant.Domain.Entities.MenuItem", b =>
+            modelBuilder.Entity("S2O.Services.Restaurant.Domain.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Category")
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid>("RestaurantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("S2O.Services.Restaurant.Domain.Entities.Dish", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -39,7 +70,6 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ImageUrl")
@@ -66,9 +96,11 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("RestaurantId");
 
-                    b.ToTable("MenuItems");
+                    b.ToTable("Dishes");
                 });
 
             modelBuilder.Entity("S2O.Services.Restaurant.Domain.Entities.Restaurant", b =>
@@ -87,6 +119,9 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -100,7 +135,7 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("OwnerIdentityId")
+                    b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("PhoneNumber")
@@ -112,42 +147,18 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
                     b.ToTable("Restaurants");
                 });
 
-            modelBuilder.Entity("S2O.Services.Restaurant.Domain.Entities.Table", b =>
+            modelBuilder.Entity("S2O.Services.Restaurant.Domain.Entities.Dish", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.HasOne("S2O.Services.Restaurant.Domain.Entities.Category", null)
+                        .WithMany("Dishes")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
 
-                    b.Property<int>("Capacity")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsOccupied")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("RestaurantId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("TableName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RestaurantId");
-
-                    b.ToTable("Tables");
+            modelBuilder.Entity("S2O.Services.Restaurant.Domain.Entities.Category", b =>
+                {
+                    b.Navigation("Dishes");
                 });
 #pragma warning restore 612, 618
         }

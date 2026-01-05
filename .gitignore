@@ -12,3 +12,14 @@ riderModule.iml
 .vs/
 /backend/.vs/S2O.restaurant/v17/.suo
 /backend/.vs/
+*.suo
+*.cache
+*.nupkg
+!packages/build/
+TestResults/
+*.trdx
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+*.log

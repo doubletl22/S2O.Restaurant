@@ -6,23 +6,18 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace S2O.Services.Restaurant.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialRestaurantDb : Migration
+    public partial class AddMenuStructure : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "MenuItems",
+                name: "Categories",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    RestaurantId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
-                    ImageUrl = table.Column<string>(type: "text", nullable: true),
-                    IsAvailable = table.Column<bool>(type: "boolean", nullable: false),
-                    Category = table.Column<string>(type: "text", nullable: false),
+                    RestaurantId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -30,7 +25,7 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MenuItems", x => x.Id);
+                    table.PrimaryKey("PK_Categories", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -41,8 +36,9 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
                     PhoneNumber = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    OwnerIdentityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -54,14 +50,17 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tables",
+                name: "Dishes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    ImageUrl = table.Column<string>(type: "text", nullable: true),
+                    IsAvailable = table.Column<bool>(type: "boolean", nullable: false),
                     RestaurantId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TableName = table.Column<string>(type: "text", nullable: false),
-                    Capacity = table.Column<int>(type: "integer", nullable: false),
-                    IsOccupied = table.Column<bool>(type: "boolean", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     LastModified = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -69,17 +68,28 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tables", x => x.Id);
+                    table.PrimaryKey("PK_Dishes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Dishes_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_MenuItems_RestaurantId",
-                table: "MenuItems",
+                name: "IX_Categories_RestaurantId",
+                table: "Categories",
                 column: "RestaurantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tables_RestaurantId",
-                table: "Tables",
+                name: "IX_Dishes_CategoryId",
+                table: "Dishes",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Dishes_RestaurantId",
+                table: "Dishes",
                 column: "RestaurantId");
         }
 
@@ -87,13 +97,13 @@ namespace S2O.Services.Restaurant.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "MenuItems");
+                name: "Dishes");
 
             migrationBuilder.DropTable(
                 name: "Restaurants");
 
             migrationBuilder.DropTable(
-                name: "Tables");
+                name: "Categories");
         }
     }
 }
