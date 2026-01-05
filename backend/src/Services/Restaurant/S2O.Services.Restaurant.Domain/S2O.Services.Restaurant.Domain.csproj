@@ -7,4 +7,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared.Kernel\S2O.Shared.Kernel.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Common\Interfaces\" />
+	</ItemGroup>
 </Project>
