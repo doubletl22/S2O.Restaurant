@@ -5,6 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
 			<PrivateAssets>all</PrivateAssets>
@@ -15,5 +16,8 @@
 		<ProjectReference Include="..\S2O.Services.Restaurant.Application\S2O.Services.Restaurant.Application.csproj" />
 		<ProjectReference Include="..\S2O.Services.Restaurant.Infrastructure\S2O.Services.Restaurant.Infrastructure.csproj" />
 		<ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared.Infra\S2O.Shared.Infra.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Controllers\" />
 	</ItemGroup>
 </Project>
