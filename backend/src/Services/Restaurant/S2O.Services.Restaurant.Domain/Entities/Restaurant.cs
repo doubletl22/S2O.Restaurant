@@ -4,27 +4,39 @@ namespace S2O.Services.Restaurant.Domain.Entities
 {
     public class Restaurant : AggregateRoot<Guid>
     {
-        public string Name { get; private set; } = default!;
-        public string Address { get; private set; } = default!;
-        public string PhoneNumber { get; private set; } = default!;
-        public bool IsActive { get; private set; } = true;
+        public string Name { get; private set; }
+        public string Address { get; private set; }
+        public string PhoneNumber { get; private set; }
+        public string? Description { get; private set; }
+        public bool IsActive { get; private set; }
+        public Guid OwnerId { get; private set; } // Liên kết với Identity Service
 
-        // Chủ sở hữu (Liên kết với Identity Service)
-        public Guid OwnerIdentityId { get; private set; }
+        private Restaurant() { } // Constructor cho EF Core
 
-        private Restaurant() { }
-
-        public static Restaurant Create(Guid ownerId, string name, string address, string phone)
+        public static Restaurant Create(Guid ownerId, string name, string address, string phone, string? desc)
         {
+            // Validate logic nghiệp vụ tại đây nếu cần
             return new Restaurant
             {
                 Id = Guid.NewGuid(),
-                OwnerIdentityId = ownerId,
+                OwnerId = ownerId,
                 Name = name,
                 Address = address,
                 PhoneNumber = phone,
-                IsActive = true
+                Description = desc,
+                IsActive = true, // Mặc định mở
+                CreatedBy = ownerId.ToString(),
+                CreatedAt = DateTime.UtcNow
             };
+        }
+
+        public void UpdateInfo(string name, string address, string phone, string? desc)
+        {
+            Name = name;
+            Address = address;
+            PhoneNumber = phone;
+            Description = desc;
+            LastModified = DateTime.UtcNow;
         }
     }
 }

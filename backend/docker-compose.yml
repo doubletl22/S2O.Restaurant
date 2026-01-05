@@ -81,6 +81,26 @@ services:
     networks:
       - s2o-network
 
+  #5. Restaurant Service
+  restaurant-api:
+    build:
+      context: .
+      dockerfile: src/Services/Restaurant/S2O.Services.Restaurant.API/Dockerfile
+    container_name: s2o_restaurant_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=S2O_RestaurantDb;Username=postgres;Password=admin123
+      - JwtSettings__Secret=Chuoi_Bi_Mat_Nay_Phai_Dai_It_Nhat_32_Ky_Tu_!!!
+      - JwtSettings__Issuer=S2O_IdentityService
+      - JwtSettings__Audience=S2O_ClientApp
+    ports:
+      - "5200:8080"
+    depends_on:
+      - postgres
+    networks:
+      - s2o-network
+
 volumes:
   postgres_data:
 

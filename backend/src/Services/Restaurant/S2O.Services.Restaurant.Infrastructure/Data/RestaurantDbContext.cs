@@ -1,38 +1,36 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using S2O.Services.Restaurant.Domain.Entities;
 
 namespace S2O.Services.Restaurant.Infrastructure.Data
 {
     public class RestaurantDbContext : DbContext
     {
-        private readonly ISaveChangesInterceptor _interceptor;
-
-        public RestaurantDbContext(DbContextOptions<RestaurantDbContext> options, ISaveChangesInterceptor interceptor)
-            : base(options)
-        {
-            _interceptor = interceptor;
-        }
+        public RestaurantDbContext(DbContextOptions<RestaurantDbContext> options) : base(options) { }
 
         public DbSet<Domain.Entities.Restaurant> Restaurants { get; set; }
-        public DbSet<MenuItem> MenuItems { get; set; }
-        public DbSet<Table> Tables { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.AddInterceptors(_interceptor);
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Dish> Dishes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<MenuItem>(e =>
+            // 1. Config Dish
+            modelBuilder.Entity<Dish>(e =>
             {
                 e.HasKey(x => x.Id);
                 e.Property(x => x.Price).HasColumnType("decimal(18,2)");
-                e.HasIndex(x => x.RestaurantId);
+                e.HasIndex(x => x.RestaurantId); // Index để query nhanh theo nhà hàng
+
+                // Quan hệ 1 Category - N Dish
+                e.HasOne<Category>()
+                 .WithMany(c => c.Dishes)
+                 .HasForeignKey(x => x.CategoryId)
+                 .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<Table>(e =>
+            // 2. Config Category
+            modelBuilder.Entity<Category>(e =>
             {
                 e.HasKey(x => x.Id);
                 e.HasIndex(x => x.RestaurantId);
