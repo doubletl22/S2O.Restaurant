@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 ﻿using Microsoft.AspNetCore.Identity;
+=======
+﻿using FirebaseAdmin.Auth.Multitenancy;
+using Microsoft.AspNetCore.Identity;
+>>>>>>> f5342a11e7fc2e575843751d2d0873992823dccb
 using S2O.Services.Identity.Application.DTOs;
 using S2O.Services.Identity.Application.Interfaces;
 using S2O.Services.Identity.Application.UseCase.Users;
@@ -45,6 +50,7 @@ namespace S2O.Services.Identity.Application.UseCase
                 IsActive = true
             };
             await _users.AddAsync(user);
+<<<<<<< HEAD
 
             var userTenant = new UserTenant
             {
@@ -53,6 +59,8 @@ namespace S2O.Services.Identity.Application.UseCase
             };
 
             await _userTenants.AddAsync(userTenant);
+=======
+>>>>>>> f5342a11e7fc2e575843751d2d0873992823dccb
         }
     }
 }

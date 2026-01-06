@@ -16,6 +16,9 @@ namespace S2O.Services.Identity.Application.Interfaces
         Task<IEnumerable<User>> GetByTenantIdAsync(Guid tenantId);
         Task UpdateAsync(User user);
         Task<bool> ExistsByEmailAsync(string email);
+<<<<<<< HEAD
         Task DeleteUser(User user);
+=======
+>>>>>>> f5342a11e7fc2e575843751d2d0873992823dccb
     }
 }

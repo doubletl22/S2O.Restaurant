@@ -62,9 +62,22 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
     {
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+<<<<<<< HEAD
         var res = await _passwordLoginHandler.HandlerAsync(dto, ip);
         return res is null ? Unauthorized() : Ok(res);
 
+=======
+        try
+        {
+
+            var result = await _passwordLoginHandler.HandlerAsync(dto, ip);
+            return Ok(result);
+        }
+        catch (Exception)
+        {
+            return Unauthorized("Thông tin đăng nhập không hợp lệ");
+        }
+>>>>>>> f5342a11e7fc2e575843751d2d0873992823dccb
     }
 
 }

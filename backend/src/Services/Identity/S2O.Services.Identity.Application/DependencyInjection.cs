@@ -21,8 +21,12 @@ namespace S2O.Services.Identity.Application
             services.AddScoped<GetUserByTenantHandler>();
             services.AddScoped<RegisterUserHandler>();
             services.AddScoped<PasswordLoginHandler>();
+<<<<<<< HEAD
             services.AddScoped<CreateUserHandler>();
             services.AddScoped<DeleteUserHandler>();
+=======
+
+>>>>>>> f5342a11e7fc2e575843751d2d0873992823dccb
             return services;
         }
     }

@@ -50,7 +50,11 @@ namespace S2O.Services.Identity.Application.UseCase
             }
 
             var authResponse = _jwt.GenerateAuthResponse(user.Id, tenant.Id, user.Role);
+<<<<<<< HEAD
             var refreshToken =  new RefreshToken
+=======
+            await _refreshRepo.AddAsync(new RefreshToken
+>>>>>>> f5342a11e7fc2e575843751d2d0873992823dccb
             {
                 Id = Guid.NewGuid(),
                 TenantId = tenant.Id,
@@ -59,9 +63,13 @@ namespace S2O.Services.Identity.Application.UseCase
                 ExpiresAt = DateTime.UtcNow.AddDays(_jwt.GetRefreshTokenLifetimeDays()),
                 CreatedByIp = ip,
                 CreatedAt = DateTime.UtcNow
+<<<<<<< HEAD
             };
 
             await _refreshRepo.AddAsync(refreshToken);
+=======
+            });
+>>>>>>> f5342a11e7fc2e575843751d2d0873992823dccb
             Console.WriteLine(JsonSerializer.Serialize(authResponse));
             return authResponse;
         }
