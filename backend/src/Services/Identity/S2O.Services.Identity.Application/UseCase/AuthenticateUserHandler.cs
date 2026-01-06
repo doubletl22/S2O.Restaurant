@@ -30,7 +30,7 @@ namespace S2O.Services.Identity.Application.UseCase
             _tenants = tenants;
         }
 
-        public async Task<AuthResponseDto?> HandleAsync(LoginRequestDto dto, string? ip = null)
+        public async Task<AuthResponseDto?> HandleAsync(LoginFirebaseRequestDto dto, string? ip = null)
         {
             var firebaseUser = await _firebase.VerifyTokenAsync(dto.FirebaseIdToken);
             if (firebaseUser == null)

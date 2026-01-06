@@ -1,24 +1,21 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+﻿using Ocelot.DependencyInjection;
+using Ocelot.Middleware;
 using S2O.GateWay.Extensions;
 using S2O.GateWay.Middlewares;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+builder.Services.AddOcelot(builder.Configuration);
 
 builder.Services.AddJwtAuthentication(builder.Configuration);
-// Authorization
-builder.Services.AddRoleAuthorization(builder.Configuration);
+
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<UserContextForwardingMiddleware>();
-
-app.MapReverseProxy();
+await app.UseOcelot();
 
 app.Run();

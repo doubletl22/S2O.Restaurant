@@ -40,6 +40,7 @@ namespace S2O.Services.Identity.Infrastructure
             services.AddScoped<ITenantRepository, TenantRepository>();
             services.AddScoped<IFirebaseAuthService, FirebaseAuthService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
             return services;
         }
     }

@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Formatters.Xml;
+
 using Microsoft.IdentityModel.Tokens;
-using S2O.GateWay.Authorization;
 using System.Text;
 
 namespace S2O.GateWay.Extensions

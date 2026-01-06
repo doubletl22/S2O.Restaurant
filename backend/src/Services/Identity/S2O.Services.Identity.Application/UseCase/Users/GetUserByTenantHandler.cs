@@ -2,7 +2,7 @@
 using S2O.Services.Identity.Application.Interfaces;
 
 
-namespace S2O.Services.Identity.Application.UseCase
+namespace S2O.Services.Identity.Application.UseCase.Users
 {
     public class GetUserByTenantHandler
     {

@@ -2,6 +2,7 @@
 using S2O.Services.Identity.Application.Interfaces;
 using S2O.Services.Identity.Domain.Entities;
 using S2O.Services.Identity.Infrastructure.Data;
+using System.Reflection.Metadata.Ecma335;
 
 namespace S2O.Services.Identity.Infrastructure.Repositories
 {
@@ -21,11 +22,24 @@ namespace S2O.Services.Identity.Infrastructure.Repositories
             return user;
         }
 
+        public async Task DeleteUser(User user)
+        {
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<bool> ExistsAsync(Guid userId, Guid tenantId)
         {
             return await _context.UserTenants
                 .AsNoTracking()
                 .AnyAsync(ut => ut.UserId == userId && ut.TenantId == tenantId);
+        }
+
+        public async Task<bool> ExistsByEmailAsync(string email)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Email == email);
         }
 
         public async Task<User?> GetByEmailAsync(string email)

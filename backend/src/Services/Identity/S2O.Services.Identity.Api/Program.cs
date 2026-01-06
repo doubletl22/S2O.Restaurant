@@ -23,9 +23,9 @@ public class Program
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddJwtAuthentication(builder.Configuration);
 
-        FirebaseApp.Create(new AppOptions 
+        FirebaseApp.Create(new AppOptions
         {
-            Credential = GoogleCredential.FromFile("firebase-adminsdk.json") 
+            Credential = GoogleCredential.FromFile("firebase-adminsdk.json")
         });
 
         var app = builder.Build();

@@ -3,14 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using S2O.Services.Identity.Application.DTOs;
 using S2O.Services.Identity.Application.DTOs.Users;
 using S2O.Services.Identity.Application.Interfaces;
-using S2O.Services.Identity.Application.UseCase;
 using S2O.Services.Identity.Application.UseCase.Users;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace S2O.Services.Identity.Api.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("users")]
     [Authorize(Roles = "Admin")]
     public class UserController : ControllerBase
     {
@@ -20,13 +19,17 @@ namespace S2O.Services.Identity.Api.Controllers
         private readonly UpdateUserHandler _updateUserHandler;
         private readonly GetUserByIdHandler _getUserByIdHandler;
         private readonly SearchUserByEmailHandler _searchUserByEmailHandler;
+        private readonly CreateUserHandler _createUserHandler;
+        private readonly DeleteUserHandler _deleteUser;
 
         public UserController(GetUserByTenantHandler getUsersByTenantHandler,
             AssignUserToTenantHandler assignUserToTenantHandler,
             UpdateUserStatusHandler updateUserStatusHandler,
             UpdateUserHandler updateUserHandler,
             GetUserByIdHandler getUserByIdHandler,
-            SearchUserByEmailHandler searchUserByEmailHandler)
+            SearchUserByEmailHandler searchUserByEmailHandler,
+            CreateUserHandler createUserHandler,
+            DeleteUserHandler deleteUser)
         {
             _getUsersByTenantHandler = getUsersByTenantHandler;
             _assignUserToTenantHandler = assignUserToTenantHandler;
@@ -34,6 +37,8 @@ namespace S2O.Services.Identity.Api.Controllers
             _updateUserHandler = updateUserHandler;
             _getUserByIdHandler = getUserByIdHandler;
             _searchUserByEmailHandler = searchUserByEmailHandler;
+            _createUserHandler = createUserHandler;
+            _deleteUser = deleteUser;
         }
 
         [HttpGet]
@@ -46,7 +51,7 @@ namespace S2O.Services.Identity.Api.Controllers
         }
 
 
-        [HttpPost("{userId}/tenants")]
+        [HttpPost("{userId}/tenants")]  
         public async Task<IActionResult> AssignUserToTenant(Guid userId, [FromQuery] string tenantCode)
         {
             if (string.IsNullOrWhiteSpace(tenantCode))
@@ -93,9 +98,25 @@ namespace S2O.Services.Identity.Api.Controllers
             }
 
             return Ok(user);
-
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
+        {
+           var userId = await _createUserHandler.HandleAsync(dto);
+            return CreatedAtAction(nameof(GetUserById),
+                new 
+                {
+                    id = userId
+                }, null);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            await _deleteUser.HandleAsync(id);
+            return NoContent();
+        }
 
     }
 }
