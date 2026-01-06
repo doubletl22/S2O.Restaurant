@@ -9,8 +9,8 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace S2O.Services.Identity.Api.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("users")]
     [Authorize(Roles = "Admin")]
     public class UserController : ControllerBase
     {
@@ -46,7 +46,7 @@ namespace S2O.Services.Identity.Api.Controllers
         }
 
 
-        [HttpPost("{userId}/tenants")]
+        [HttpPost("{userId}/tenants")]  
         public async Task<IActionResult> AssignUserToTenant(Guid userId, [FromQuery] string tenantCode)
         {
             if (string.IsNullOrWhiteSpace(tenantCode))

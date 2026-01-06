@@ -12,7 +12,7 @@ using S2O.Services.Identity.Infrastructure.Data;
 namespace S2O.Services.Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(AppIdentityDbContext))]
-    [Migration("20260105022051_Auth")]
+    [Migration("20260105114302_Auth")]
     partial class Auth
     {
         /// <inheritdoc />
@@ -113,6 +113,10 @@ namespace S2O.Services.Identity.Infrastructure.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Role")
                         .IsRequired()

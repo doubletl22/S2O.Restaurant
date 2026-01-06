@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace S2O.Services.Identity.Application.DTOs
 {
-    public class LoginRequestDto
+    public class LoginFirebaseRequestDto
     {
-        public string Email { get; set; } = default!; 
-        public string Password { get; set; } = default!; 
+        public string FirebaseIdToken { get; set; } = string.Empty; 
         public string TenantCode { get; set; } = string.Empty;
     }
 }
+

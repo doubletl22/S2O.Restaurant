@@ -17,6 +17,8 @@ namespace S2O.Services.Identity.Application
             services.AddScoped<RefreshAccessTokenHandler>();
             services.AddScoped<LogoutHandler>();
             services.AddScoped<GetUserByTenantHandler>();
+            services.AddScoped<RegisterUserHandler>();
+            services.AddScoped<PasswordLoginHandler>();
 
             return services;
         }

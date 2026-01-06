@@ -13,7 +13,6 @@ namespace S2O.Services.Identity.Infrastructure.Data
         public DbSet<User> Users => Set<User>();
         public DbSet<UserTenant> UserTenants => Set<UserTenant>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
-
         public DbSet<Tenant> Tenants => Set<Tenant>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

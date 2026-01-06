@@ -28,6 +28,13 @@ namespace S2O.Services.Identity.Infrastructure.Repositories
                 .AnyAsync(ut => ut.UserId == userId && ut.TenantId == tenantId);
         }
 
+        public async Task<bool> ExistsByEmailAsync(string email)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Email == email);
+        }
+
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
