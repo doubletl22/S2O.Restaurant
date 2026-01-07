@@ -1,11 +1,15 @@
 ﻿using MediatR;
 using S2O.Shared.Kernel.Wrapper;
 
-namespace S2O.Shared.Kernel.CQRS
-{
-    // Command không trả về dữ liệu (chỉ trả về Success/Failure)
-    public interface ICommand : IRequest<Result> { }
+namespace S2O.Shared.Kernel.CQRS;
 
-    // Command có trả về dữ liệu (VD: trả về ID vừa tạo)
-    public interface ICommand<TResponse> : IRequest<Result<TResponse>> { }
+// 1. Command không trả về value (VD: DeleteUserCommand)
+// Chỉ trả về trạng thái Success/Fail
+public interface ICommand : IRequest<Result>
+{
+}
+
+// 2. Command có trả về value (VD: CreateUserCommand -> trả về Guid)
+public interface ICommand<TResponse> : IRequest<Result<TResponse>>
+{
 }

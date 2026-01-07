@@ -1,18 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
-
-	<ItemGroup>
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\S2O.Services.Customer.Domain\S2O.Services.Customer.Domain.csproj" />
-
-		<ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared.Kernel\S2O.Shared.Kernel.csproj" />
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
 </Project>
