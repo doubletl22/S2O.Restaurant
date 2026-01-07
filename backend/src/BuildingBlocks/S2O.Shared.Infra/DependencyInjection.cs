@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore.Diagnostics; 
 using S2O.Shared.Infra.Interceptors;
 
 namespace S2O.Shared.Infra;
@@ -11,23 +10,19 @@ public static class InfraDependencyInjection
     public static IServiceCollection AddSharedInfra<TContext>(
         this IServiceCollection services,
         IConfiguration configuration)
-        where TContext : DbContext
+        where TContext : BaseDbContext
     {
-        // Đăng ký Interceptor
-        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-                            ?? configuration.GetConnectionString("Database")
-                            ?? configuration.GetConnectionString("AuthDb");
+        // 1. Đăng ký Interceptor
+        services.AddScoped<AuditableEntityInterceptor>();
 
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-        }
+        // 2. Đăng ký DbContext (PostgreSQL)
+        var connectionString = configuration.GetConnectionString("Database");
 
         services.AddDbContext<TContext>((sp, options) =>
         {
             options.UseNpgsql(connectionString);
-            options.AddInterceptors(sp.GetRequiredService<ISaveChangesInterceptor>());
+            // Lấy Interceptor từ DI Container chèn vào
+            options.AddInterceptors(sp.GetRequiredService<AuditableEntityInterceptor>());
         });
 
         return services;
