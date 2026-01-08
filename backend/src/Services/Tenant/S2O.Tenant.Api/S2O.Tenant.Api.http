@@ -1,0 +1,6 @@
+@S2O.Tenant.Api_HostAddress = http://localhost:5125
+
+GET {{S2O.Tenant.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

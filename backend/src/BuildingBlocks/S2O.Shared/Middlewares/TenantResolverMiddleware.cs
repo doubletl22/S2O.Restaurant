@@ -1,36 +1,37 @@
 ﻿using Microsoft.AspNetCore.Http;
-using S2O.Shared.Multitenancy;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+using S2O.Shared.Interfaces;
+using System.Security.Claims;
 
-namespace S2O.Shared.Middlewares
+namespace S2O.Shared.Middlewares;
+
+public class TenantResolverMiddleware
 {
-    public class TenantResolverMiddleware
+    private readonly RequestDelegate _next;
+    private const string TenantHeaderKey = "x-tenant-id";
+
+    public TenantResolverMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
+        _next = next;
+    }
 
-        public TenantResolverMiddleware(RequestDelegate next) => _next = next;
-
-        public async Task InvokeAsync(HttpContext context, ITenantContext tenantContext)
+    public async Task InvokeAsync(HttpContext context, ITenantContext tenantContext)
+    {
+        // 1. Thử lấy TenantId từ Header (Ưu tiên cho khách quét QR)
+        if (context.Request.Headers.TryGetValue(TenantHeaderKey, out var headerTenantId))
         {
-            // Thực tế: TenantId có thể lấy từ Header 'x-tenant-id' hoặc từ Domain/Subdomain
-            if (context.Request.Headers.TryGetValue("x-tenant-id", out var tenantId))
-            {
-                tenantContext.TenantId = tenantId.ToString();
-            }
-            else
-            {
-                // Đối với dự án thật, bạn có thể ném lỗi 400 nếu không có TenantId cho các API yêu cầu định danh
-                // context.Response.StatusCode = 400;
-                // await context.Response.WriteAsync("Tenant-ID is missing.");
-                // return;
-            }
-
-            await _next(context);
+            tenantContext.TenantId = headerTenantId;
         }
+        // 2. Nếu không có Header, thử lấy từ JWT Claims (Dành cho user đã login)
+        else if (context.User.Identity?.IsAuthenticated == true)
+        {
+            var tenantClaim = context.User.FindFirst("tenant_id")?.Value;
+            if (!string.IsNullOrEmpty(tenantClaim))
+            {
+                tenantContext.TenantId = tenantClaim;
+            }
+        }
+
+        // Bạn có thể thêm logic chặn request nếu không có TenantId ở các API yêu cầu bắt buộc
+        await _next(context);
     }
 }
