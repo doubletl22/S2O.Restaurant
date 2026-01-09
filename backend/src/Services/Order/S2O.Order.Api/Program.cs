@@ -52,7 +52,7 @@ builder.Services.AddScoped<IUserContext, UserContext>();
 // --- 5. Cấu hình MediatR ---
 // Đăng ký các Handler nằm trong project App
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(PlaceOrderCommand).Assembly));
+    cfg.RegisterServicesFromAssembly(typeof(S2O.Order.App.Features.Orders.Commands.CreateOrder.CreateOrderCommand).Assembly));
 
 // --- 6. Các dịch vụ API cơ bản ---
 builder.Services.AddControllers();
@@ -80,6 +80,14 @@ builder.Services.AddSwaggerGen(options => {
         }
     });
 });
+
+
+builder.Services.AddTransient<AuthenticationDelegatingHandler>();
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ExternalServices:CatalogUrl"]!);
+})
+.AddHttpMessageHandler<AuthenticationDelegatingHandler>();
 
 var app = builder.Build();
 
