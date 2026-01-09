@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Identity.App.Abstractions;
+using S2O.Identity.App.Services;
 using S2O.Identity.Domain.Entities;
 using S2O.Identity.Infra.Authentication;
 using S2O.Identity.Infra.Persistence;
@@ -14,6 +15,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddScoped<TokenService>();
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 

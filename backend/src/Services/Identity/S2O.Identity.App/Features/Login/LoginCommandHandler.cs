@@ -1,31 +1,37 @@
-﻿namespace S2O.Identity.App.Features.Login;
-
-using MediatR;
-using S2O.Identity.App.Abstractions;
+﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
 using S2O.Identity.Domain.Entities;
-using S2O.Shared.Kernel.Abstractions;
 using S2O.Shared.Kernel.Results;
+using S2O.Identity.App.Services; 
 
-// Đảm bảo interface này trả về Result<string>
-public class LoginCommandHandler : ICommandHandler<LoginCommand, string>
+namespace S2O.Identity.App.Features.Login;
+
+public class LoginHandler : IRequestHandler<LoginCommand, Result<string>>
 {
-    private readonly ITokenProvider _tokenProvider;
-    // UserManager logic...
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly TokenService _tokenService;
 
-    public LoginCommandHandler(ITokenProvider tokenProvider)
+    public LoginHandler(UserManager<ApplicationUser> userManager, TokenService tokenService)
     {
-        _tokenProvider = tokenProvider;
+        _userManager = userManager;
+        _tokenService = tokenService;
     }
 
-    // PHẢI CÓ: async Task<Result<string>>
     public async Task<Result<string>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        // Giả lập logic thành công
-        await Task.Delay(1); // Để tránh cảnh báo 'async' nhưng không có 'await'
+        // 1. Kiểm tra User tồn tại
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user == null)
+            return Result<string>.Failure(new Error("Auth.UserNotFound", "Email không tồn tại"));
 
-        string mockToken = "fake-jwt-token";
+        // 2. Kiểm tra mật khẩu
+        var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
+        if (!isPasswordValid)
+            return Result<string>.Failure(new Error("Auth.InvalidPassword", "Mật khẩu không đúng"));
 
-        // PHẢI CÓ: Trả về kiểu Result<string>
-        return Result<string>.Success(mockToken);
+        // 3. TẠO TOKEN THẬT (Thay cho chuỗi "fake-jwt-token")
+        var token = _tokenService.CreateToken(user);
+
+        return Result<string>.Success(token);
     }
 }
