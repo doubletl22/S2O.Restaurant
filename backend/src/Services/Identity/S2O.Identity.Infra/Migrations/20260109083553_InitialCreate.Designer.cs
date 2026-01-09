@@ -12,8 +12,8 @@ using S2O.Identity.Infra.Persistence;
 namespace S2O.Identity.Infra.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20260108212929_InitialIdentityDb")]
-    partial class InitialIdentityDb
+    [Migration("20260109083553_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -213,9 +213,8 @@ namespace S2O.Identity.Infra.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
-                    b.Property<string>("TenantId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
