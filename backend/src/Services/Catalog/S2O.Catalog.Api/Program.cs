@@ -65,7 +65,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<CatalogDbContext>();
+    await CatalogDataSeeder.SeedAsync(context);
+}
 // Middleware giải mã TenantId từ Token JWT
 app.UseAuthentication();
 // app.UseTenantResolver(); // Nếu Lâm đã viết Middleware này trong Shared
