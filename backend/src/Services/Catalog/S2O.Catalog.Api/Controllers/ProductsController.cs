@@ -34,6 +34,13 @@ public class ProductsController : ControllerBase
 
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        // Dùng MediatR gọi Query GetProductById
+        var result = await _sender.Send(new GetProductByIdQuery(id));
+        return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
+    }
 }
 
 // Model nhận dữ liệu từ Form

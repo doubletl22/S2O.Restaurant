@@ -13,7 +13,7 @@ public class Product : IAuditableEntity, IMustHaveTenant
     public Guid CategoryId { get; set; }
     public Category Category { get; set; } = null!;
 
-    public Guid TenantId { get; set; }
+    public Guid? TenantId { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public string? CreatedBy { get; set; }
     public DateTime? LastModifiedAtUtc { get; set; }
