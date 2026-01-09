@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿namespace S2O.Order.Infra.Persistence;
+
+using Microsoft.EntityFrameworkCore;
 using S2O.Order.Domain.Entities;
 using S2O.Shared.Interfaces;
 using S2O.Order.App.Abstractions;
