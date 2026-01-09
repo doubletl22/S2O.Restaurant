@@ -2,5 +2,5 @@
 
 public interface ITenantEntity
 {
-    string TenantId { get; set; }
+    Guid? TenantId { get; set; }
 }

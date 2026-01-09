@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿namespace S2O.Identity.Infra.Persistence;
+
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using S2O.Auth.Domain.Entities;
+using S2O.Identity.Domain.Entities;
 using S2O.Shared.Infra.Data;
 using S2O.Shared.Interfaces;
-
-namespace S2O.Auth.Infra.Persistence;
 
 public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
 {

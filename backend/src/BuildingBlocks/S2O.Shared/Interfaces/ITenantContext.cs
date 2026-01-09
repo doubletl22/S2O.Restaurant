@@ -2,5 +2,6 @@
 
 public interface ITenantContext
 {
-    string? TenantId { get; set; }
+    Guid? TenantId { get; set; }
+    string? Email { get; set; }
 }

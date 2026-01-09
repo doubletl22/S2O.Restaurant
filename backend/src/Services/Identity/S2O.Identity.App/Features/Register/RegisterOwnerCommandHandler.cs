@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using S2O.Auth.App.Features.Register;
-using S2O.Auth.Domain.Entities;
+using S2O.Identity.App.Features.Register;
 using S2O.Identity.Domain.Entities;
 using S2O.Shared.Kernel.Abstractions;
 using S2O.Shared.Kernel.Results;
@@ -31,15 +30,15 @@ public class RegisterOwnerCommandHandler : ICommandHandler<RegisterOwnerCommand,
 
         // 2. Tạo TenantId duy nhất cho nhà hàng mới 
         // Trong thực tế, bạn có thể gọi sang Service Tenant hoặc tự sinh một mã GUID
-        var newTenantId = Guid.NewGuid().ToString();
+        var newTenantId = Guid.NewGuid();
 
-        // 3. Khởi tạo đối tượng User với vai trò Chủ nhà hàng (Owner) [cite: 7, 28]
+        // 3. Khởi tạo đối tượng User
         var user = new ApplicationUser
         {
             UserName = request.Email,
             Email = request.Email,
             FullName = request.FullName,
-            TenantId = newTenantId, // Gán "chìa khóa" nhà hàng ngay từ lúc đăng ký [cite: 7]
+            TenantId = newTenantId, 
             CreatedAtUtc = DateTime.UtcNow
         };
 

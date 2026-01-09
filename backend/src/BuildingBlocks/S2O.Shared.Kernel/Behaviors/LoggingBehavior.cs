@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 namespace S2O.Shared.Kernel.Behaviors;
+using S2O.Shared.Kernel.Results;
 
 public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

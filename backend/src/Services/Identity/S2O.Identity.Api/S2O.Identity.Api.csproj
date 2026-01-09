@@ -1,19 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.*">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.*" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.*" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\S2O.Identity.Infra\S2O.Identity.Infra.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared\S2O.Shared.csproj" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<ProjectReference Include="..\S2O.Identity.Infra\S2O.Identity.Infra.csproj" />
+		<ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared\S2O.Shared.csproj" />
+		<ProjectReference Include="..\S2O.Identity.Domain\S2O.Identity.Domain.csproj" />
+		<ProjectReference Include="..\S2O.Identity.App\S2O.Identity.App.csproj" />
+	</ItemGroup>
 </Project>

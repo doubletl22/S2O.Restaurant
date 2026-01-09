@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿namespace S2O.Identity.Domain.Entities;
 
-namespace S2O.Auth.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 public class ApplicationRole : IdentityRole
 {

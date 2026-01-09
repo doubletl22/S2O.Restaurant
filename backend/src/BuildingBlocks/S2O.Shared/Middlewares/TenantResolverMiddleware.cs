@@ -17,17 +17,19 @@ public class TenantResolverMiddleware
     public async Task InvokeAsync(HttpContext context, ITenantContext tenantContext)
     {
         // 1. Thử lấy TenantId từ Header (Ưu tiên cho khách quét QR)
-        if (context.Request.Headers.TryGetValue(TenantHeaderKey, out var headerTenantId))
+        if (context.Request.Headers.TryGetValue("X-Tenant-Id", out var tenantIdHeader))
         {
-            tenantContext.TenantId = headerTenantId;
-        }
-        // 2. Nếu không có Header, thử lấy từ JWT Claims (Dành cho user đã login)
-        else if (context.User.Identity?.IsAuthenticated == true)
-        {
-            var tenantClaim = context.User.FindFirst("tenant_id")?.Value;
-            if (!string.IsNullOrEmpty(tenantClaim))
+            var tenantIdString = tenantIdHeader.ToString();
+
+            // Thêm logic Parse từ string sang Guid
+            if (Guid.TryParse(tenantIdString, out var tenantIdGuid))
             {
-                tenantContext.TenantId = tenantClaim;
+                tenantContext.TenantId = tenantIdGuid;
+            }
+            else
+            {
+                // Nếu header không phải Guid hợp lệ, có thể để null hoặc xử lý tùy ý
+                tenantContext.TenantId = null;
             }
         }
 

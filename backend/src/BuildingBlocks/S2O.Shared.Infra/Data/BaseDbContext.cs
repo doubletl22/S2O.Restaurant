@@ -38,5 +38,5 @@ public abstract class BaseDbContext : DbContext
     }
 
     // Thuộc tính hỗ trợ cho Query Filter
-    private string? _tenantId => _tenantContext.TenantId;
+    private string? _tenantId => null;
 }
