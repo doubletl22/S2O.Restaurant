@@ -14,23 +14,18 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Cấu hình PostgreSQL từ appsettings.json
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. Cấu hình ASP.NET Core Identity
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
 
-// 3. Đăng ký MediatR (Lấy assembly từ lớp App để quét các Handler)
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(S2O.Identity.App.Features.Login.LoginCommand).Assembly));
 
-// 4. Đăng ký các dịch vụ nội bộ
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 
-// 5. Cấu hình Authentication & JWT
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,21 +45,70 @@ builder.Services.AddAuthentication(options => {
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "S2O Identity API",
+        Version = "v1",
+        Description = "Dịch vụ quản lý xác thực và phân quyền hệ thống S2O"
+    });
+
+    // Thêm định nghĩa bảo mật Bearer
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Nhập Token của bạn theo định dạng: Bearer {your_token}"
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddScoped<UpdateAuditableEntitiesInterceptor>();
+builder.Services.AddControllers();
+builder.Services.AddScoped<ITenantContext, TenantContext>();
+builder.Services.AddScoped<UpdateAuditableEntitiesInterceptor>();
+builder.Services.AddDbContext<AuthDbContext>((sp, options) =>
+{
+    // sp là IServiceProvider, giúp lấy Interceptor đã đăng ký ở trên
+    var interceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
+
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .AddInterceptors(interceptor); // Thêm interceptor tại đây
+});
 
 var app = builder.Build();
 
-// Cấu hình Pipeline cho Microservice
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "S2O Identity API V1");
+    });
 }
 
-app.UseTenantResolver(); // Nhận diện TenantId từ Header hoặc Token
+app.UseTenantResolver(); 
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

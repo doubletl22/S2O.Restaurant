@@ -2,8 +2,10 @@
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using S2O.Identity.Domain.Entities;
 using S2O.Shared.Infra.Data;
+using S2O.Shared.Infra.Interceptors;
 using S2O.Shared.Interfaces;
 
 public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
@@ -22,5 +24,17 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole,
 
         // Áp dụng bộ lọc Tenant cho User
         builder.Entity<ApplicationUser>().HasQueryFilter(u => u.TenantId == _tenantContext.TenantId);
+        builder.Entity<ApplicationUser>(entity =>
+        {
+            entity.Property(u => u.TenantId)
+                  .IsRequired(false);
+        });
+
+    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        // Lấy Interceptor từ DI Container
+        //optionsBuilder.AddInterceptors(this.GetService<UpdateAuditableEntitiesInterceptor>());
+        base.OnConfiguring(optionsBuilder);
     }
 }
