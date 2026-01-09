@@ -1,8 +1,5 @@
-﻿// File: S2O.Identity.Infra/Authentication/TokenProvider.cs
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using S2O.Auth.App.Abstractions;
-using S2O.Auth.Domain.Entities;
 using S2O.Identity.App.Abstractions;
 using S2O.Identity.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt;
@@ -21,9 +18,9 @@ public class TokenProvider : ITokenProvider
     {
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-            new Claim("tenant_id", user.TenantId) 
+             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+             new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+             new Claim("tenant_id", user.TenantId?.ToString() ?? string.Empty)
         };
 
         foreach (var role in roles)

@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+﻿namespace S2O.Shared.Kernel.Behaviors;
+using S2O.Shared.Kernel.Results;
+using FluentValidation;
 using MediatR;
-namespace S2O.Shared.Kernel.Behaviors;
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
     where TResponse : Result

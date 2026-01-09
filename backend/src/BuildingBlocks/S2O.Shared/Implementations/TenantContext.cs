@@ -4,5 +4,6 @@ namespace S2O.Shared.Implementations;
 
 public class TenantContext : ITenantContext
 {
-    public string? TenantId { get; set; }
+    public Guid? TenantId { get; set; }
+    public string? Email { get; set; }
 }

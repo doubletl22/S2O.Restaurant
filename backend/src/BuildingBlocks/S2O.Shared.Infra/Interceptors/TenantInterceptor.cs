@@ -26,7 +26,7 @@ public class TenantInterceptor : SaveChangesInterceptor
             if (entry.State == EntityState.Added)
             {
                 // Tự động gán TenantId từ context hiện tại [cite: 12]
-                entry.Property(x => x.TenantId).CurrentValue = _tenantContext.TenantId ?? "system";
+                var tenantId = _tenantContext.TenantId?.ToString() ?? string.Empty;
             }
         }
 

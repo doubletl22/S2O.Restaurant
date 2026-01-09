@@ -1,36 +1,49 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using S2O.Shared.Kernel.Primitives; 
 using S2O.Shared.Interfaces;
-using S2O.Shared.Infra.Interfaces;
+
+namespace S2O.Shared.Infra.Interceptors;
 
 public class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
 {
-    private readonly ITenantContext _tenantContext;
+    private readonly IUserContext _userContext; // 1. Thêm biến này
 
-    public UpdateAuditableEntitiesInterceptor(ITenantContext tenantContext)
+    public UpdateAuditableEntitiesInterceptor(IUserContext userContext)
     {
-        _tenantContext = tenantContext;
+        _userContext = userContext; // 2. Inject vào Constructor
     }
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
-        var dbContext = eventData.Context;
-        if (dbContext is null) return base.SavingChanges(eventData, result);
+        UpdateEntities(eventData.Context);
+        return base.SavingChanges(eventData, result);
+    }
 
-        var entries = dbContext.ChangeTracker.Entries<IMustHaveTenant>();
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+    {
+        UpdateEntities(eventData.Context);
+        return base.SavingChangesAsync(eventData, result, cancellationToken);
+    }
 
-        foreach (var entry in entries)
+    private void UpdateEntities(DbContext? context)
+    {
+        if (context == null) return;
+
+        // 3. Quan trọng: Kiểm tra thực thể có phải là IAuditableEntity không (chứ không phải IMustHaveTenant)
+        foreach (var entry in context.ChangeTracker.Entries<IAuditableEntity>())
         {
             if (entry.State == EntityState.Added)
             {
-                if (string.IsNullOrEmpty(_tenantContext.TenantId))
-                {
-                    throw new InvalidOperationException("TenantId is missing in the current context.");
-                }
-                entry.Property(a => a.TenantId).CurrentValue = _tenantContext.TenantId;
+                entry.Entity.CreatedAtUtc = DateTime.UtcNow;
+                entry.Entity.CreatedBy = _userContext.UserId?.ToString();
+            }
+
+            if (entry.State == EntityState.Added || entry.State == EntityState.Modified)
+            {
+                entry.Entity.LastModifiedAtUtc = DateTime.UtcNow;
+                entry.Entity.LastModifiedBy = _userContext.UserId?.ToString();
             }
         }
-
-        return base.SavingChanges(eventData, result);
     }
 }

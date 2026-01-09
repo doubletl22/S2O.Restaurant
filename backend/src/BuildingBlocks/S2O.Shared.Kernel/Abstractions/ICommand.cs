@@ -1,5 +1,6 @@
-﻿using MediatR;
-namespace S2O.Shared.Kernel.Abstractions;
+﻿namespace S2O.Shared.Kernel.Abstractions;
+using MediatR;
+using S2O.Shared.Kernel.Results;
 public interface ICommand : IRequest<Result> { }
 public interface ICommand<TResponse> : IRequest<Result<TResponse>> { }
 
