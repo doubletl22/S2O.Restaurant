@@ -1,4 +1,5 @@
-﻿using S2O.Order.App.Abstractions;
+﻿namespace S2O.Order.Infra.ExternalServices;
+using S2O.Order.App.Abstractions;
 using S2O.Order.App.DTOs;
 using System.Net.Http.Json;
 

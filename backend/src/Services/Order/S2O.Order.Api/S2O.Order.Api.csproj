@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\S2O.Order.Infra\S2O.Order.Infra.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared\S2O.Shared.csproj" />
+    <ProjectReference Include="..\S2O.Order.App\S2O.Order.App.csproj" />
   </ItemGroup>
 
 </Project>

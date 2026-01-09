@@ -5,6 +5,8 @@ namespace S2O.Order.Domain.Entities;
 public class Order : IAuditableEntity, IMustHaveTenant
 {
     public Guid Id { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public int TableNumber { get; set; }
     public string OrderNumber { get; set; } = string.Empty; // Mã đơn hàng (VD: S2O-2026-001)
     public Guid TableId { get; set; } // Đơn hàng thuộc bàn nào
     public decimal TotalAmount { get; set; }
@@ -13,7 +15,7 @@ public class Order : IAuditableEntity, IMustHaveTenant
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 
     // Multi-tenant & Audit
-    public Guid TenantId { get; set; }
+    public Guid? TenantId { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public string? CreatedBy { get; set; }
     public DateTime? LastModifiedAtUtc { get; set; }
