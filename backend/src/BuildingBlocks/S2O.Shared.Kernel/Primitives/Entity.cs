@@ -1,12 +1,16 @@
 ﻿namespace S2O.Shared.Kernel.Primitives;
 
-public abstract class Entity<TId> : IEntity<TId>
+public abstract class Entity
 {
-    public TId Id { get; set; } = default!;
+    public Guid Id { get; protected set; }
+    public DateTime CreatedAtUtc { get; set; }
+    public DateTime? ModifiedAtUtc { get; set; }
 
-    // Triển khai Audit Log
-    public DateTime? CreatedAt { get; set; }
-    public string? CreatedBy { get; set; }
-    public DateTime? LastModified { get; set; }
-    public string? LastModifiedBy { get; set; }
+    protected Entity(Guid id) => Id = id;
+    protected Entity() => Id = Guid.NewGuid();
+}
+
+public abstract class AggregateRoot : Entity
+{
+    // Dùng cho mô hình CQRS và Domain Events sau này
 }

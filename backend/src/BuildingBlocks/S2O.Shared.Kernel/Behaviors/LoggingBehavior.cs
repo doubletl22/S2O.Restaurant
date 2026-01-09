@@ -1,36 +1,25 @@
-﻿using System.Diagnostics;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
-
 namespace S2O.Shared.Kernel.Behaviors;
+using S2O.Shared.Kernel.Results;
 
-public class LoggingBehavior<TRequest, TResponse>
-    : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : notnull
+public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IRequest<TResponse>
+    where TResponse : Result
 {
     private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
 
-    public LoggingBehavior(ILogger<LoggingBehavior<TRequest, TResponse>> logger)
-    {
-        _logger = logger;
-    }
+    public LoggingBehavior(ILogger<LoggingBehavior<TRequest, TResponse>> logger) => _logger = logger;
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        var requestName = typeof(TRequest).Name;
-        _logger.LogInformation("[START] Handling command {RequestName}", requestName);
+        _logger.LogInformation("Starting request {RequestName}", typeof(TRequest).Name);
+        var result = await next();
 
-        var timer = Stopwatch.StartNew();
-        var response = await next();
-        timer.Stop();
+        if (result.IsFailure)
+            _logger.LogError("Request {RequestName} failed with error: {Error}", typeof(TRequest).Name, result.Error);
 
-        if (timer.ElapsedMilliseconds > 500) // Cảnh báo nếu chạy quá 500ms
-        {
-            _logger.LogWarning("[PERFORMANCE] Long running request: {RequestName} ({ElapsedMilliseconds}ms)",
-                requestName, timer.ElapsedMilliseconds);
-        }
-
-        _logger.LogInformation("[END] Handled {RequestName}", requestName);
-        return response;
+        _logger.LogInformation("Completed request {RequestName}", typeof(TRequest).Name);
+        return result;
     }
 }
