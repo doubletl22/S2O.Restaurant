@@ -1,7 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Transfer;
 using Microsoft.Extensions.Configuration;
-using S2O.Shared.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 
 namespace S2O.Shared.Infra.Services;
 

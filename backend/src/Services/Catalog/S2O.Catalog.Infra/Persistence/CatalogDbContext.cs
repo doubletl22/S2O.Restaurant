@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using S2O.Catalog.Domain.Entities;
-using S2O.Shared.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Catalog.App.Abstractions;
 
 namespace S2O.Catalog.Infra.Persistence;

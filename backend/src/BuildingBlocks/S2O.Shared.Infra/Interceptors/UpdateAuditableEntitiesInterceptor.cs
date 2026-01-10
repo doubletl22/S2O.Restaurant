@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using S2O.Shared.Kernel.Primitives; 
-using S2O.Shared.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 
 namespace S2O.Shared.Infra.Interceptors;
 

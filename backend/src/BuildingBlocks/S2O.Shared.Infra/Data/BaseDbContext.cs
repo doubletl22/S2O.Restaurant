@@ -1,6 +1,6 @@
-﻿// File: BuildingBlocks/S2O.Shared.Infra/Data/BaseDbContext.cs
+﻿// Path: S2O.Shared.Infra/Data/BaseDbContext.cs
 using Microsoft.EntityFrameworkCore;
-using S2O.Shared.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Primitives;
 using System.Linq.Expressions;
 
@@ -20,23 +20,22 @@ public abstract class BaseDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Tự động áp dụng bộ lọc Tenant cho tất cả thực thể có ITenantEntity [cite: 32]
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            if (typeof(ITenantEntity).IsAssignableFrom(entityType.ClrType))
+            // Kiểm tra Entity có thực thi IMustHaveTenant không
+            if (typeof(IMustHaveTenant).IsAssignableFrom(entityType.ClrType))
             {
                 var parameter = Expression.Parameter(entityType.ClrType, "e");
                 var body = Expression.Equal(
-                    Expression.Property(parameter, nameof(ITenantEntity.TenantId)),
-                    Expression.Property(Expression.Constant(this), nameof(_tenantId))
+                    Expression.Property(parameter, nameof(IMustHaveTenant.TenantId)),
+                    Expression.Property(Expression.Constant(this), nameof(CurrentTenantId))
                 );
                 var lambda = Expression.Lambda(body, parameter);
-
                 modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
             }
         }
     }
 
-    // Thuộc tính hỗ trợ cho Query Filter
-    private string? _tenantId => null;
+    // Thuộc tính để Query Filter có thể truy cập giá trị từ _tenantContext
+    public Guid? CurrentTenantId => _tenantContext.TenantId;
 }

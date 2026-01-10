@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using S2O.Identity.Domain.Entities;
 using S2O.Shared.Infra.Data;
 using S2O.Shared.Infra.Interceptors;
-using S2O.Shared.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 
 public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
 {

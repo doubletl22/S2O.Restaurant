@@ -5,9 +5,10 @@ using S2O.Order.App.Abstractions;
 using S2O.Order.App.Features.Orders.Commands;
 using S2O.Order.Infra.ExternalServices;
 using S2O.Order.Infra.Persistence;
-using S2O.Shared.Implementations;
+using S2O.Shared.Infra.Services;
 using S2O.Shared.Infra.Interceptors;
-using S2O.Shared.Interfaces;
+using S2O.Shared.Infra;
+using S2O.Shared.Kernel.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,8 +48,8 @@ builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client => {
 // --- 4. Cấu hình Multi-tenant & User Context ---
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITenantContext, TenantContext>();
+builder.Services.AddSharedInfrastructure();
 builder.Services.AddScoped<IUserContext, UserContext>();
-
 // --- 5. Cấu hình MediatR ---
 // Đăng ký các Handler nằm trong project App
 builder.Services.AddMediatR(cfg =>
