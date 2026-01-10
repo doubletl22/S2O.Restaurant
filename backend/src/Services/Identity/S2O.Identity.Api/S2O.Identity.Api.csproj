@@ -20,8 +20,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\S2O.Identity.Infra\S2O.Identity.Infra.csproj" />
-		<ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared\S2O.Shared.csproj" />
 		<ProjectReference Include="..\S2O.Identity.Domain\S2O.Identity.Domain.csproj" />
 		<ProjectReference Include="..\S2O.Identity.App\S2O.Identity.App.csproj" />
+		<ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared.Kernel\S2O.Shared.Kernel.csproj" />
+		<ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared.Infra\S2O.Shared.Infra.csproj" />
 	</ItemGroup>
 </Project>

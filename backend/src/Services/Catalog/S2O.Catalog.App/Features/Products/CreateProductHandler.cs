@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using S2O.Catalog.App.Features.Products;
 using S2O.Catalog.Domain.Entities;
-using S2O.Shared.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Results;
 using S2O.Catalog.App.Abstractions;
 
