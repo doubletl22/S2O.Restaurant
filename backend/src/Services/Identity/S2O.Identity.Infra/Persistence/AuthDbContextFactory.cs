@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using S2O.Shared.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 
 namespace S2O.Identity.Infra.Persistence;
 

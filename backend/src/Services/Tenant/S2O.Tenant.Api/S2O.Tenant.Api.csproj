@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\S2O.Tenant.Infra\S2O.Tenant.Infra.csproj" />
-    <ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared\S2O.Shared.csproj" />
   </ItemGroup>
 
 </Project>
