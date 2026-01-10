@@ -2,7 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using S2O.Order.Domain.Entities;
-using S2O.Shared.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Order.App.Abstractions;
 
 public class OrderDbContext : DbContext, IOrderDbContext

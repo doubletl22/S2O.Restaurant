@@ -2,7 +2,7 @@
 using S2O.Order.App.Abstractions;
 using S2O.Order.App.Features.Orders.Commands;
 using S2O.Order.Domain.Entities;
-using S2O.Shared.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Results;
 
 public class PlaceOrderHandler : IRequestHandler<PlaceOrderCommand, Result<Guid>>

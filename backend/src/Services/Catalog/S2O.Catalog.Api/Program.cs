@@ -5,15 +5,14 @@ using Microsoft.IdentityModel.Tokens;
 using S2O.Catalog.App.Abstractions;
 using S2O.Catalog.App.Features.Products;
 using S2O.Catalog.Infra.Persistence;
-using S2O.Shared.Implementations;
 using S2O.Shared.Infra.Interceptors;
 using S2O.Shared.Infra.Services;
-using S2O.Shared.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
+using S2O.Shared.Infra;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Cấu hình Database & Interceptor (Lưu ý dùng DB riêng S2O_Catalog_Db)
 builder.Services.AddScoped<UpdateAuditableEntitiesInterceptor>();
 builder.Services.AddDbContext<CatalogDbContext>((sp, options) => {
     var interceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
@@ -21,21 +20,13 @@ builder.Services.AddDbContext<CatalogDbContext>((sp, options) => {
            .AddInterceptors(interceptor);
 });
 builder.Services.AddScoped<ICatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
-
-// 2. Cấu hình AWS S3
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddAWSService<IAmazonS3>();
 builder.Services.AddScoped<IFileStorageService, S3StorageService>();
-
-// 3. Cấu hình Multi-tenant & User Context
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ITenantContext, TenantContext>();
+builder.Services.AddSharedInfrastructure();
 builder.Services.AddScoped<IUserContext, UserContext>();
-
-// 4. Cấu hình MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateProductCommand).Assembly));
-
-// 5. Cấu hình JWT Authentication (Copy từ Identity Service để giải mã Token)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -56,8 +47,37 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // Đừng quên cấu hình nút Authorize như bên Identity
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "S2O Catalog API", Version = "v1" });
 
+    // 1. Định nghĩa chuẩn bảo mật JWT cho Swagger
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Dán Token vào đây theo định dạng: Bearer {token}"
+    });
+
+    // 2. Yêu cầu Swagger sử dụng định nghĩa trên cho các API
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -71,9 +91,9 @@ using (var scope = app.Services.CreateScope())
     var context = services.GetRequiredService<CatalogDbContext>();
     await CatalogDataSeeder.SeedAsync(context);
 }
-// Middleware giải mã TenantId từ Token JWT
+
+
 app.UseAuthentication();
-// app.UseTenantResolver(); // Nếu Lâm đã viết Middleware này trong Shared
 app.UseAuthorization();
 app.MapControllers();
 
