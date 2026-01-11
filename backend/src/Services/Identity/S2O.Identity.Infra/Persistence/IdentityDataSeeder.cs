@@ -27,7 +27,7 @@ public static class IdentityDataSeeder
                 UserName = adminEmail,
                 Email = adminEmail,
                 FullName = "S2O System Administrator",
-                TenantId = null, // Tài khoản admin tổng không thuộc tenant nào
+                TenantId = null, 
                 EmailConfirmed = true
             };
 

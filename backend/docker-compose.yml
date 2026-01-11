@@ -1,19 +1,72 @@
 version: '3.8'
 
 services:
-  db-identity:
+  s2o.db:
     image: postgres:latest
-    container_name: s2o-postgres-identity
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 432005
-      POSTGRES_DB: S2O_Identity
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_DB=S2O_Identity_Db
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: s2o-rabbitmq
+  identity-api:
+    build:
+      context: .
+      dockerfile: src/Services/Identity/S2O.Identity.Api/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=s2o.db;Database=S2O_Identity_Db;Username=postgres;Password=admin123
+    depends_on:
+       s2o.db: 
+          condition: service_healthy
+
+  catalog-api:
+    build:
+      context: .
+      dockerfile: src/Services/Catalog/S2O.Catalog.Api/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=s2o.db;Database=S2O_Catalog_Db;Username=postgres;Password=admin123
+    depends_on:
+      - s2o.db
+
+  order-api:
+    build:
+      context: .
+      dockerfile: src/Services/Order/S2O.Order.Api/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=s2o.db;Database=S2O_Order_Db;Username=postgres;Password=admin123
+    depends_on:
+      - s2o.db
+
+  minio:
+      image: minio/minio
+      container_name: s2o_minio
+      ports:
+        - "9000:9000"   # Port API (Code sẽ gọi vào đây)
+        - "9001:9001"   # Port Web UI (Bạn vào đây quản lý file)
+      environment:
+        MINIO_ROOT_USER: minioadmin
+        MINIO_ROOT_PASSWORD: minioadmin
+      command: server /data --console-address ":9001"
+      volumes:
+        - minio_data:/data
+
+  gateway:
+    build:
+      context: .
+      dockerfile: src/Gateways/S2O.GateWay/Dockerfile
     ports:
-      - "5672:5672"
-      - "15672:15672"                                              
+      - "5000:8080"
+    depends_on:
+      - identity-api
+      - catalog-api
+      - order-api
+
+volumes:
+  postgres_data:
+  minio_data:
