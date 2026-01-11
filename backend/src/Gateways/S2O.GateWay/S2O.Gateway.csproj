@@ -27,6 +27,11 @@
     <Folder Include="Authorization\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\S2O.Shared.Infra\S2O.Shared.Infra.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\S2O.Shared.Kernel\S2O.Shared.Kernel.csproj" />
+  </ItemGroup>
+
 	<ItemGroup>
         <Content Update="ocelot.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
