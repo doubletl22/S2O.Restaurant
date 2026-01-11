@@ -17,7 +17,9 @@ public class TenantContext : ITenantContext
     {
         get
         {
-            var tid = _httpContextAccessor.HttpContext?.User?.FindFirst("tenantId")?.Value;
+            var tid = _httpContextAccessor.HttpContext?.User?.FindFirst("tenantId")?.Value
+                   ?? _httpContextAccessor.HttpContext?.User?.FindFirst("TenantId")?.Value;
+
             return Guid.TryParse(tid, out var guid) ? guid : null;
         }
         set { }

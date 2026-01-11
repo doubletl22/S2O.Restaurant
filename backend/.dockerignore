@@ -1,7 +1,8 @@
-**/.dockerignore
-**/.env
-**/bin/
-**/obj/
-**/.vs/
-**/.git/
-**/docker-compose*
+**/.bin
+**/.obj
+**/out
+**/.git
+**/.vs
+**/.vscode
+**/bin
+**/obj

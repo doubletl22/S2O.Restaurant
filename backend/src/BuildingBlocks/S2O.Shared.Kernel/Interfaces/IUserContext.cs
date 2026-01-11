@@ -1,5 +1,4 @@
-﻿// Path: BuildingBlocks/S2O.Shared.Kernel/Interfaces/IUserContext.cs
-namespace S2O.Shared.Kernel.Interfaces;
+﻿namespace S2O.Shared.Kernel.Interfaces;
 
 public interface IUserContext
 {

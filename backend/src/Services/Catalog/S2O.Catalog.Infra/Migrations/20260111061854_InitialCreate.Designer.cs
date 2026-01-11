@@ -12,8 +12,8 @@ using S2O.Catalog.Infra.Persistence;
 namespace S2O.Catalog.Infra.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    [Migration("20260109092126_InitialCatalogDb")]
-    partial class InitialCatalogDb
+    [Migration("20260111061854_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,7 +50,7 @@ namespace S2O.Catalog.Infra.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("TenantId")
+                    b.Property<Guid?>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -97,7 +97,7 @@ namespace S2O.Catalog.Infra.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)");
 
-                    b.Property<Guid>("TenantId")
+                    b.Property<Guid?>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");

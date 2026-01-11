@@ -1,5 +1,4 @@
-﻿// Path: BuildingBlocks/S2O.Shared.Infra/Services/UserContext.cs
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using S2O.Shared.Kernel.Interfaces;
 using System.Security.Claims;
 
