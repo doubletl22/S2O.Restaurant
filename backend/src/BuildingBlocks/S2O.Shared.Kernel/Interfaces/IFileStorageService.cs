@@ -1,5 +1,4 @@
-﻿// Path: BuildingBlocks/S2O.Shared.Kernel/Interfaces/IFileStorageService.cs
-namespace S2O.Shared.Kernel.Interfaces;
+﻿namespace S2O.Shared.Kernel.Interfaces;
 
 public interface IFileStorageService
 {

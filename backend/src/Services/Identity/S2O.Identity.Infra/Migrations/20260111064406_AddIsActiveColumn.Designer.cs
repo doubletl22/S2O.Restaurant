@@ -12,8 +12,8 @@ using S2O.Identity.Infra.Persistence;
 namespace S2O.Identity.Infra.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20260109083553_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260111064406_AddIsActiveColumn")]
+    partial class AddIsActiveColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -186,6 +186,9 @@ namespace S2O.Identity.Infra.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");

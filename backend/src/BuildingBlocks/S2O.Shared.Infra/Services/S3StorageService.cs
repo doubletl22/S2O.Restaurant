@@ -16,6 +16,8 @@ public class S3StorageService : IFileStorageService
         _bucketName = configuration["S3:BucketName"]!;
     }
 
+    // File: backend/src/BuildingBlocks/S2O.Shared.Infra/Services/S3StorageService.cs
+
     public async Task<string> UploadAsync(Stream fileStream, string fileName, string contentType)
     {
         var fileKey = $"{Guid.NewGuid()}-{fileName}";
@@ -25,12 +27,20 @@ public class S3StorageService : IFileStorageService
             Key = fileKey,
             BucketName = _bucketName,
             ContentType = contentType,
-            CannedACL = S3CannedACL.PublicRead // Để khách hàng có thể xem ảnh qua URL
+            CannedACL = S3CannedACL.PublicRead
         };
 
         using var transferUtility = new TransferUtility(_s3Client);
         await transferUtility.UploadAsync(uploadRequest);
 
+        // KIỂM TRA: Nếu có ServiceURL trong config (đang chạy MinIO/LocalStack)
+        if (!string.IsNullOrEmpty(_s3Client.Config.ServiceURL))
+        {
+            // Trả về link local: http://localhost:9000/s2o-catalog/tên-file
+            return $"{_s3Client.Config.ServiceURL}/{_bucketName}/{fileKey}";
+        }
+
+        // Ngược lại trả về link AWS S3 chuẩn
         return $"https://{_bucketName}.s3.amazonaws.com/{fileKey}";
     }
 

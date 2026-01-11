@@ -20,7 +20,7 @@ public class TokenService
             new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
             new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("tenant_id", user.TenantId?.ToString() ?? string.Empty) // Khử cảnh báo null (Warning CS8604)
+            new Claim("tenantId", user.TenantId?.ToString() ?? string.Empty) // Khử cảnh báo null (Warning CS8604)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"] ?? throw new InvalidOperationException("JWT Secret is missing")));

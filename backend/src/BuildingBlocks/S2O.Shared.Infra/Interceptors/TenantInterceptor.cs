@@ -1,5 +1,4 @@
-﻿// File: BuildingBlocks/S2O.Shared.Infra/Interceptors/TenantInterceptor.cs
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Primitives;
