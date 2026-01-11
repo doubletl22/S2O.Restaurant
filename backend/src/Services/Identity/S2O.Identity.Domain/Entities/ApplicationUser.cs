@@ -7,7 +7,8 @@ public class ApplicationUser : IdentityUser, ITenantEntity
 {
     public string FullName { get; set; } = string.Empty;
 
-    public Guid? TenantId { get; set; } 
+    public Guid? TenantId { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 }

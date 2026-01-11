@@ -1,5 +1,4 @@
-﻿// Path: S2O.Shared.Infra/Data/BaseDbContext.cs
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Primitives;
 using System.Linq.Expressions;
@@ -11,10 +10,7 @@ public abstract class BaseDbContext : DbContext
     protected readonly ITenantContext _tenantContext;
 
     protected BaseDbContext(DbContextOptions options, ITenantContext tenantContext)
-        : base(options)
-    {
-        _tenantContext = tenantContext;
-    }
+        : base(options) => _tenantContext = tenantContext;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,10 +18,12 @@ public abstract class BaseDbContext : DbContext
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            // Kiểm tra Entity có thực thi IMustHaveTenant không
+            // Đổi từ ITenantEntity sang IMustHaveTenant cho đồng bộ với Product
             if (typeof(IMustHaveTenant).IsAssignableFrom(entityType.ClrType))
             {
                 var parameter = Expression.Parameter(entityType.ClrType, "e");
+
+                // So sánh thuộc tính TenantId của Entity với CurrentTenantId của DbContext
                 var body = Expression.Equal(
                     Expression.Property(parameter, nameof(IMustHaveTenant.TenantId)),
                     Expression.Property(Expression.Constant(this), nameof(CurrentTenantId))
@@ -36,6 +34,6 @@ public abstract class BaseDbContext : DbContext
         }
     }
 
-    // Thuộc tính để Query Filter có thể truy cập giá trị từ _tenantContext
+    // EF Core sẽ gọi thuộc tính này mỗi khi thực thi truy vấn
     public Guid? CurrentTenantId => _tenantContext.TenantId;
 }
