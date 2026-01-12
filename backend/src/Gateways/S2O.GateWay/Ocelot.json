@@ -1,6 +1,7 @@
 ﻿{
   "Routes": [
-    // 1. Identity Service (Giữ nguyên)
+    // ==========================================
+    // 1. IDENTITY SERVICE
     {
       "DownstreamPathTemplate": "/api/auth/{everything}",
       "DownstreamScheme": "http",
@@ -9,7 +10,44 @@
       "UpstreamHttpMethod": [ "POST" ]
     },
 
-    // 2. Catalog Service - Products (Sửa lại để nhận cả /api/products)
+    // ==========================================
+    // 2. TENANT SERVICE 
+    {
+      "DownstreamPathTemplate": "/api/tables/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "tenant-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/tables/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/tables",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "tenant-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/tables",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+
+    // ==========================================
+    // 3. CATALOG SERVICE
+    
+    // 3.1 Public Menu (Dành cho Guest - KHÔNG CẦN AUTH)
+    {
+      "DownstreamPathTemplate": "/api/public/menu",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "catalog-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/public/menu",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+
+    // 3.2 Products (Quản lý - Cần Auth)
     {
       "DownstreamPathTemplate": "/api/products/{everything}",
       "DownstreamScheme": "http",
@@ -33,7 +71,7 @@
       }
     },
 
-    // 3. Catalog Service - Categories (THÊM MỚI)
+    // 3.3 Categories (Quản lý - Cần Auth)
     {
       "DownstreamPathTemplate": "/api/categories/{everything}",
       "DownstreamScheme": "http",
@@ -57,13 +95,37 @@
       }
     },
 
-    // 4. Order Service (Giữ nguyên)
+    // ==========================================
+    // 4. ORDER SERVICE
+
+    // 4.1 Guest Order (Đặt món - KHÔNG CẦN AUTH)
+    // Đặt route này TRƯỚC route chung để ưu tiên match
+    {
+      "DownstreamPathTemplate": "/api/orders/guest",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/orders/guest",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+
+    // 4.2 Order Management (Chủ quán - Cần Auth)
     {
       "DownstreamPathTemplate": "/api/orders/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/orders/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/orders",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/orders",
+      "UpstreamHttpMethod": [ "GET" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []

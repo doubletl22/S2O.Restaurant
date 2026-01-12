@@ -1,7 +1,9 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using S2O.Order.App.Features.Orders.Queries;
+using S2O.Order.App.Features.Orders.Commands;
 using S2O.Order.App.Features.Orders.Commands.CreateOrder;
+using S2O.Order.App.Features.Orders.Queries;
 
 namespace S2O.Order.Api.Controllers;
 
@@ -26,6 +28,15 @@ public class OrdersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderCommand command)
     {
+        var result = await _mediator.Send(command);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
+    [HttpPost("guest")]
+    [AllowAnonymous] // Mấu chốt: Cho phép không cần đăng nhập
+    public async Task<IActionResult> PlaceGuestOrder([FromBody] PlaceGuestOrderCommand command)
+    {
+        // Frontend PHẢI gửi header "X-Tenant-Id"
         var result = await _mediator.Send(command);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }

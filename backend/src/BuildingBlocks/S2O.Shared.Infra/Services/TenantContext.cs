@@ -7,6 +7,7 @@ namespace S2O.Shared.Infra.Services;
 public class TenantContext : ITenantContext
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private Guid? _tenantId;
 
     public TenantContext(IHttpContextAccessor httpContextAccessor)
     {
@@ -17,12 +18,28 @@ public class TenantContext : ITenantContext
     {
         get
         {
-            var tid = _httpContextAccessor.HttpContext?.User?.FindFirst("tenantId")?.Value
-                   ?? _httpContextAccessor.HttpContext?.User?.FindFirst("TenantId")?.Value;
+            if (_tenantId.HasValue) return _tenantId.Value;
 
-            return Guid.TryParse(tid, out var guid) ? guid : null;
+            var context = _httpContextAccessor.HttpContext;
+            if (context == null) return null;
+
+            var tidString = context.User?.FindFirst("tenantId")?.Value
+                         ?? context.User?.FindFirst("TenantId")?.Value;
+
+            if (string.IsNullOrEmpty(tidString) && context.Request.Headers.TryGetValue("X-Tenant-Id", out var headerId))
+            {
+                tidString = headerId;
+            }
+
+            if (Guid.TryParse(tidString, out var guid))
+            {
+                _tenantId = guid; 
+                return guid;
+            }
+
+            return null;
         }
-        set { }
+        set => _tenantId = value;
     }
 
     public string? Email
