@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using ErrorOr;
+using MediatR;
 using S2O.Shared.Kernel.Results;
 
 namespace S2O.Catalog.App.Features.Products;
@@ -9,6 +10,5 @@ public record CreateProductCommand(
     decimal Price,
     Guid CategoryId,
     Stream ImageStream,
-    string ImageName,
-    string ContentType
-) : IRequest<Result<Guid>>;
+    string FileName
+) : IRequest<ErrorOr<Guid>>;

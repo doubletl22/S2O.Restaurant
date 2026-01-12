@@ -6,11 +6,7 @@ public class Category : IAuditableEntity, IMustHaveTenant
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
-
-    // Thuộc tính bắt buộc cho Multi-tenant
     public Guid? TenantId { get; set; }
-
-    // Thuộc tính Audit
     public DateTime CreatedAtUtc { get; set; }
     public string? CreatedBy { get; set; }
     public DateTime? LastModifiedAtUtc { get; set; }
