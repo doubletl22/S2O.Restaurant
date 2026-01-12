@@ -85,6 +85,22 @@ services:
       s2o.db:
         condition: service_healthy
 
+  booking-api:
+    build:
+      context: .
+      dockerfile: src/Services/Booking/S2O.Booking.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=s2o.db;Database=S2O_Booking_Db;Username=postgres;Password=admin123
+      - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
+      - Jwt__Issuer=S2O.Identity
+      - Jwt__Audience=S2O.Restaurant
+    depends_on:
+      s2o.db:
+        condition: service_healthy
+
+  
+
   gateway:
     build:
       context: .
@@ -104,6 +120,7 @@ services:
       - catalog-api
       - order-api
       - tenant-api
+      - booking-api
 
 volumes:
   postgres_data:
