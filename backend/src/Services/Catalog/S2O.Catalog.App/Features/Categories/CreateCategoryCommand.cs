@@ -13,7 +13,9 @@ public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, Resu
     private readonly ICatalogDbContext _context;
     private readonly ITenantContext _tenantContext;
 
-    public CreateCategoryHandler(ICatalogDbContext context, ITenantContext tenantContext)
+    public CreateCategoryHandler(
+        ICatalogDbContext context, 
+        ITenantContext tenantContext)
     {
         _context = context;
         _tenantContext = tenantContext;
@@ -26,7 +28,6 @@ public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, Resu
             Id = Guid.NewGuid(),
             Name = request.Name,
             Description = request.Description,
-            // Lấy TenantId từ Context giống như Product
             TenantId = _tenantContext.TenantId ?? throw new UnauthorizedAccessException("Không tìm thấy TenantId!")
         };
 

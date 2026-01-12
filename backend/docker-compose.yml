@@ -6,14 +6,12 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=admin123
-      - POSTGRES_DB=S2O_Identity_Db
-      - POSTGRES_DB=S2O_Catalog_Db
-      - POSTGRES_DB=S2O_Order_Db
-      - POSTGRES_DB=S2O_Tenant_Db
+      - POSTGRES_DB=postgres
       - TZ=Asia/Ho_Chi_Minh      
       - PGTZ=Asia/Ho_Chi_Minh
     volumes:
       - postgres_data:/var/lib/postgresql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     ports:
       - "5433:5432"
     healthcheck:
