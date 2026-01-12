@@ -124,6 +124,15 @@
       "DownstreamHostAndPorts": [{ "Host": "booking-api", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/bookings/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+    },
+    // ==========================================
+    // 6. PAYMENT SERVICE
+    {
+      "DownstreamPathTemplate": "/api/payments/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "payment-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/payments/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     }
 
 
