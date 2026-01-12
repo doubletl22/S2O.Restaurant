@@ -2,7 +2,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\S2O.Tenant.App\S2O.Tenant.App.csproj" />
+	  <ProjectReference Include="..\S2O.Tenant.Domain\S2O.Tenant.Domain.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\S2O.Shared.Infra\S2O.Shared.Infra.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <PropertyGroup>

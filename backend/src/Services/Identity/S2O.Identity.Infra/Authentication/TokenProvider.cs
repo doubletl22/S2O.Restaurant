@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using S2O.Identity.App.Abstractions;
 using S2O.Identity.Domain.Entities;
+using S2O.Shared.Kernel.Constants;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,7 +21,7 @@ public class TokenProvider : ITokenProvider
         {
              new Claim(JwtRegisteredClaimNames.Sub, user.Id),
              new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-             new Claim("tenant_id", user.TenantId?.ToString() ?? string.Empty)
+             new Claim(ClaimConstants.TenantId, user.TenantId?.ToString() ?? string.Empty)
         };
 
         foreach (var role in roles)

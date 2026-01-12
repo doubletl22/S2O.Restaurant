@@ -6,9 +6,14 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=admin123
-      - POSTGRES_DB=S2O_Identity_Db
+      - POSTGRES_DB=postgres
+      - TZ=Asia/Ho_Chi_Minh      
+      - PGTZ=Asia/Ho_Chi_Minh
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -20,53 +25,85 @@ services:
       context: .
       dockerfile: src/Services/Identity/S2O.Identity.Api/Dockerfile
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=s2o.db;Database=S2O_Identity_Db;Username=postgres;Password=admin123
+      - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
+      - Jwt__Issuer=S2O.Identity
+      - Jwt__Audience=S2O.Restaurant
+      - Cloudinary__CloudName=${CLOUDINARY_NAME}
+      - Cloudinary__ApiKey=${CLOUDINARY_KEY}
+      - Cloudinary__ApiSecret=${CLOUDINARY_SECRET}
     depends_on:
-       s2o.db: 
-          condition: service_healthy
+      s2o.db: 
+        condition: service_healthy
 
   catalog-api:
     build:
       context: .
       dockerfile: src/Services/Catalog/S2O.Catalog.Api/Dockerfile
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=s2o.db;Database=S2O_Catalog_Db;Username=postgres;Password=admin123
+      - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
+      - Jwt__Issuer=S2O.Identity
+      - Jwt__Audience=S2O.Restaurant
+      - Cloudinary__CloudName=${CLOUDINARY_NAME}
+      - Cloudinary__ApiKey=${CLOUDINARY_KEY}
+      - Cloudinary__ApiSecret=${CLOUDINARY_SECRET}
     depends_on:
-      - s2o.db
-
+      s2o.db:
+        condition: service_healthy
+    
   order-api:
     build:
       context: .
       dockerfile: src/Services/Order/S2O.Order.Api/Dockerfile
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=s2o.db;Database=S2O_Order_Db;Username=postgres;Password=admin123
+      - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
+      - Jwt__Issuer=S2O.Identity
+      - Jwt__Audience=S2O.Restaurant
+      - Cloudinary__CloudName=${CLOUDINARY_NAME}
+      - Cloudinary__ApiKey=${CLOUDINARY_KEY}
+      - Cloudinary__ApiSecret=${CLOUDINARY_SECRET}
     depends_on:
-      - s2o.db
+      s2o.db:
+        condition: service_healthy
 
-  minio:
-      image: minio/minio
-      container_name: s2o_minio
-      ports:
-        - "9000:9000"   # Port API (Code sẽ gọi vào đây)
-        - "9001:9001"   # Port Web UI (Bạn vào đây quản lý file)
-      environment:
-        MINIO_ROOT_USER: minioadmin
-        MINIO_ROOT_PASSWORD: minioadmin
-      command: server /data --console-address ":9001"
-      volumes:
-        - minio_data:/data
+  tenant-api:
+    build:
+      context: .
+      dockerfile: src/Services/Tenant/S2O.Tenant.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=s2o.db;Database=S2O_Tenant_Db;Username=postgres;Password=admin123
+      - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
+      - Jwt__Issuer=S2O.Identity
+      - Jwt__Audience=S2O.Restaurant
+    depends_on:
+      s2o.db:
+        condition: service_healthy
 
   gateway:
     build:
       context: .
       dockerfile: src/Gateways/S2O.GateWay/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
+      - Jwt__Issuer=S2O.Identity
+      - Jwt__Audience=S2O.Restaurant
+      - Cloudinary__CloudName=${CLOUDINARY_NAME}
+      - Cloudinary__ApiKey=${CLOUDINARY_KEY}
+      - Cloudinary__ApiSecret=${CLOUDINARY_SECRET}
     ports:
       - "5000:8080"
     depends_on:
       - identity-api
       - catalog-api
       - order-api
+      - tenant-api
 
 volumes:
   postgres_data:
-  minio_data:

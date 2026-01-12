@@ -1,14 +1,16 @@
-﻿namespace S2O.Order.Domain.Entities;
+﻿using S2O.Shared.Kernel.Primitives;
+namespace S2O.Order.Domain.Entities;
 
-public class OrderItem
+public class OrderItem : Entity, IMustHaveTenant
 {
-    public Guid Id { get; set; }
-    public Guid ProductId { get; set; } // ID món ăn từ Catalog Service
-    public string ProductName { get; set; } = string.Empty; // Lưu tên món tại thời điểm đặt (tránh đổi tên menu làm sai lệch hóa đơn cũ)
+    public new Guid Id { get; set; }
+    public Guid OrderId { get; set; }
+    public Guid ProductId { get; set; }
+    public string ProductName { get; set; } = string.Empty;
     public decimal UnitPrice { get; set; }
     public int Quantity { get; set; }
     public decimal TotalPrice => UnitPrice * Quantity;
-
-    public Guid OrderId { get; set; }
+    public string? Note { get; set; }
     public Order Order { get; set; } = null!;
+    public Guid? TenantId { get; set; }
 }

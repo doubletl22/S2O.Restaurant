@@ -1,30 +1,41 @@
-﻿using Amazon.S3;
+﻿using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Catalog.App.Abstractions;
 using S2O.Catalog.App.Features.Products;
 using S2O.Catalog.Infra.Persistence;
+using S2O.Infra.Services;
+using S2O.Kernel.Interfaces;
+using S2O.Shared.Infra;
 using S2O.Shared.Infra.Interceptors;
 using S2O.Shared.Infra.Services;
 using S2O.Shared.Kernel.Interfaces;
-using S2O.Shared.Infra;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var cloudinaryConfig = builder.Configuration.GetSection("Cloudinary");
+
+var account = new Account(
+    cloudinaryConfig["CloudName"],
+    cloudinaryConfig["ApiKey"],
+    cloudinaryConfig["ApiSecret"]
+);
+
+var cloudinary = new Cloudinary(account);
+builder.Services.AddSingleton(cloudinary);
+builder.Services.AddSharedInfrastructure(builder.Configuration);
+builder.Services.AddScoped<TenantInterceptor>();
 builder.Services.AddScoped<UpdateAuditableEntitiesInterceptor>();
 builder.Services.AddDbContext<CatalogDbContext>((sp, options) => {
-    var interceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
+    var tenantInterceptor = sp.GetRequiredService<TenantInterceptor>();
+    var auditableInterceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .AddInterceptors(interceptor);
+           .AddInterceptors(auditableInterceptor, tenantInterceptor);
 });
 builder.Services.AddScoped<ICatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
-builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
-builder.Services.AddAWSService<IAmazonS3>();
-builder.Services.AddScoped<IFileStorageService, S3StorageService>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddSharedInfrastructure();
 builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateProductCommand).Assembly));
 builder.Services.AddAuthentication(options =>
@@ -44,7 +55,7 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
         };
     });
-
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -80,6 +91,15 @@ builder.Services.AddSwaggerGen(options =>
 });
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<CatalogDbContext>();
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
+}
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

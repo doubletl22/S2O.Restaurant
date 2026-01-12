@@ -32,12 +32,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 3. Đăng ký Ocelot
 builder.Services.AddOcelot(builder.Configuration);
-
-// NẾU BẠN DÙNG SHARED: Hãy vào Shared xóa đoạn AddAuthentication trong đó 
-// để tránh lỗi "Scheme already exists" đã gặp lúc trước.
-builder.Services.AddSharedInfrastructure();
+builder.Services.AddSharedInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
