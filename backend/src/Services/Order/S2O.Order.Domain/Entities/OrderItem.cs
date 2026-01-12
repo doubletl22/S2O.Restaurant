@@ -8,6 +8,7 @@ public class OrderItem
     public decimal UnitPrice { get; set; }
     public int Quantity { get; set; }
     public decimal TotalPrice => UnitPrice * Quantity;
+    public string? Note { get; set; }
 
     public Guid OrderId { get; set; }
     public Order Order { get; set; } = null!;

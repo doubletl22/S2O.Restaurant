@@ -5,16 +5,16 @@ namespace S2O.Order.Domain.Entities;
 public class Order : IAuditableEntity, IMustHaveTenant
 {
     public Guid Id { get; set; }
+    public Guid? CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
     public int TableNumber { get; set; }
-    public string OrderNumber { get; set; } = string.Empty; // Mã đơn hàng (VD: S2O-2026-001)
-    public Guid TableId { get; set; } // Đơn hàng thuộc bàn nào
+    public string OrderNumber { get; set; } = string.Empty; 
+    public Guid? TableId { get; set; }
+    public string? GuestName { get; set; } 
+    public string? Note { get; set; }
     public decimal TotalAmount { get; set; }
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
-
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
-
-    // Multi-tenant & Audit
     public Guid? TenantId { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public string? CreatedBy { get; set; }

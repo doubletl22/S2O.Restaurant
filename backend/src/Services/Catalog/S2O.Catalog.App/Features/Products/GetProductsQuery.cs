@@ -4,8 +4,7 @@ using S2O.Catalog.Domain.Entities;
 using S2O.Shared.Kernel.Results;
 using Microsoft.EntityFrameworkCore;
 
-public record GetProductsQuery() : IRequest<Result<List<Product>>>;
-
+public record GetProductsQuery(string? CategoryId) : IRequest<Result<List<Product>>>;
 // Handler đơn giản
 public class GetProductsHandler : IRequestHandler<GetProductsQuery, Result<List<Product>>>
 {
@@ -14,8 +13,14 @@ public class GetProductsHandler : IRequestHandler<GetProductsQuery, Result<List<
 
     public async Task<Result<List<Product>>> Handle(GetProductsQuery request, CancellationToken ct)
     {
-        // Filter sẽ tự động được áp dụng nhờ CatalogDbContext
-        var products = await _context.Products.ToListAsync(ct);
+        var query = _context.Products.AsQueryable();
+
+        if (!string.IsNullOrEmpty(request.CategoryId) && Guid.TryParse(request.CategoryId, out var catId))
+        {
+            query = query.Where(p => p.CategoryId == catId);
+        }
+
+        var products = await query.ToListAsync(ct);
         return Result<List<Product>>.Success(products);
     }
 }
