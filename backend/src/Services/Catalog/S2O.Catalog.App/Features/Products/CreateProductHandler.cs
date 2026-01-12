@@ -12,12 +12,15 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
 {
     private readonly ICatalogDbContext _context;
     private readonly IFileStorageService _fileStorageService;
+    private readonly ITenantContext _tenantContext;
     public CreateProductCommandHandler(
         ICatalogDbContext context,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        ITenantContext tenantContext)
     {
         _context = context;
         _fileStorageService = fileStorageService;
+        _tenantContext = tenantContext;
     }
 
     public async Task<ErrorOr<Guid>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
@@ -62,7 +65,8 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             Description = request.Description,
             Price = request.Price,
             CategoryId = request.CategoryId,
-            ImageUrl = imageUrl
+            ImageUrl = imageUrl,
+            TenantId = _tenantContext.TenantId ?? throw new UnauthorizedAccessException("Không tìm thấy TenantId!")
         };
 
         // 4. Lưu vào Database (PostgreSQL)

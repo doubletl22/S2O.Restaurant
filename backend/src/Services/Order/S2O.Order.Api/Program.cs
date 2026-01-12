@@ -55,8 +55,7 @@ builder.Services.AddScoped<IUserContext, UserContext>();
 // --- 5. Cấu hình MediatR ---
 // Đăng ký các Handler nằm trong project App
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(S2O.Order.App.Features.Orders.Commands.CreateOrder.CreateOrderCommand).Assembly));
-
+        cfg.RegisterServicesFromAssembly(typeof(S2O.Order.App.Features.Orders.Commands.PlaceGuestOrderCommand).Assembly));
 // --- 6. Các dịch vụ API cơ bản ---
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -100,7 +99,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
+}
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
