@@ -20,7 +20,7 @@ public class GetProductByIdHandler : IRequestHandler<GetProductByIdQuery, Result
         var product = await _context.Products
             .AsNoTracking()
             .Where(p => p.Id == request.Id)
-            .Select(p => new ProductResponse(p.Id, p.Name, p.Price, p.Description))
+            .Select(p => new ProductResponse(p.Id, p.Name, p.Price, p.Description, p.CategoryId, p.ImageUrl))
             .FirstOrDefaultAsync(ct);
 
         if (product == null)

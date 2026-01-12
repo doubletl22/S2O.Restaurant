@@ -42,5 +42,4 @@ public class LoginHandler : ICommandHandler<LoginCommand, string>
         var token = _tokenService.CreateToken(user);
 
         return Result<string>.Success(token);
-    }
-}
+    }}

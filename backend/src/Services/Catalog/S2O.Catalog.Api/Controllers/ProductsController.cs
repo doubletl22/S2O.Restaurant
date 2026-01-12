@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using ErrorOr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using S2O.Catalog.App.Features.Products;
@@ -15,7 +16,7 @@ public class ProductsController : ControllerBase
     public ProductsController(ISender sender) => _sender = sender;
 
     [HttpPost]
-    [Consumes("multipart/form-data")] // Quan trọng để Swagger hiểu là có upload file
+    [Consumes("multipart/form-data")] 
     public async Task<IActionResult> Create([FromForm] CreateProductRequest request)
     {
         // Chuyển từ Request sang Command
@@ -26,13 +27,27 @@ public class ProductsController : ControllerBase
             request.Price,
             request.CategoryId,
             stream,
-            request.Image.FileName,
-            request.Image.ContentType
+            request.Image.FileName
         );
 
         var result = await _sender.Send(command);
 
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        return result.Match(
+        id => Ok(new { ProductId = id }),
+        errors => {
+            // Lấy lỗi đầu tiên để hiển thị cho chi tiết
+            var firstError = errors.FirstOrDefault();
+            return Problem(
+                statusCode: firstError.Type switch
+                {
+                    ErrorType.NotFound => StatusCodes.Status404NotFound,
+                    ErrorType.Validation => StatusCodes.Status400BadRequest,
+                    _ => StatusCodes.Status500InternalServerError
+                },
+                title: firstError.Description 
+            );
+        }
+    );
     }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)

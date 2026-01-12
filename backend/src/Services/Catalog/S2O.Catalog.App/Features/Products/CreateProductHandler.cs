@@ -1,29 +1,60 @@
-﻿using MediatR;
-using S2O.Catalog.App.Features.Products;
+﻿using ErrorOr;
+using MediatR;
+using S2O.Catalog.App.Abstractions; 
 using S2O.Catalog.Domain.Entities;
-using S2O.Shared.Kernel.Interfaces;
-using S2O.Shared.Kernel.Results;
-using S2O.Catalog.App.Abstractions;
+using S2O.Kernel.Interfaces;
+using S2O.Shared.Kernel.Interfaces; 
 
-public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result<Guid>>
+
+namespace S2O.Catalog.App.Features.Products.Handlers;
+
+public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, ErrorOr<Guid>>
 {
     private readonly ICatalogDbContext _context;
-    private readonly ITenantContext _tenantContext;
-    private readonly IFileStorageService _fileService;
-
-    public CreateProductHandler(ICatalogDbContext context, ITenantContext tenantContext, IFileStorageService fileService)
+    private readonly IFileStorageService _fileStorageService;
+    public CreateProductCommandHandler(
+        ICatalogDbContext context,
+        IFileStorageService fileStorageService)
     {
         _context = context;
-        _tenantContext = tenantContext;
-        _fileService = fileService;
+        _fileStorageService = fileStorageService;
     }
 
-    public async Task<Result<Guid>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Guid>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
-        // 1. Upload ảnh lên S3
-        var imageUrl = await _fileService.UploadAsync(request.ImageStream, request.ImageName, request.ContentType);
+        // 1. Kiểm tra Category có tồn tại không
+        var category = await _context.Categories
+            .FindAsync(new object[] { request.CategoryId }, cancellationToken);
 
-        // 2. Khởi tạo Entity
+        if (category == null)
+        {
+            return ErrorOr.Error.NotFound("Category.NotFound", "Danh mục không tồn tại.");
+        }
+
+        string imageUrl = string.Empty;
+
+        try
+        {
+            // 2. Upload ảnh lên Cloudinary thông qua StorageService
+            if (request.ImageStream != null && request.ImageStream.Length > 0)
+            {
+                imageUrl = await _fileStorageService.UploadFileAsync(
+                    request.ImageStream,
+                    request.FileName
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            return ErrorOr.Error.Failure("Image.UploadError", $"Lỗi khi tải ảnh lên: {ex.Message}");
+        }
+        finally
+        {
+            // Luôn đóng stream để giải phóng bộ nhớ hệ thống
+            request.ImageStream?.Close();
+        }
+
+        // 3. Khởi tạo Entity Product
         var product = new Product
         {
             Id = Guid.NewGuid(),
@@ -31,15 +62,13 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
             Description = request.Description,
             Price = request.Price,
             CategoryId = request.CategoryId,
-            ImageUrl = imageUrl,
-            // TENANT ID: Lấy từ Context (đã được Middleware TenantResolver xử lý)
-            TenantId = _tenantContext.TenantId ?? throw new UnauthorizedAccessException("Không tìm thấy TenantId!")
+            ImageUrl = imageUrl
         };
 
-        // 3. Lưu vào DB
+        // 4. Lưu vào Database (PostgreSQL)
         _context.Products.Add(product);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Result<Guid>.Success(product.Id);
+        return product.Id;
     }
 }
