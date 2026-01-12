@@ -114,9 +114,28 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/orders/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+    },
+    // ==========================================
+    // 5. BOOKING SERVICE
+    {
+      "DownstreamPathTemplate": "/api/bookings/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "booking-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/bookings/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+    },
+    // ==========================================
+    // 6. PAYMENT SERVICE
+    {
+      "DownstreamPathTemplate": "/api/payments/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "payment-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/payments/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     }
+
+
   ],
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:5000"
