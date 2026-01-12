@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using S2O.Infra.Services;
+using S2O.Kernel.Interfaces;
 using S2O.Order.App.Abstractions;
 using S2O.Order.App.Features.Orders.Commands;
 using S2O.Order.Infra.ExternalServices;
 using S2O.Order.Infra.Persistence;
-using S2O.Shared.Infra.Services;
-using S2O.Shared.Infra.Interceptors;
 using S2O.Shared.Infra;
+using S2O.Shared.Infra.Interceptors;
+using S2O.Shared.Infra.Services;
 using S2O.Shared.Kernel.Interfaces;
 using System.Text;
 
@@ -38,7 +40,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
         };
     });
-
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 // --- 3. Cấu hình HttpClient gọi sang Catalog Service ---
 // Lâm lưu ý: ExternalServices:CatalogUrl lấy từ appsettings.json
 builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client => {
@@ -48,13 +50,12 @@ builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client => {
 // --- 4. Cấu hình Multi-tenant & User Context ---
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITenantContext, TenantContext>();
-builder.Services.AddSharedInfrastructure();
+builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddScoped<IUserContext, UserContext>();
 // --- 5. Cấu hình MediatR ---
 // Đăng ký các Handler nằm trong project App
 builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(S2O.Order.App.Features.Orders.Commands.CreateOrder.CreateOrderCommand).Assembly));
-
+        cfg.RegisterServicesFromAssembly(typeof(S2O.Order.App.Features.Orders.Commands.PlaceGuestOrderCommand).Assembly));
 // --- 6. Các dịch vụ API cơ bản ---
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -98,7 +99,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        context.Database.Migrate();
+    }
+}
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
