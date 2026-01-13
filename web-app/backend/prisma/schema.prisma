@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  OWNER
+  MANAGER
+  STAFF
+}
+
+enum OrderStatus {
+  NEW
+  CONFIRMED
+  COOKING
+  READY
+  SERVED
+  CANCELLED
+  PAID
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CARD
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(STAFF)
+
+  restaurantId String?
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  tokenHash String   // hash của refresh token
+  revokedAt DateTime?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Restaurant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+
+  branches  Branch[]
+  categories Category[]
+  items     MenuItem[]
+  users     User[]
+  orders    Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Branch {
+  id           String   @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  name         String
+  address      String?
+
+  tables       Table[]
+  orders       Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Table {
+  id       String @id @default(cuid())
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  code     String // A01...
+  name     String?
+  isActive Boolean @default(true)
+
+  orders   Order[]
+
+  @@unique([branchId, code])
+}
+
+model Category {
+  id           String @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  name         String
+  sortOrder    Int    @default(0)
+  isActive     Boolean @default(true)
+
+  items        MenuItem[]
+}
+
+model MenuItem {
+  id           String @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id])
+
+  name         String
+  description  String?
+  price        Int    // VND
+  imageUrl     String?
+  isActive     Boolean @default(true)
+  sortOrder    Int    @default(0)
+
+  orderItems   OrderItem[]
+}
+
+model Order {
+  id           String @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  branchId     String
+  branch       Branch @relation(fields: [branchId], references: [id])
+
+  tableId      String?
+  table        Table?  @relation(fields: [tableId], references: [id])
+
+  // guest identity (không cần login)
+  guestName    String?
+  guestPhone   String?
+  guestNote    String?
+
+  status       OrderStatus @default(NEW)
+
+  items        OrderItem[]
+  payments     Payment[]
+
+  billRequested Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([restaurantId, branchId, status])
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  order     Order @relation(fields: [orderId], references: [id])
+
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+
+  qty       Int
+  unitPrice Int
+  note      String?
+}
+
+model Payment {
+  id        String @id @default(cuid())
+  orderId   String
+  order     Order @relation(fields: [orderId], references: [id])
+
+  method    PaymentMethod
+  amount    Int
+  note      String?
+  paidAt    DateTime @default(now())
+}
+
+model AuditLog {
+  id        String @id @default(cuid())
+  actorId   String?
+  actor     User? @relation(fields: [actorId], references: [id])
+
+  restaurantId String?
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+
+  action    String
+  entity    String
+  entityId  String?
+  metaJson  String?
+
+  createdAt DateTime @default(now())
+}
