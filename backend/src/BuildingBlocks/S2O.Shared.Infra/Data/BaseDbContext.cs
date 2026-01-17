@@ -12,28 +12,60 @@ public abstract class BaseDbContext : DbContext
     protected BaseDbContext(DbContextOptions options, ITenantContext tenantContext)
         : base(options) => _tenantContext = tenantContext;
 
+    // Getter cho Expression Tree dùng (EF Core gọi cái này mỗi lần query)
+    public Guid? CurrentTenantId => _tenantContext.TenantId;
+    public Guid? CurrentBranchId => _tenantContext.BranchId; // Mới
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            // Đổi từ ITenantEntity sang IMustHaveTenant cho đồng bộ với Product
-            if (typeof(IMustHaveTenant).IsAssignableFrom(entityType.ClrType))
-            {
-                var parameter = Expression.Parameter(entityType.ClrType, "e");
+            var clrType = entityType.ClrType;
 
-                // So sánh thuộc tính TenantId của Entity với CurrentTenantId của DbContext
-                var body = Expression.Equal(
+            // Tạo Parameter expression "e => ..."
+            var parameter = Expression.Parameter(clrType, "e");
+
+            // --- Filter Tenant ---
+            if (typeof(IMustHaveTenant).IsAssignableFrom(clrType))
+            {
+                // e.TenantId == this.CurrentTenantId
+                var tenantFilter = Expression.Equal(
                     Expression.Property(parameter, nameof(IMustHaveTenant.TenantId)),
                     Expression.Property(Expression.Constant(this), nameof(CurrentTenantId))
                 );
-                var lambda = Expression.Lambda(body, parameter);
-                modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+
+                // Nếu Entity CŨNG implement IMustHaveBranch, ta cần filter kết hợp (AND)
+                if (typeof(IMustHaveBranch).IsAssignableFrom(clrType))
+                {
+                    // e.BranchId == this.CurrentBranchId
+                    var branchFilter = Expression.Equal(
+                        Expression.Property(parameter, nameof(IMustHaveBranch.BranchId)),
+                        Expression.Property(Expression.Constant(this), nameof(CurrentBranchId))
+                    );
+
+                    // e.TenantId == CurrentTenantId && e.BranchId == CurrentBranchId
+                    // Lưu ý: Filter Branch quan trọng hơn, nhưng Tenant giữ lại để safety
+                    var combinedFilter = Expression.AndAlso(tenantFilter, branchFilter);
+
+                    modelBuilder.Entity(clrType).HasQueryFilter(Expression.Lambda(combinedFilter, parameter));
+                }
+                else
+                {
+                    // Chỉ filter theo Tenant (ví dụ: Category, Product dùng chung)
+                    modelBuilder.Entity(clrType).HasQueryFilter(Expression.Lambda(tenantFilter, parameter));
+                }
+            }
+            // Trường hợp hiếm: Chỉ có Branch mà không có Tenant (ít gặp nhưng cứ handle)
+            else if (typeof(IMustHaveBranch).IsAssignableFrom(clrType))
+            {
+                var branchFilter = Expression.Equal(
+                    Expression.Property(parameter, nameof(IMustHaveBranch.BranchId)),
+                    Expression.Property(Expression.Constant(this), nameof(CurrentBranchId))
+                );
+                modelBuilder.Entity(clrType).HasQueryFilter(Expression.Lambda(branchFilter, parameter));
             }
         }
     }
-
-    // EF Core sẽ gọi thuộc tính này mỗi khi thực thi truy vấn
-    public Guid? CurrentTenantId => _tenantContext.TenantId;
 }

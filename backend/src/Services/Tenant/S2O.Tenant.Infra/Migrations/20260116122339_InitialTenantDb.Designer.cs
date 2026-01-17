@@ -12,8 +12,8 @@ using S2O.Tenant.Infra.Persistence;
 namespace S2O.Tenant.Infra.Migrations
 {
     [DbContext(typeof(TenantDbContext))]
-    [Migration("20260112140408_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260116122339_InitialTenantDb")]
+    partial class InitialTenantDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,6 +29,9 @@ namespace S2O.Tenant.Infra.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("BranchId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAtUtc")
