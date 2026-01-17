@@ -2,7 +2,7 @@
 
 public abstract class Entity
 {
-    public Guid Id { get; protected set; }
+    public Guid Id { get; init; }
     public DateTime CreatedAtUtc { get; set; }
     public DateTime? ModifiedAtUtc { get; set; }
 

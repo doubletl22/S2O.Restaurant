@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace S2O.Tenant.Infra.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialTenantDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,6 +17,7 @@ namespace S2O.Tenant.Infra.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<Guid>(type: "uuid", nullable: true),
+                    BranchId = table.Column<Guid>(type: "uuid", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: false),
                     QrCodeUrl = table.Column<string>(type: "text", nullable: true),
                     IsOccupied = table.Column<bool>(type: "boolean", nullable: false),

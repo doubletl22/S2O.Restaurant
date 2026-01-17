@@ -1,11 +1,12 @@
-﻿using S2O.Order.App.Abstractions;
-using S2O.Shared.Kernel.Abstractions;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using S2O.Order.App.Abstractions;
 using S2O.Shared.Kernel.Results;
-using S2O.Shared.Kernel.Interfaces; 
+using OrderEntity = S2O.Order.Domain.Entities.Order; // Alias
 
 namespace S2O.Order.App.Features.Orders.Commands;
 
-public class UpdateOrderStatusHandler : ICommandHandler<UpdateOrderStatusCommand, bool>
+public class UpdateOrderStatusHandler : IRequestHandler<UpdateOrderStatusCommand, Result>
 {
     private readonly IOrderDbContext _context;
 
@@ -14,20 +15,25 @@ public class UpdateOrderStatusHandler : ICommandHandler<UpdateOrderStatusCommand
         _context = context;
     }
 
-    public async Task<Result<bool>> Handle(UpdateOrderStatusCommand request, CancellationToken ct)
+    public async Task<Result> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
     {
-        var order = await _context.Orders.FindAsync(new object[] { request.OrderId }, ct);
+        var order = await _context.Orders
+            .FirstOrDefaultAsync(o => o.Id == request.OrderId, cancellationToken);
 
-        if (order == null)
+        if (order == null) return Result.Failure(new Error("Order.NotFound", "Không tìm thấy đơn hàng"));
+
+        // SECURITY CHECK: Đảm bảo nhân viên đang làm việc đúng chi nhánh của đơn hàng
+        if (order.BranchId != request.CurrentBranchId)
         {
-            return Result<bool>.Failure(new Error("Order.NotFound", "Không tìm thấy đơn hàng."));
+            return Result.Failure(new Error("Security.InvalidBranch", "Bạn không có quyền xử lý đơn hàng của chi nhánh khác."));
         }
 
+        // Cập nhật trạng thái
         order.Status = request.NewStatus;
-        order.LastModifiedAtUtc = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync(ct);
+        // (Có thể thêm logic log lịch sử: Ai đã đổi trạng thái vào giờ nào)
 
-        return Result<bool>.Success(true);
+        await _context.SaveChangesAsync(cancellationToken);
+        return Result.Success();
     }
 }

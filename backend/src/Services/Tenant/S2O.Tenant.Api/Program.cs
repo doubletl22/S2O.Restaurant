@@ -1,4 +1,5 @@
-﻿using S2O.Shared.Infra.Services;
+﻿using Microsoft.EntityFrameworkCore;
+using S2O.Shared.Infra.Services;
 using S2O.Shared.Kernel.Interfaces;
 using S2O.Tenant.App.Features.Tables; // Namespace chứa MediatR handler
 using S2O.Tenant.Infra; // Namespace chứa DependencyInjection
@@ -26,6 +27,25 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        // Lưu ý: Đảm bảo TenantDbContext được public hoặc reference đúng namespace
+        var context = services.GetRequiredService<S2O.Tenant.Infra.Persistence.TenantDbContext>();
+
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log lỗi nếu cần
+        Console.WriteLine("Lỗi Migration Tenant: " + ex.Message);
+    }
 }
 
 app.UseHttpsRedirection();

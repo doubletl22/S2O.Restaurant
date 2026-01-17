@@ -1,10 +1,10 @@
 ﻿namespace S2O.Catalog.App.DTOs;
 
-public record ProductResponse(
-    Guid Id, 
-    string Name, 
-    decimal Price, 
-    string Description,
-    Guid CategoryId,
-    string? ImageUrl
-);
+public class ProductResponse
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public string? Description { get; set; } // Cho phép null
+    public string? ImageUrl { get; set; }
+}

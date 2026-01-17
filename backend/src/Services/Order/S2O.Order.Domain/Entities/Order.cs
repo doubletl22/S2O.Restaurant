@@ -1,10 +1,13 @@
 ﻿using S2O.Shared.Kernel.Primitives;
+using S2O.Order.Domain.Enums;
 
 namespace S2O.Order.Domain.Entities;
 
 public class Order : Entity, IAuditableEntity, IMustHaveTenant
 {
+    public Guid? UserId { get; set; }
     public new Guid Id { get; set; }
+    public Guid BranchId { get; set; }
     public Guid? CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
     public string TableName { get; set; } = string.Empty;
@@ -12,7 +15,7 @@ public class Order : Entity, IAuditableEntity, IMustHaveTenant
     public string OrderNumber { get; set; } = string.Empty;
     public string? Note { get; set; }
     public decimal TotalAmount { get; set; }
-    public OrderStatus Status { get; set; } = OrderStatus.Pending;
+    public OrderStatus Status { get; set; }
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
     public Guid? TenantId { get; set; }
     public string? CreatedBy { get; set; }
@@ -20,12 +23,3 @@ public class Order : Entity, IAuditableEntity, IMustHaveTenant
     public string? LastModifiedBy { get; set; }
 }
 
-public enum OrderStatus
-{
-    Pending,    // Chờ xử lý
-    Preparing,  // Đang chế biến (Bếp nhận)
-    Ready,      // Đã xong món
-    Delivered,  // Đã phục vụ
-    Completed,  // Đã thanh toán
-    Cancelled   // Đã hủy
-}
