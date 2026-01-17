@@ -12,8 +12,8 @@ using S2O.Catalog.Infra.Persistence;
 namespace S2O.Catalog.Infra.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    [Migration("20260111061854_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260116124425_AddIsActiveToCategory")]
+    partial class AddIsActiveToCategory
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,6 +39,9 @@ namespace S2O.Catalog.Infra.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastModifiedAtUtc")
                         .HasColumnType("timestamp with time zone");
@@ -79,6 +82,9 @@ namespace S2O.Catalog.Infra.Migrations
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("boolean");

@@ -7,6 +7,7 @@ public class Category : IAuditableEntity, IMustHaveTenant
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public Guid? TenantId { get; set; }
+    public bool IsActive { get; set; } = true;
     public DateTime CreatedAtUtc { get; set; }
     public string? CreatedBy { get; set; }
     public DateTime? LastModifiedAtUtc { get; set; }

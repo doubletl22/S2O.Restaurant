@@ -12,7 +12,7 @@ public class Product : IAuditableEntity, IMustHaveTenant
 
     public Guid CategoryId { get; set; }
     public Category Category { get; set; } = null!;
-
+    public bool IsActive { get; set; } = true;
     public Guid? TenantId { get; set; }
     public DateTime CreatedAtUtc { get; set; }
     public string? CreatedBy { get; set; }

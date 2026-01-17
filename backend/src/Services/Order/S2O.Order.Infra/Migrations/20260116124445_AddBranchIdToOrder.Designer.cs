@@ -12,8 +12,8 @@ using S2O.Order.Infra.Persistence;
 namespace S2O.Order.Infra.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20260112192404_InitialOrderDb")]
-    partial class InitialOrderDb
+    [Migration("20260116124445_AddBranchIdToOrder")]
+    partial class AddBranchIdToOrder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,6 +29,9 @@ namespace S2O.Order.Infra.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BranchId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAtUtc")

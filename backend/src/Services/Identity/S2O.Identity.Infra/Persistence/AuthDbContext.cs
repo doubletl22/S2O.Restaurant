@@ -1,5 +1,5 @@
 ﻿namespace S2O.Identity.Infra.Persistence;
-
+using S2O.Identity.App.Abstractions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -8,7 +8,7 @@ using S2O.Shared.Infra.Data;
 using S2O.Shared.Infra.Interceptors;
 using S2O.Shared.Kernel.Interfaces;
 
-public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>
+public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>, IAuthDbContext
 {
     private readonly ITenantContext _tenantContext;
 
@@ -17,7 +17,8 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole,
     {
         _tenantContext = tenantContext;
     }
-
+    public new DbSet<ApplicationUser> Users => Set<ApplicationUser>();
+    public DbSet<Branch> Branches { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

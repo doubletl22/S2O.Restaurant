@@ -36,6 +36,8 @@ services:
     depends_on:
       s2o.db: 
         condition: service_healthy
+    ports:
+      - "5001:8080"
 
   catalog-api:
     build:
@@ -53,6 +55,8 @@ services:
     depends_on:
       s2o.db:
         condition: service_healthy
+    ports:
+      - "5002:8080"
     
   order-api:
     build:
@@ -70,6 +74,8 @@ services:
     depends_on:
       s2o.db:
         condition: service_healthy
+    ports:
+      - "5003:8080"
 
   tenant-api:
     build:
@@ -84,6 +90,8 @@ services:
     depends_on:
       s2o.db:
         condition: service_healthy
+    ports:  
+      - "5004:8080"
 
   booking-api:
     build:
@@ -98,6 +106,8 @@ services:
     depends_on:
       s2o.db:
         condition: service_healthy
+    ports:
+      - "5005:8080"
 
   payment-api:
     build:
@@ -112,6 +122,8 @@ services:
     depends_on:
       s2o.db:
         condition: service_healthy
+    ports:
+      - "5006:8080"
 
   gateway:
     build:

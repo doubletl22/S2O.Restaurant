@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Infra.Services;
 using S2O.Kernel.Interfaces;
+using S2O.Order.Api.Hubs;
+using S2O.Order.Api.Services;
 using S2O.Order.App.Abstractions;
 using S2O.Order.App.Features.Orders.Commands;
 using S2O.Order.Infra.ExternalServices;
@@ -82,8 +84,8 @@ builder.Services.AddSwaggerGen(options => {
         }
     });
 });
-
-
+builder.Services.AddSignalR();
+builder.Services.AddScoped<IOrderNotifier, OrderNotifier>();
 builder.Services.AddTransient<AuthenticationDelegatingHandler>();
 builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
 {
@@ -108,7 +110,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 app.UseHttpsRedirection();
-
+app.MapHub<OrderHub>("/hubs/orders");
 app.UseAuthentication();
 app.UseAuthorization();
 
