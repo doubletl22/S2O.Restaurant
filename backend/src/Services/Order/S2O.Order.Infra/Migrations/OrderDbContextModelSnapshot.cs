@@ -28,6 +28,9 @@ namespace S2O.Order.Infra.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
@@ -72,6 +75,9 @@ namespace S2O.Order.Infra.Migrations
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("numeric");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 

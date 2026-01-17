@@ -111,4 +111,34 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>(); // Lấy Logger để ghi log
+
+    try
+    {
+        var context = services.GetRequiredService<CatalogDbContext>();
+
+        // 1. Chạy Migration
+        logger.LogInformation("Đang kiểm tra và cập nhật Database Catalog...");
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            await context.Database.MigrateAsync(); // Nên dùng Async cho chuẩn
+        }
+
+        // 2. Chạy Seeder (Gọi hàm SeedAsync vừa viết)
+        logger.LogInformation("Đang Seed dữ liệu mẫu (Danh mục, Món ăn)...");
+        await CatalogDataSeeder.SeedAsync(context);
+
+        logger.LogInformation("Hoàn tất khởi tạo Catalog Database.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Lỗi nghiêm trọng khi khởi tạo Catalog Database.");
+    }
+}
+
+
+
 app.Run();

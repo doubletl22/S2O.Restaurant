@@ -9,6 +9,14 @@
       "UpstreamPathTemplate": "/api/auth/{everything}",
       "UpstreamHttpMethod": [ "POST" ]
     },
+    // 1.2 Firebase
+    {
+      "DownstreamPathTemplate": "/api/auth/firebase-login",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "identity-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/auth/firebase-login",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
 
     // ==========================================
     // 2. TENANT SERVICE 
@@ -21,7 +29,11 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
-      }
+      },
+      "AddHeadersToRequest": {
+      "X-Tenant-ID": "Claims[tenant_id] > value",
+      "X-Branch-ID": "Claims[branch_id] > value",
+      "X-User-ID": "Claims[sub] > value"}
     },
     {
       "DownstreamPathTemplate": "/api/tables",
@@ -40,10 +52,10 @@
     
     // 3.1 Public Menu (Dành cho Guest - KHÔNG CẦN AUTH)
     {
-      "DownstreamPathTemplate": "/api/public/menu",
+      "DownstreamPathTemplate": "/api/public/menu/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "catalog-api", "Port": 8080 }],
-      "UpstreamPathTemplate": "/api/public/menu",
+      "UpstreamPathTemplate": "/api/public/menu/{everything}",
       "UpstreamHttpMethod": [ "GET" ]
     },
 
@@ -57,7 +69,11 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
-      }
+      },
+      "AddHeadersToRequest": {
+      "X-Tenant-ID": "Claims[tenant_id] > value",
+      "X-Branch-ID": "Claims[branch_id] > value",
+      "X-User-ID": "Claims[sub] > value"}
     },
     {
       "DownstreamPathTemplate": "/api/products",
@@ -81,7 +97,11 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
-      }
+      },
+      "AddHeadersToRequest": {
+      "X-Tenant-ID": "Claims[tenant_id] > value",
+      "X-Branch-ID": "Claims[branch_id] > value",
+      "X-User-ID": "Claims[sub] > value"}
     },
     {
       "DownstreamPathTemplate": "/api/categories",
@@ -114,8 +134,79 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/orders/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AddHeadersToRequest": {
+      "X-Tenant-ID": "Claims[tenant_id] > value",
+      "X-Branch-ID": "Claims[branch_id] > value",
+      "X-User-ID": "Claims[sub] > value"}
     },
+    // 4.3 Route Hủy Đơn
+    {
+      "DownstreamPathTemplate": "/api/orders/guest/{id}/cancel",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/orders/guest/{id}/cancel",
+      "UpstreamHttpMethod": [ "PUT" ]
+    },
+    // 4.4 Route Sửa Đơn
+    {
+      "DownstreamPathTemplate": "/api/orders/guest/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/orders/guest/{id}",
+      "UpstreamHttpMethod": [ "PUT" ]
+    },
+    // 4.5 Xem lịch sử 
+    {
+      "DownstreamPathTemplate": "/api/orders/history",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/orders/history",
+      "UpstreamHttpMethod": [ "GET" ],
+  
+        // --- THÊM ĐOẠN NÀY ĐỂ BẮT BUỘC ĐĂNG NHẬP ---
+      "AuthenticationOptions": {
+      "AuthenticationProviderKey": "Bearer",
+      "AllowedScopes": []
+     },
+     // 4.6 order của customer đã đăng nhập
+     {
+      "DownstreamPathTemplate": "/api/orders/customer",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
+      "UpstreamPathTemplate": "/api/orders/customer",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []}
+      },
+      // 4.7 nhân viên
+      // 1. Lấy danh sách Order (GET)
+{
+  "DownstreamPathTemplate": "/api/staff/orders",
+  "DownstreamScheme": "http",
+  "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
+  "UpstreamPathTemplate": "/api/staff/orders",
+  "UpstreamHttpMethod": [ "GET" ],
+  "AuthenticationOptions": {
+    "AuthenticationProviderKey": "Bearer",
+    "AllowedScopes": []
+  }
+},
+// 2. Cập nhật trạng thái (PUT)
+{
+  "DownstreamPathTemplate": "/api/staff/orders/{id}/status",
+  "DownstreamScheme": "http",
+  "DownstreamHostAndPorts": [{ "Host": "order-api", "Port": 8080 }],
+  "UpstreamPathTemplate": "/api/staff/orders/{id}/status",
+  "UpstreamHttpMethod": [ "PUT" ],
+  "AuthenticationOptions": {
+    "AuthenticationProviderKey": "Bearer",
+    "AllowedScopes": []
+  }
+},
+      
+}
     // ==========================================
     // 5. BOOKING SERVICE
     {
@@ -123,7 +214,11 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "booking-api", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/bookings/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AddHeadersToRequest": {
+      "X-Tenant-ID": "Claims[tenant_id] > value",
+      "X-Branch-ID": "Claims[branch_id] > value",
+      "X-User-ID": "Claims[sub] > value"}
     },
     // ==========================================
     // 6. PAYMENT SERVICE
@@ -132,7 +227,11 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [{ "Host": "payment-api", "Port": 8080 }],
       "UpstreamPathTemplate": "/api/payments/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AddHeadersToRequest": {
+      "X-Tenant-ID": "Claims[tenant_id] > value",
+      "X-Branch-ID": "Claims[branch_id] > value",
+      "X-User-ID": "Claims[sub] > value"}
     }
 
 

@@ -19,7 +19,11 @@ public class GetCategoriesHandler : IRequestHandler<GetCategoriesQuery, Result<L
         // Global Query Filter cho TenantId đã được cấu hình trong CatalogDbContext
         var categories = await _context.Categories
             .AsNoTracking()
-            .Select(c => new CategoryResponse(c.Id, c.Name, c.Description))
+            .Select(c => new CategoryResponse{
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description
+            })
             .ToListAsync(ct);
 
         return Result<List<CategoryResponse>>.Success(categories);

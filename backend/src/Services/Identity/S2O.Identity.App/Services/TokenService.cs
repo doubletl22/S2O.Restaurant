@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using S2O.Identity.Domain.Entities;
 using System.IdentityModel.Tokens.Jwt; // Thư viện chính cho TokenHandler
 using System.Security.Claims;
+using S2O.Shared.Kernel.Constants;
 using System.Text;
 
 namespace S2O.Identity.App.Services;
@@ -14,14 +15,18 @@ public class TokenService
 
     public string CreateToken(ApplicationUser user)
     {
-        // Sử dụng tên đầy đủ System.IdentityModel.Tokens.Jwt để tránh xung đột (Lỗi CS0104)
         var claims = new List<Claim>
         {
-            new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
-            new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("tenantId", user.TenantId?.ToString() ?? string.Empty) // Khử cảnh báo null (Warning CS8604)
+            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.GivenName, user.FullName), 
+            new Claim(ClaimTypes.Name, user.UserName ?? ""),
+            new Claim("tenant_id", user.TenantId?.ToString() ?? "")
         };
+        if (user.BranchId.HasValue)
+        {
+            claims.Add(new Claim("branch_id", user.BranchId.Value.ToString()));
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"] ?? throw new InvalidOperationException("JWT Secret is missing")));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
