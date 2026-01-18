@@ -6,8 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- Dockerfile không được đưa vào Compile, nếu không C# compiler sẽ đọc Dockerfile như code C# -->
   <ItemGroup>
-    <Compile Include="Dockerfile" />
+    <None Include="Dockerfile" />
   </ItemGroup>
 
   <ItemGroup>
