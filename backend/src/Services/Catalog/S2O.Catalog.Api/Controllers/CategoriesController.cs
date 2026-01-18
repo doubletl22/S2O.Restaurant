@@ -1,24 +1,29 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using S2O.Catalog.App.Features.Categories;
+using S2O.Catalog.App.Features.Categories.Commands;
+using S2O.Catalog.App.Features.Categories.Queries; // (Bạn tự làm thêm phần Get List nhé)
 
 namespace S2O.Catalog.Api.Controllers;
 
-[Authorize]
+[Route("api/categories")]
 [ApiController]
-[Route("api/[controller]")]
 public class CategoriesController : ControllerBase
 {
     private readonly ISender _sender;
 
-    public CategoriesController(ISender sender) => _sender = sender;
-
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateCategoryRequest request)
+    public CategoriesController(ISender sender)
     {
-        var result = await _sender.Send(new CreateCategoryCommand(request.Name, request.Description));
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        _sender = sender;
+    }
+
+    // POST: api/categories (Chỉ Owner tạo được)
+    [HttpPost]
+    [Authorize(Roles = "Owner")]
+    public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryCommand command)
+    {
+        var result = await _sender.Send(command);
+        return result.IsSuccess ? Ok(new { CategoryId = result.Value }) : BadRequest(result.Error);
     }
 
     [HttpGet]
