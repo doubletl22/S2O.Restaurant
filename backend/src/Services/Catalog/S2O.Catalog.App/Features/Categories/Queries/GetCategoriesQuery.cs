@@ -4,7 +4,7 @@ using S2O.Catalog.App.Abstractions;
 using S2O.Catalog.App.DTOs;
 using S2O.Shared.Kernel.Results;
 
-namespace S2O.Catalog.App.Features.Categories;
+namespace S2O.Catalog.App.Features.Categories.Queries;
 
 public record GetCategoriesQuery() : IRequest<Result<List<CategoryResponse>>>;
 

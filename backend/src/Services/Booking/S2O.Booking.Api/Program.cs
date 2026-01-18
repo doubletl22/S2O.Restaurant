@@ -1,29 +1,21 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using S2O.Booking.App.Features.Bookings.Commands; // Để scan MediatR
+using S2O.Booking.App.Features.Bookings.Commands; 
 using S2O.Booking.Infra;
 using S2O.Shared.Infra;
-using S2O.Shared.Infra.Services;
-using S2O.Shared.Kernel.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Add Infrastructure (DB, Interceptors)
 builder.Services.AddBookingInfra(builder.Configuration);
 
-// 2. Add Shared Services (Tenant, User Context)
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ITenantContext, TenantContext>();
-builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddSharedInfrastructure(builder.Configuration); // Đăng ký DateTimeProvider, etc.
 
-// 3. Add MediatR
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreateBookingCommand).Assembly));
 
-// 4. Add Authentication (JWT)
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -39,11 +31,36 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// 5. API Controllers & Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Cấu hình nút Authorize (Ổ khóa)
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Nhập Token vào đây. Ví dụ: Bearer {token}"
+    });
 
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
