@@ -1,12 +1,12 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using S2O.Catalog.App.Abstractions;
-using S2O.Catalog.App.DTOs;
+using S2O.Catalog.Domain.Entities; // Sử dụng Entity Product
 using S2O.Shared.Kernel.Results;
 
 namespace S2O.Catalog.App.Features.Public;
 
-public class GetPublicMenuHandler : IRequestHandler<GetPublicMenuQuery, Result<IEnumerable<CategoryResponse>>>
+public class GetPublicMenuHandler : IRequestHandler<GetPublicMenuQuery, Result<List<Product>>>
 {
     private readonly ICatalogDbContext _context;
 
@@ -15,32 +15,20 @@ public class GetPublicMenuHandler : IRequestHandler<GetPublicMenuQuery, Result<I
         _context = context;
     }
 
-    public async Task<Result<IEnumerable<CategoryResponse>>> Handle(GetPublicMenuQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<Product>>> Handle(GetPublicMenuQuery request, CancellationToken ct)
     {
-        // 1. Lấy danh mục + Sản phẩm thuộc Tenant đó
-        // Lưu ý: Dùng IgnoreQueryFilters vì Guest không có Token đăng nhập để tự lọc
-        var categories = await _context.Categories
+        var query = _context.Products
+            .IgnoreQueryFilters()
             .AsNoTracking()
-            .IgnoreQueryFilters() // <-- Quan trọng: Bỏ qua bộ lọc Tenant tự động
-            .Include(c => c.Products)
-            .Where(c => c.TenantId == request.TenantId && c.IsActive) // Lọc thủ công
-            .Select(c => new CategoryResponse
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Products = c.Products
-                    .Where(p => p.IsActive)
-                    .Select(p => new ProductResponse
-                    {
-                        Id = p.Id,
-                        Name = p.Name,
-                        Price = p.Price,
-                        Description = p.Description,
-                        ImageUrl = p.ImageUrl
-                    }).ToList()
-            })
-            .ToListAsync(cancellationToken);
+            .Where(p => p.TenantId == request.TenantId); 
 
-        return Result<IEnumerable<CategoryResponse>>.Success(categories);
+        if (!string.IsNullOrEmpty(request.CategoryId) && Guid.TryParse(request.CategoryId, out var catId))
+        {
+            query = query.Where(p => p.CategoryId == catId);
+        }
+
+        var products = await query.ToListAsync(ct);
+
+        return Result<List<Product>>.Success(products);
     }
 }

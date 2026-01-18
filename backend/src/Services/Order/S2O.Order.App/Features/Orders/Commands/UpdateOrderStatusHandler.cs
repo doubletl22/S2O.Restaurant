@@ -9,10 +9,11 @@ namespace S2O.Order.App.Features.Orders.Commands;
 public class UpdateOrderStatusHandler : IRequestHandler<UpdateOrderStatusCommand, Result>
 {
     private readonly IOrderDbContext _context;
-
-    public UpdateOrderStatusHandler(IOrderDbContext context)
+    private readonly IOrderNotifier _notifier;
+    public UpdateOrderStatusHandler(IOrderDbContext context, IOrderNotifier notifier)
     {
         _context = context;
+        _notifier = notifier;
     }
 
     public async Task<Result> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
@@ -34,6 +35,11 @@ public class UpdateOrderStatusHandler : IRequestHandler<UpdateOrderStatusCommand
         // (Có thể thêm logic log lịch sử: Ai đã đổi trạng thái vào giờ nào)
 
         await _context.SaveChangesAsync(cancellationToken);
+        await _notifier.NotifyOrderStatusChangedAsync(
+            order.BranchId,
+            order.Id,
+            order.Status.ToString()
+        );
         return Result.Success();
     }
 }

@@ -6,7 +6,6 @@ namespace S2O.Order.Domain.Entities;
 public class Order : Entity, IAuditableEntity, IMustHaveTenant
 {
     public Guid? UserId { get; set; }
-    public new Guid Id { get; set; }
     public Guid BranchId { get; set; }
     public Guid? CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
