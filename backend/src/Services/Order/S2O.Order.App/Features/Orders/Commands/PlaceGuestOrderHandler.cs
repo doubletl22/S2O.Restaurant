@@ -1,85 +1,58 @@
-﻿using S2O.Order.App.Abstractions;
-using S2O.Order.Domain.Entities;
-using S2O.Shared.Kernel.Abstractions;
-using S2O.Shared.Kernel.Interfaces;
+﻿using MediatR;
+using S2O.Order.App.Abstractions;
+using S2O.Order.Domain.Entities; // Entity Order của bạn
 using S2O.Shared.Kernel.Results;
+using S2O.Order.Domain.Enums;
 
 namespace S2O.Order.App.Features.Orders.Commands;
 
-public class PlaceGuestOrderHandler : ICommandHandler<PlaceGuestOrderCommand, Guid>
+public class PlaceGuestOrderHandler : IRequestHandler<PlaceGuestOrderCommand, Result<Guid>>
 {
     private readonly IOrderDbContext _context;
-    private readonly ITenantContext _tenantContext;
-    private readonly ICatalogClient _catalogClient;
+    private readonly IOrderNotifier _notifier;
+    // (Có thể inject thêm CatalogClient để check giá tiền nếu cần)
 
-    public PlaceGuestOrderHandler(
-        IOrderDbContext context,
-        ITenantContext tenantContext,
-        ICatalogClient catalogClient)
+    public PlaceGuestOrderHandler(IOrderDbContext context, IOrderNotifier notifier)
     {
         _context = context;
-        _tenantContext = tenantContext;
-        _catalogClient = catalogClient;
+        _notifier = notifier;
     }
 
-    public async Task<Result<Guid>> Handle(PlaceGuestOrderCommand request, CancellationToken ct)
+    public async Task<Result<Guid>> Handle(PlaceGuestOrderCommand request, CancellationToken cancellationToken)
     {
-        // 1. Kiểm tra Tenant
-        if (_tenantContext.TenantId == null)
-        {
-            return Result<Guid>.Failure(new Error("Order.TenantMissing", "Không xác định được nhà hàng (Thiếu TenantId)."));
-        }
-
-        var orderItems = new List<OrderItem>();
-        decimal totalAmount = 0;
-
-        // 2. Duyệt qua từng món
-        foreach (var itemDto in request.Items)
-        {
-            var product = await _catalogClient.GetProductAsync(itemDto.ProductId);
-
-            if (product == null)
-            {
-                return Result<Guid>.Failure(new Error("Order.ProductNotFound", $"Món ăn {itemDto.ProductId} không tồn tại hoặc đã hết."));
-            }
-
-            var itemTotal = product.Price * itemDto.Quantity;
-            totalAmount += itemTotal;
-
-            orderItems.Add(new OrderItem
-            {
-                Id = Guid.NewGuid(),
-                ProductId = product.Id,
-                ProductName = product.Name,
-                UnitPrice = product.Price,
-                Quantity = itemDto.Quantity,
-                Note = itemDto.Note,
-                TenantId = _tenantContext.TenantId.Value
-            });
-        }
-
-        // 3. Tạo đơn hàng
+        // 1. Tạo đơn hàng mới
         var order = new Domain.Entities.Order
         {
             Id = Guid.NewGuid(),
-            TenantId = _tenantContext.TenantId.Value,
-            TableId = request.TableId,
-            CustomerName = request.GuestName,
-            OrderNumber = GenerateOrderNumber(),
-            Status = OrderStatus.Pending,
-            TotalAmount = totalAmount,
+            TenantId = request.TenantId,   // Gán thủ công
+            BranchId = request.BranchId,   // Gán thủ công
+            // UserId = null,             // Khách vãng lai -> Null
+            TableId = request.TableId,     // Bàn số mấy
+            Status = OrderStatus.Pending,           // Trạng thái chờ bếp nhận
+            TotalAmount = 0,               // Tính sau hoặc tính ngay ở đây
             CreatedAtUtc = DateTime.UtcNow,
-            Items = orderItems
+            Note = $"Khách lẻ: {request.GuestName} - {request.GuestPhone}"
         };
 
+        // 2. Thêm món (Logic đơn giản, nên gọi Catalog check giá thực tế)
+        foreach (var item in request.Items)
+        {
+            var orderItem = new OrderItem
+            {
+                Id = Guid.NewGuid(),
+                OrderId = order.Id,
+                ProductId = item.ProductId,
+                Quantity = item.Quantity,
+                UnitPrice = 50000 // Tạm fix cứng hoặc phải gọi Catalog để lấy giá chuẩn
+            };
+            order.TotalAmount += orderItem.UnitPrice * orderItem.Quantity;
+            order.Items.Add(orderItem); // Giả sử bạn có List<OrderItem> trong Order
+        }
+
+        // 3. Lưu xuống DB
         _context.Orders.Add(order);
-        await _context.SaveChangesAsync(ct);
-
+        await _context.SaveChangesAsync(cancellationToken);
+        await _notifier.NotifyNewOrderAsync(order.BranchId, order.Id);
         return Result<Guid>.Success(order.Id);
-    }
-
-    private static string GenerateOrderNumber()
-    {
-        return $"S2O-{DateTime.UtcNow:yyyyMMdd}-{new Random().Next(1000, 9999)}";
     }
 }

@@ -6,11 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <!-- Dockerfile không được đưa vào Compile, nếu không C# compiler sẽ đọc Dockerfile như code C# -->
-  <ItemGroup>
-    <None Include="Dockerfile" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.22" />

@@ -20,22 +20,38 @@ public class TenantInterceptor : SaveChangesInterceptor
     {
         if (eventData.Context is null) return base.SavingChanges(eventData, result);
 
-        foreach (var entry in eventData.Context.ChangeTracker.Entries<ITenantEntity>())
+        var tracker = eventData.Context.ChangeTracker;
+
+        // 1. Xử lý TenantId (Cho IMustHaveTenant)
+        foreach (var entry in tracker.Entries<IMustHaveTenant>())
         {
-            if (entry.State == EntityState.Added)
+            if (entry.State == EntityState.Added && _tenantContext.TenantId.HasValue)
             {
-                if (_tenantContext.TenantId.HasValue)
-                {
-                    entry.Entity.TenantId = _tenantContext.TenantId.Value;
-                }
+                // Chỉ gán nếu chưa có giá trị (hoặc ghi đè tùy logic, ở đây mình ghi đè cho chắc)
+                entry.Entity.TenantId = _tenantContext.TenantId.Value;
             }
         }
 
-        // Tự động cập nhật thời gian Audit
-        foreach (var entry in eventData.Context.ChangeTracker.Entries<Entity>())
+        // 2. Xử lý BranchId (Cho IMustHaveBranch - MỚI)
+        foreach (var entry in tracker.Entries<IMustHaveBranch>())
         {
-            if (entry.State == EntityState.Added) entry.Entity.CreatedAtUtc = DateTime.UtcNow;
-            if (entry.State == EntityState.Modified) entry.Entity.ModifiedAtUtc = DateTime.UtcNow;
+            if (entry.State == EntityState.Added && _tenantContext.BranchId.HasValue)
+            {
+                entry.Entity.BranchId = _tenantContext.BranchId.Value;
+            }
+        }
+
+        // 3. Xử lý Audit (CreatedAt, ModifiedAt)
+        foreach (var entry in tracker.Entries<Entity>())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedAtUtc = DateTime.UtcNow;
+            }
+            if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.ModifiedAtUtc = DateTime.UtcNow;
+            }
         }
 
         return base.SavingChanges(eventData, result);

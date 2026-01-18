@@ -1,155 +1,285 @@
 ﻿{
   "Routes": [
+    // ==============================================================================
+    // 1. IDENTITY SERVICE (Cổng đăng nhập)
+    // ==============================================================================
     {
       "DownstreamPathTemplate": "/api/auth/{everything}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "identity-api", "Port": 8080 }
-      ],
+      "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
       "UpstreamPathTemplate": "/api/auth/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS" ]
+      "UpstreamHttpMethod": [ "POST" ]
     },
-
     {
-      "DownstreamPathTemplate": "/api/tables",
+      "DownstreamPathTemplate": "/api/auth/firebase-login",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "tenant-api", "Port": 8080 }
-      ],
-      "UpstreamPathTemplate": "/api/tables",
-      "UpstreamHttpMethod": [ "GET", "POST", "OPTIONS" ],
+      "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/auth/firebase-login",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    // API tạo nhân viên (Dành cho Admin/Owner)
+    {
+      "DownstreamPathTemplate": "/api/accounts/staff",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/staff",
+      "UpstreamHttpMethod": [ "POST" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/tables/{everything}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "tenant-api", "Port": 8080 }
-      ],
-      "UpstreamPathTemplate": "/api/tables/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-Role": "Claims[role] > value",
+        "X-User-Id": "Claims[sub] > value"
       }
     },
 
+    // ==============================================================================
+    // 2. CATALOG SERVICE (Menu & Món ăn)
+    // ==============================================================================
+    
+    // 2.1 Public Menu (Khách xem - Không cần Auth)
     {
-      "DownstreamPathTemplate": "/api/public/menu",
+      "DownstreamPathTemplate": "/api/public/menu/{tenantId}", 
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "catalog-api", "Port": 8080 }
-      ],
-      "UpstreamPathTemplate": "/api/public/menu",
-      "UpstreamHttpMethod": [ "GET", "OPTIONS" ]
+      "DownstreamHostAndPorts": [ { "Host": "catalog-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/public/menu/{tenantId}",
+      "UpstreamHttpMethod": [ "GET" ]
     },
 
+    // 2.2 Quản lý Món ăn (Admin/Owner - Cần Auth)
+    // Thêm món
     {
       "DownstreamPathTemplate": "/api/products",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "catalog-api", "Port": 8080 }
-      ],
-      "UpstreamPathTemplate": "/api/products",
-      "UpstreamHttpMethod": [ "GET", "POST", "OPTIONS" ],
+      "DownstreamHostAndPorts": [ { "Host": "catalog-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/products",
+      "UpstreamHttpMethod": [ "POST" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-Role": "Claims[role] > value",
+        "X-User-Id": "Claims[sub] > value"
       }
     },
+    // Sửa món (Cập nhật giá, tắt món)
     {
-      "DownstreamPathTemplate": "/api/products/{everything}",
+      "DownstreamPathTemplate": "/api/products/{id}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "catalog-api", "Port": 8080 }
-      ],
-      "UpstreamPathTemplate": "/api/products/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS" ],
+      "DownstreamHostAndPorts": [ { "Host": "catalog-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/products/{id}",
+      "UpstreamHttpMethod": [ "PUT" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-Role": "Claims[role] > value",
+        "X-User-Id": "Claims[sub] > value"
       }
     },
 
-    {
-      "DownstreamPathTemplate": "/api/categories",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "catalog-api", "Port": 8080 }
-      ],
-      "UpstreamPathTemplate": "/api/categories",
-      "UpstreamHttpMethod": [ "GET", "POST", "OPTIONS" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
-    },
+    // 2.3 Categories (Danh mục - Cần Auth chung)
     {
       "DownstreamPathTemplate": "/api/categories/{everything}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "catalog-api", "Port": 8080 }
-      ],
+      "DownstreamHostAndPorts": [ { "Host": "catalog-api", "Port": 8080 } ],
       "UpstreamPathTemplate": "/api/categories/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS" ],
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-User-ID": "Claims[sub] > value"
       }
     },
 
+    // ==============================================================================
+    // 3. ORDER SERVICE (Đặt món & Xử lý)
+    // ==============================================================================
+
+    // 3.1 Khách Vãng Lai (Guest - Không Auth)
     {
       "DownstreamPathTemplate": "/api/orders/guest",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "order-api", "Port": 8080 }
-      ],
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
       "UpstreamPathTemplate": "/api/orders/guest",
-      "UpstreamHttpMethod": [ "POST", "OPTIONS" ]
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/orders/guest/{id}/cancel",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/orders/guest/{id}/cancel",
+      "UpstreamHttpMethod": [ "PUT" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/orders/guest/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/orders/guest/{id}",
+      "UpstreamHttpMethod": [ "PUT" ]
     },
 
+    // 3.2 Khách Thành Viên (Customer - Cần Auth)
     {
-      "DownstreamPathTemplate": "/api/orders/{everything}",
+      "DownstreamPathTemplate": "/api/orders/customer",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "order-api", "Port": 8080 }
-      ],
-      "UpstreamPathTemplate": "/api/orders/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS" ],
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/orders/customer",
+      "UpstreamHttpMethod": [ "POST" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-User-Id": "Claims[sub] > value",
+        "X-User-Name": "Claims[name] > value"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/orders/history",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/orders/history",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-User-Id": "Claims[sub] > value"
       }
     },
 
+    // 3.3 Nhân viên (Staff - Cần Auth + BranchId)
+    {
+      "DownstreamPathTemplate": "/api/staff/orders",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/staff/orders",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-Branch-Id": "Claims[branch_id] > value",
+        "X-User-Id": "Claims[sub] > value"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/staff/orders/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/staff/orders/{id}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-Branch-Id": "Claims[branch_id] > value"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/staff/orders/{id}/status",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/staff/orders/{id}/status",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-Branch-Id": "Claims[branch_id] > value",
+        "X-User-Id": "Claims[sub] > value"
+      }
+    },
+
+    // 3.4 Báo cáo (Admin/Owner - Cần Auth)
+    {
+      "DownstreamPathTemplate": "/api/reports/revenue",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/revenue",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-Role": "Claims[role] > value"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/reports/top-selling",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/top-selling",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-Role": "Claims[role] > value"
+      }
+    },
+
+    // ==============================================================================
+    // 4. TENANT SERVICE (Bàn & Chi nhánh)
+    // ==============================================================================
+    {
+      "DownstreamPathTemplate": "/api/tables/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/tables/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-Tenant-ID": "Claims[tenant_id] > value",
+        "X-Branch-ID": "Claims[branch_id] > value",
+        "X-User-ID": "Claims[sub] > value"
+      }
+    },
+
+    // ==============================================================================
+    // 5. BOOKING & PAYMENT (Các dịch vụ khác)
+    // ==============================================================================
     {
       "DownstreamPathTemplate": "/api/bookings/{everything}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "booking-api", "Port": 8080 }
-      ],
+      "DownstreamHostAndPorts": [ { "Host": "booking-api", "Port": 8080 } ],
       "UpstreamPathTemplate": "/api/bookings/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS" ],
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-User-ID": "Claims[sub] > value"
       }
     },
-
     {
       "DownstreamPathTemplate": "/api/payments/{everything}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        { "Host": "payment-api", "Port": 8080 }
-      ],
+      "DownstreamHostAndPorts": [ { "Host": "payment-api", "Port": 8080 } ],
       "UpstreamPathTemplate": "/api/payments/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS" ],
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-User-ID": "Claims[sub] > value"
       }
     }
   ],

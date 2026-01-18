@@ -1,9 +1,8 @@
-﻿using CloudinaryDotNet;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Catalog.App.Abstractions;
-using S2O.Catalog.App.Features.Products;
+using S2O.Catalog.App.Features.Products.Commands;
 using S2O.Catalog.Infra.Persistence;
 using S2O.Infra.Services;
 using S2O.Kernel.Interfaces;
@@ -15,16 +14,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var cloudinaryConfig = builder.Configuration.GetSection("Cloudinary");
-
-var account = new Account(
-    cloudinaryConfig["CloudName"],
-    cloudinaryConfig["ApiKey"],
-    cloudinaryConfig["ApiSecret"]
-);
-
-var cloudinary = new Cloudinary(account);
-builder.Services.AddSingleton(cloudinary);
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 builder.Services.AddScoped<TenantInterceptor>();
 builder.Services.AddScoped<UpdateAuditableEntitiesInterceptor>();
@@ -62,7 +51,6 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "S2O Catalog API", Version = "v1" });
 
-    // 1. Định nghĩa chuẩn bảo mật JWT cho Swagger
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -73,7 +61,6 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Dán Token vào đây theo định dạng: Bearer {token}"
     });
 
-    // 2. Yêu cầu Swagger sử dụng định nghĩa trên cho các API
     options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
@@ -110,5 +97,35 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>(); // Lấy Logger để ghi log
+
+    try
+    {
+        var context = services.GetRequiredService<CatalogDbContext>();
+
+        // 1. Chạy Migration
+        logger.LogInformation("Đang kiểm tra và cập nhật Database Catalog...");
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            await context.Database.MigrateAsync(); // Nên dùng Async cho chuẩn
+        }
+
+        // 2. Chạy Seeder (Gọi hàm SeedAsync vừa viết)
+        logger.LogInformation("Đang Seed dữ liệu mẫu (Danh mục, Món ăn)...");
+        await CatalogDataSeeder.SeedAsync(context);
+
+        logger.LogInformation("Hoàn tất khởi tạo Catalog Database.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Lỗi nghiêm trọng khi khởi tạo Catalog Database.");
+    }
+}
+
+
 
 app.Run();

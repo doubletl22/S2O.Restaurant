@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Identity.App.Abstractions;
-using S2O.Identity.App.Services;
 using S2O.Identity.Domain.Entities;
 using S2O.Identity.Infra.Authentication;
 using S2O.Identity.Infra.Persistence;
@@ -22,6 +23,8 @@ builder.Services.AddDbContext<AuthDbContext>((sp, options) =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
            .AddInterceptors(interceptor);
 });
+
+builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
@@ -44,8 +47,8 @@ builder.Services.AddAuthentication(options => {
 });
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddAuthorization();
-builder.Services.AddSharedInfrastructure(builder.Configuration); 
-builder.Services.AddScoped<TokenService>();
+builder.Services.AddSharedInfrastructure(builder.Configuration);
+builder.Services.AddScoped<S2O.Identity.App.Services.TokenService>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(S2O.Identity.App.Features.Login.LoginCommand).Assembly));
@@ -98,7 +101,7 @@ using (var scope = app.Services.CreateScope())
         var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
 
         logger.LogInformation("Đang Seed dữ liệu mẫu...");
-        await IdentityDataSeeder.SeedAsync(userManager, roleManager);
+        await IdentityDataSeeder.SeedAsync(userManager, roleManager, context);
 
         logger.LogInformation("Hoàn tất chuẩn bị Database.");
     }
@@ -115,5 +118,16 @@ using (var scope = app.Services.CreateScope())
     {
         context.Database.Migrate();
     }
+}
+if (File.Exists("firebase-adminsdk.json"))
+{
+    FirebaseApp.Create(new AppOptions
+    {
+        Credential = GoogleCredential.FromFile("firebase-adminsdk.json")
+    });
+}
+else
+{
+    Console.WriteLine("⚠️ Cảnh báo: Không tìm thấy firebase-adminsdk.json");
 }
 app.Run();

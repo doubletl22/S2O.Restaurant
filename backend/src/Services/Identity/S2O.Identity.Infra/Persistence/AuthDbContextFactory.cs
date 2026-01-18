@@ -22,5 +22,6 @@ public class AuthDbContextFactory : IDesignTimeDbContextFactory<AuthDbContext>
 internal class DesignTimeTenantContext : ITenantContext
 {
     public Guid? TenantId { get; set; } = Guid.Empty;
+    public Guid? BranchId { get; set; } = Guid.Empty;
     public string? Email { get; set; } = "design-time@s2o.com";
 }

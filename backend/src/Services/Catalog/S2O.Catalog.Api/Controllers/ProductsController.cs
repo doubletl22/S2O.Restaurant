@@ -1,67 +1,63 @@
 ﻿using MediatR;
-using ErrorOr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using S2O.Catalog.App.Features.Products;
+using S2O.Catalog.App.Features.Products.Commands; // Namespace chứa Command tạo món
+using S2O.Catalog.App.Features.Public;            // Namespace chứa Query xem menu
 
 namespace S2O.Catalog.Api.Controllers;
 
-[Authorize] // Chỉ những người đã đăng nhập mới được thao tác menu
+[Route("api/products")] // Đổi Route chuẩn REST: /api/products
 [ApiController]
-[Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
     private readonly ISender _sender;
 
-    public ProductsController(ISender sender) => _sender = sender;
-
-    [HttpPost]
-    [Consumes("multipart/form-data")] 
-    public async Task<IActionResult> Create([FromForm] CreateProductRequest request)
+    public ProductsController(ISender sender)
     {
-        // Chuyển từ Request sang Command
-        using var stream = request.Image.OpenReadStream();
-        var command = new CreateProductCommand(
-            request.Name,
-            request.Description,
-            request.Price,
-            request.CategoryId,
-            stream,
-            request.Image.FileName
-        );
+        _sender = sender;
+    }
+
+    // 1. GET: Lấy Menu (Dành cho Khách & App đặt món)
+    // URL: GET api/products/{tenantId}
+    [HttpGet("{tenantId}")]
+    [AllowAnonymous] 
+    public async Task<IActionResult> GetMenu(Guid tenantId, [FromQuery] string? categoryId) 
+    {
+        var query = new GetPublicMenuQuery(tenantId, categoryId);
+        var result = await _sender.Send(query);
+
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    // 2. POST: Thêm món mới (Dành cho Chủ quán)
+    // URL: POST api/products
+    [HttpPost]
+    [Authorize(Roles = "Owner")] // <-- Bắt buộc là Chủ quán
+    public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
+    {
+        // Có thể lấy TenantId từ Token nếu muốn bảo mật hơn
+        // var tenantId = User.FindFirst("tenant_id")?.Value;
 
         var result = await _sender.Send(command);
 
-        return result.Match(
-        id => Ok(new { ProductId = id }),
-        errors => {
-            // Lấy lỗi đầu tiên để hiển thị cho chi tiết
-            var firstError = errors.FirstOrDefault();
-            return Problem(
-                statusCode: firstError.Type switch
-                {
-                    ErrorType.NotFound => StatusCodes.Status404NotFound,
-                    ErrorType.Validation => StatusCodes.Status400BadRequest,
-                    _ => StatusCodes.Status500InternalServerError
-                },
-                title: firstError.Description 
-            );
-        }
-    );
+        return result.IsSuccess
+            ? Ok(new { ProductId = result.Value })
+            : BadRequest(result.Error);
     }
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+
+    [HttpPut("{id}")]
+    [Authorize(Roles = "Owner")] // Chỉ chủ quán mới được sửa
+    public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductCommand command)
     {
-        // Dùng MediatR gọi Query GetProductById
-        var result = await _sender.Send(new GetProductByIdQuery(id));
-        return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
+        // Kiểm tra ID trên URL có khớp với ID trong Body không (Tránh gửi nhầm)
+        if (id != command.ProductId)
+        {
+            return BadRequest("Mã sản phẩm trên URL không khớp với dữ liệu gửi lên.");
+        }
+
+        var result = await _sender.Send(command);
+
+        // Nếu thành công trả về 200 OK (hoặc 204 No Content)
+        return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
 }
-
-// Model nhận dữ liệu từ Form
-public record CreateProductRequest(
-    string Name,
-    string Description,
-    decimal Price,
-    Guid CategoryId,
-    IFormFile Image);

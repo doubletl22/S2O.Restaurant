@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Màn hình Bếp (S2O Kitchen)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+    <style>
+        .order-card { border: 2px solid red; padding: 10px; margin: 10px; background: #ffe6e6; }
+        .success { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>👨‍🍳 BẾP - CHI NHÁNH 2222...</h1>
+    <div id="status">Đang kết nối...</div>
+    
+    <div id="orders-container">
+        </div>
+
+    <script>
+        // 1. Kết nối thẳng vào Order API (Bỏ qua Gateway để test cho dễ trước)
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("http://localhost:5000/hubs/orders") 
+            .build();
+
+        // 2. Lắng nghe sự kiện "NewOrderCreated"
+        connection.on("NewOrderCreated", (data) => {
+            console.log("Nhận đơn:", data);
+            
+            const div = document.createElement("div");
+            div.className = "order-card";
+            div.innerHTML = `
+                <h3>🔔 TING TING! CÓ ĐƠN MỚI</h3>
+                <p>Order ID: <b>${data.orderId}</b></p>
+                <p>Message: ${data.message}</p>
+                <p><i>(Hãy reload API Staff để xem chi tiết)</i></p>
+            `;
+            document.getElementById("orders-container").prepend(div);
+            
+            // Có thể thêm âm thanh ting ting ở đây
+            alert("BẾP ƠI! CÓ ĐƠN MỚI KÌA!");
+        });
+
+        // 3. Bắt đầu kết nối
+        connection.start().then(() => {
+            document.getElementById("status").innerText = "✅ Đã kết nối Socket!";
+            document.getElementById("status").className = "success";
+            
+            // Quan trọng: Phải Join vào đúng Group BranchId của quán
+            // Giả sử quán của bạn ID là: 22222222-2222-2222-2222-222222222222
+            const branchId = "22222222-2222-2222-2222-222222222222"; 
+            connection.invoke("JoinBranch", branchId);
+            
+        }).catch(err => {
+            document.getElementById("status").innerText = "❌ Lỗi kết nối: " + err;
+        });
+    </script>
+</body>
+</html>
