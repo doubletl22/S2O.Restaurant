@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Identity.App.Abstractions;
-using S2O.Identity.App.Services;
 using S2O.Identity.Domain.Entities;
 using S2O.Identity.Infra.Authentication;
 using S2O.Identity.Infra.Persistence;

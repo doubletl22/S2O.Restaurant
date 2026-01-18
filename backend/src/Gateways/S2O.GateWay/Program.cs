@@ -2,22 +2,19 @@
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using S2O.Shared.Infra; // Nếu bạn dùng Shared Infrastructure cho Gateway
+using S2O.Shared.Infra; 
 using System.Text;
 
-// Program.cs
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Phải nạp cấu hình Ocelot trước
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
 
-// 2. Đăng ký Authentication (Dùng trực tiếp ở Gateway để Ocelot dễ nhận diện)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer("Bearer", options => // Đặt tên rõ ràng là "Bearer"
+.AddJwtBearer("Bearer", options => 
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -32,15 +29,26 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddOcelot(builder.Configuration);
 builder.Services.AddSharedInfrastructure(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Ocelot chạy ở cuối
 await app.UseOcelot();
 
 app.Run();

@@ -71,6 +71,7 @@ services:
       - Cloudinary__CloudName=${CLOUDINARY_NAME}
       - Cloudinary__ApiKey=${CLOUDINARY_KEY}
       - Cloudinary__ApiSecret=${CLOUDINARY_SECRET}
+      - ExternalServices__CatalogUrl=http://catalog-api:8080
     depends_on:
       s2o.db:
         condition: service_healthy
