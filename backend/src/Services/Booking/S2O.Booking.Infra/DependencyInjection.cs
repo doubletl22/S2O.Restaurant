@@ -11,13 +11,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddBookingInfra(this IServiceCollection services, IConfiguration configuration)
     {
-        // SỬA: Dùng đúng tên class 'UpdateAuditableEntitiesInterceptor'
         services.AddScoped<UpdateAuditableEntitiesInterceptor>();
         services.AddScoped<TenantInterceptor>();
 
         services.AddDbContext<BookingDbContext>((sp, options) =>
         {
-            // SỬA: Lấy đúng service ra
             var auditInterceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
             var tenantInterceptor = sp.GetRequiredService<TenantInterceptor>();
 

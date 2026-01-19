@@ -34,6 +34,7 @@ public class RegisterTenantHandler : IRequestHandler<RegisterTenantCommand, Resu
             Email = request.Email,
             FullName = request.OwnerName,
             IsActive = true,
+            TenantId = newTenantId
 
             // Lưu ý: ApplicationUser của bạn cần có trường TenantId (hoặc lưu trong Claim)
             // Nếu bạn đã map TenantId vào Entity ApplicationUser thì gán ở đây:
@@ -47,7 +48,7 @@ public class RegisterTenantHandler : IRequestHandler<RegisterTenantCommand, Resu
         }
 
         // 4. Gán Role "Owner"
-        await _userManager.AddToRoleAsync(user, "Owner");
+        await _userManager.AddToRoleAsync(user, "RestaurantOwner");
 
         // 5. Quan trọng: Thêm Claims định danh Tenant
         // Khi ông này đăng nhập, Token sẽ chứa tenant_id này -> Dữ liệu Catalog/Order sẽ lọc theo nó.

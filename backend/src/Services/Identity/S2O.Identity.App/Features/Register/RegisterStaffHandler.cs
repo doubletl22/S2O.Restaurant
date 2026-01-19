@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using S2O.Identity.Domain.Entities;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Results;
 
 namespace S2O.Identity.App.Features.Register;
@@ -8,23 +9,36 @@ namespace S2O.Identity.App.Features.Register;
 public class RegisterStaffHandler : IRequestHandler<RegisterStaffCommand, Result<Guid>>
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IUserContext _userContext;
+    private readonly ITenantContext _tenantContext;
 
-    public RegisterStaffHandler(UserManager<ApplicationUser> userManager)
+    public RegisterStaffHandler(UserManager<ApplicationUser> userManager, 
+        IUserContext userContext,
+        ITenantContext tenantContext)
     {
         _userManager = userManager;
+        _userContext = userContext;
+        _tenantContext = tenantContext;
     }
+
+
 
     public async Task<Result<Guid>> Handle(RegisterStaffCommand request, CancellationToken cancellationToken)
     {
-        // 1. Tạo User
+        var currentTenantId = _tenantContext.TenantId;
+        if (currentTenantId == null)
+        {
+            return Result<Guid>.Failure(Error.Validation("Auth.Invalid", "Chỉ Owner đã đăng nhập mới được tạo Staff."));
+        }
+
         var user = new ApplicationUser
         {
-            UserName = request.Email,
+            UserName = request.Username,
             Email = request.Email,
             FullName = request.FullName,
-            BranchId = request.BranchId, // Gán cứng chi nhánh
-            IsActive = true,
-            CreatedAtUtc = DateTime.UtcNow
+            TenantId = currentTenantId.Value, // <--- QUAN TRỌNG: Lấy theo Owner
+            BranchId = request.BranchId,      // Staff thuộc chi nhánh nào do Owner chọn
+            IsActive = true
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);

@@ -1,5 +1,4 @@
-﻿// File: backend/src/BuildingBlocks/S2O.Shared.Infra/Services/TenantContext.cs
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using S2O.Shared.Kernel.Interfaces;
 using System.Security.Claims;
 
@@ -9,14 +8,13 @@ public class TenantContext : ITenantContext
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private Guid? _tenantId;
-    private Guid? _branchId; // Thêm backing field cho Branch
+    private Guid? _branchId;
 
     public TenantContext(IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
     }
 
-    // Logic lấy TenantId (Giữ nguyên của bạn, chỉ tối ưu nhẹ)
     public Guid? TenantId
     {
         get
@@ -26,10 +24,14 @@ public class TenantContext : ITenantContext
             var context = _httpContextAccessor.HttpContext;
             if (context == null) return null;
 
-            var tidString = context.User?.FindFirst("tenantId")?.Value
+            // --- SỬA Ở ĐÂY ---
+            // Ưu tiên tìm "tenant_id" (chuẩn JWT thường dùng snake_case) trước
+            var tidString = context.User?.FindFirst("tenant_id")?.Value
+                         ?? context.User?.FindFirst("tenantId")?.Value
                          ?? context.User?.FindFirst("TenantId")?.Value;
 
-            if (string.IsNullOrEmpty(tidString) && context.Request.Headers.TryGetValue("X-Tenant-Id", out var headerId))
+            // Nếu không có trong Claim thì tìm trong Header (Dành cho Gateway forward)
+            if (string.IsNullOrEmpty(tidString) && context.Request.Headers.TryGetValue("X-Tenant-ID", out var headerId))
             {
                 tidString = headerId;
             }
@@ -56,13 +58,17 @@ public class TenantContext : ITenantContext
 
             string? bidString = null;
 
-            if (context.Request.Headers.TryGetValue("X-Branch-Id", out var headerId))
+            // Check Header trước
+            if (context.Request.Headers.TryGetValue("X-Branch-ID", out var headerId))
             {
                 bidString = headerId;
             }
             else
             {
-                bidString = context.User?.FindFirst("branchId")?.Value
+                // --- SỬA Ở ĐÂY ---
+                // Thêm "branch_id" vào danh sách tìm kiếm
+                bidString = context.User?.FindFirst("branch_id")?.Value
+                         ?? context.User?.FindFirst("branchId")?.Value
                          ?? context.User?.FindFirst("BranchId")?.Value;
             }
 
