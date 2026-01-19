@@ -12,7 +12,6 @@ public abstract class BaseApiController : ControllerBase
 
     protected BaseApiController(ISender sender) => Sender = sender;
 
-    // Helper để map Result sang HTTP Response
     protected IActionResult HandleResult(Result result) =>
         result.IsSuccess ? Ok() : BadRequest(result.Error);
 

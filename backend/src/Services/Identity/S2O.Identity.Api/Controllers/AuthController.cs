@@ -1,58 +1,52 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using S2O.Identity.App.Features.Login;
-using S2O.Identity.App.Features.Register;
+using S2O.Identity.App.Features.Register; // Nhớ using namespace chứa Command
+using S2O.Identity.App.Features.SaaS;
 
 namespace S2O.Identity.Api.Controllers;
 
-// Đảm bảo Route khớp với thiết kế API
 [Route("api/auth")]
-public class AuthController : BaseApiController
+[ApiController]
+public class AuthController : ControllerBase
 {
-    // Constructor chuẩn, đẩy sender xuống class cha
-    public AuthController(ISender sender) : base(sender) { }
+    private readonly ISender _sender;
 
-    /// <summary>
-    /// Đăng ký chủ nhà hàng mới (Tạo Tenant + User + Branch mặc định)
-    /// </summary>
-    [HttpPost("register-owner")]
-    public async Task<IActionResult> RegisterOwner([FromBody] RegisterOwnerCommand command)
+    public AuthController(ISender sender)
     {
-        var result = await Sender.Send(command);
-        return HandleResult(result);
+        _sender = sender;
     }
 
-    /// <summary>
-    /// Đăng nhập và lấy JWT Token
-    /// </summary>
+    // 1. Đăng nhập (Dùng chung cho tất cả)
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginCommand command)
     {
-        var result = await Sender.Send(command);
-        return HandleResult(result);
+        var result = await _sender.Send(command);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+    // 2. Tạo Staff (Chỉ Owner mới được gọi)
+    // URL: POST /api/auth/staff
+    [HttpPost("staff")]
+    [Authorize(Roles = "RestaurantOwner")] 
+    public async Task<IActionResult> RegisterStaff([FromBody] RegisterStaffCommand command)
+    {
+        var result = await _sender.Send(command);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
-    /// <summary>
-    /// Đăng ký khách hàng thành viên (Gán vào Tenant có sẵn)
-    /// </summary>
-    [HttpPost("register-customer")]
-    public async Task<IActionResult> RegisterCustomer([FromBody] RegisterCustomerCommand command)
+    // 3. Tạo Chủ quán mới (Chỉ SystemAdmin mới được gọi)
+    // URL: POST /api/auth/create-tenant
+    [HttpPost("create-tenant")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> CreateTenant([FromBody] RegisterTenantCommand command)
     {
-        // SỬA 1: Dùng 'Sender' (của class cha) thay vì '_sender' (không tồn tại)
-        var result = await Sender.Send(command);
-
-        // SỬA 2: Dùng hàm Helper 'HandleResult' cho gọn và đồng bộ với các hàm trên
-        return HandleResult(result);
-    }
-
-    [HttpPost("firebase-login")]
-    public async Task<IActionResult> FirebaseLogin([FromBody] LoginWithFirebaseCommand command)
-    {
-        var result = await Sender.Send(command);
-
-        if (result.IsFailure) return BadRequest(result.Error);
-
-        // Trả về Token S2O để Frontend dùng gọi API Order, Booking...
-        return Ok(new { Token = result.Value });
+        Console.WriteLine("=== ADMIN DEBUG CLAIMS ===");
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Key: {claim.Type} | Value: {claim.Value}");
+        }
+        var result = await _sender.Send(command);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 }

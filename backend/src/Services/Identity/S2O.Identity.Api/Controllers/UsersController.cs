@@ -8,7 +8,7 @@ namespace S2O.Identity.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize] // Bắt buộc phải có Token mới gọi được
+[Authorize] 
 public class UsersController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -28,17 +28,14 @@ public class UsersController : ControllerBase
     );
 
     [HttpPost]
-    // Chỉ 2 ông này mới được quyền tạo người mới
     [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
-        // 1. Lấy thông tin người đang gọi API (Requester)
         var requesterRole = User.FindFirst(ClaimTypes.Role)?.Value;
         var requesterTenantIdString = User.FindFirst("tenant_id")?.Value;
 
         Guid? targetTenantId;
 
-        // 2. Logic phân quyền (Hierarchy Check)
         if (requesterRole == "SystemAdmin")
         {
             // --- TRƯỜNG HỢP SYSTEM ADMIN ---

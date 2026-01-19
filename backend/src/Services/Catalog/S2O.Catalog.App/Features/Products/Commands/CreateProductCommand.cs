@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using S2O.Shared.Kernel.Results;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json.Serialization;
 
 namespace S2O.Catalog.App.Features.Products.Commands;
 
@@ -7,6 +9,9 @@ public record CreateProductCommand(
     string Name,
     string Description,
     decimal Price,
-    Guid CategoryId, // Món này thuộc nhóm nào (Khai vị, Món chính...)
-    string ImageUrl  // Link ảnh (Tạm thời gửi link string, chưa làm upload file)
-) : IRequest<Result<Guid>>;
+    Guid CategoryId, 
+    IFormFile? ImageFile  
+) : IRequest<Result<Guid>>
+{
+public Guid TenantId { get; init; }
+}
