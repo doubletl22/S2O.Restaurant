@@ -33,7 +33,7 @@ const AdminLayout = ({ children }) => {
             <div className="avatar">
               <User size={18} />
             </div>
-            <span>John Doe</span>
+            <span>Admin</span>
             <ChevronDown size={16} style={{ marginLeft: 5, opacity: 0.6 }} />
 
             {showDropdown && (
