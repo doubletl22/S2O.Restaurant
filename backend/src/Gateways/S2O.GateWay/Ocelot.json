@@ -19,18 +19,29 @@
     },
     // API tạo nhân viên (Dành cho Admin/Owner)
     {
-      "DownstreamPathTemplate": "/api/accounts/staff",
+      "DownstreamPathTemplate": "/api/auth/staff", 
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
-      "UpstreamPathTemplate": "/api/admin/staff",
+      "UpstreamPathTemplate": "/api/owner/staff",
       "UpstreamHttpMethod": [ "POST" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       },
       "UpstreamHeaderTransform": {
-        "X-Role": "Claims[role] > value",
-        "X-User-Id": "Claims[sub] > value"
+        "X-Tenant-ID": "Claims[tenant_id] > value"
+      }
+    },
+    // API tạo Tenant (Dành cho SysAdmin)
+    {
+      "DownstreamPathTemplate": "/api/auth/create-tenant",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/sysadmin/tenants",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
       }
     },
 
@@ -247,6 +258,22 @@
       "UpstreamHeaderTransform": {
         "X-Tenant-ID": "Claims[tenant_id] > value",
         "X-Branch-ID": "Claims[branch_id] > value",
+        "X-User-ID": "Claims[sub] > value"
+      }
+    },
+    // Chi nhánh
+    {
+      "DownstreamPathTemplate": "/api/branches",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/branches",
+      "UpstreamHttpMethod": [ "POST", "GET", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "UpstreamHeaderTransform": {
+        "X-Tenant-ID": "Claims[tenant_id] > value",
         "X-User-ID": "Claims[sub] > value"
       }
     },

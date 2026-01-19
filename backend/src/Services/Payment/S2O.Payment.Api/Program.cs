@@ -1,47 +1,22 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore;
 using S2O.Payment.App.Features.Payments.Commands;
 using S2O.Payment.Infra;
-using S2O.Shared.Infra;
-using S2O.Shared.Infra.Services;
-using S2O.Shared.Kernel.Interfaces;
-using System.Text;
+using S2O.Payment.Infra.Persistence; 
+using S2O.Shared.Infra; 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Add Infra & Shared
-builder.Services.AddPaymentInfra(builder.Configuration);
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ITenantContext, TenantContext>();
-builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddSharedInfrastructure(builder.Configuration);
-
-// 2. MediatR
+builder.Services.AddPaymentInfra(builder.Configuration);
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreatePaymentCommand).Assembly));
-
-// 3. Auth
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
-        };
-    });
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    // Cấu hình nút Authorize (Ổ khóa)
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "S2O Payment API", Version = "v1" });
+
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -67,17 +42,30 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
     try
     {
-        var context = services.GetRequiredService<S2O.Payment.Infra.Persistence.PaymentDbContext>();
-        if (context.Database.GetPendingMigrations().Any()) context.Database.Migrate();
+        var context = services.GetRequiredService<PaymentDbContext>();
+
+        logger.LogInformation("Payment Service: Đang kiểm tra Database...");
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            await context.Database.MigrateAsync();
+        }
+
+        logger.LogInformation("Payment Service: Database sẵn sàng!");
     }
-    catch { }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Lỗi nghiêm trọng khi khởi tạo Payment Database.");
+    }
 }
 
 if (app.Environment.IsDevelopment())
@@ -89,6 +77,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

@@ -32,7 +32,7 @@ public class ProductsController : ControllerBase
     // 2. POST: Thêm món mới (Dành cho Chủ quán)
     // URL: POST api/products
     [HttpPost]
-    [Authorize(Roles = "Owner")] // <-- Bắt buộc là Chủ quán
+    [Authorize(Roles = "RestaurantOwner")] // <-- Bắt buộc là Chủ quán
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
     {
         // Có thể lấy TenantId từ Token nếu muốn bảo mật hơn
@@ -46,7 +46,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = "Owner")] // Chỉ chủ quán mới được sửa
+    [Authorize(Roles = "RestaurantOwner")] // Chỉ chủ quán mới được sửa
     public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductCommand command)
     {
         // Kiểm tra ID trên URL có khớp với ID trong Body không (Tránh gửi nhầm)

@@ -1,61 +1,26 @@
 ﻿using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using S2O.Identity.App.Abstractions;
+using S2O.Identity.App.Services;
 using S2O.Identity.Domain.Entities;
 using S2O.Identity.Infra.Authentication;
 using S2O.Identity.Infra.Persistence;
 using S2O.Infra.Services;
 using S2O.Kernel.Interfaces;
-using S2O.Shared.Infra;
+using S2O.Shared.Infra; // Chứa AddSharedInfrastructure
 using S2O.Shared.Infra.Interceptors;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1. Controller & Swagger
 builder.Services.AddControllers();
-builder.Services.AddDbContext<AuthDbContext>((sp, options) =>
-{
-    var interceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .AddInterceptors(interceptor);
-});
-
-builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
-builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
-    .AddEntityFrameworkStores<AuthDbContext>()
-    .AddDefaultTokenProviders();
-
-builder.Services.AddAuthentication(options => {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options => {
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!))
-    };
-});
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-builder.Services.AddAuthorization();
-builder.Services.AddSharedInfrastructure(builder.Configuration);
-builder.Services.AddScoped<S2O.Identity.App.Services.TokenService>();
-builder.Services.AddScoped<ITokenProvider, TokenProvider>();
-builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(S2O.Identity.App.Features.Login.LoginCommand).Assembly));
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "S2O Identity API", Version = "v1" });
+
+    // Config nút Authorize trên Swagger
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -71,54 +36,33 @@ builder.Services.AddSwaggerGen(options => {
     });
 });
 
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
+// 2. Database
+builder.Services.AddDbContext<AuthDbContext>((sp, options) =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    var interceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .AddInterceptors(interceptor);
+});
+builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
 
+// 3. Identity Core (User, Role)
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddDefaultTokenProviders();
 
-app.UseAuthentication();
-app.UseAuthorization();
+// --- [ĐÃ XÓA] ĐOẠN CODE GÂY LỖI TRÙNG LẶP JWT TẠI ĐÂY ---
 
-app.MapControllers(); 
+// 4. Shared Infrastructure (Nó sẽ tự lo việc Config JWT/Bearer cho bạn)
+builder.Services.AddSharedInfrastructure(builder.Configuration);
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
+// 5. Identity Services
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>(); // (Lưu ý: Shared cũng có UserContext, bạn nên kiểm tra xem có cần cái này không)
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<ITokenProvider, TokenProvider>();
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(typeof(S2O.Identity.App.Features.Login.LoginCommand).Assembly));
 
-    try
-    {
-        var context = services.GetRequiredService<AuthDbContext>();
-
-        logger.LogInformation("Đang kiểm tra và cập nhật Database (Migration)...");
-        await context.Database.MigrateAsync();
-
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
-
-        logger.LogInformation("Đang Seed dữ liệu mẫu...");
-        await IdentityDataSeeder.SeedAsync(userManager, roleManager, context);
-
-        logger.LogInformation("Hoàn tất chuẩn bị Database.");
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "Lỗi nghiêm trọng trong quá trình khởi tạo Database.");
-    }
-}
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<AuthDbContext>();
-    if (context.Database.GetPendingMigrations().Any())
-    {
-        context.Database.Migrate();
-    }
-}
+// 6. Config Firebase
 if (File.Exists("firebase-adminsdk.json"))
 {
     FirebaseApp.Create(new AppOptions
@@ -130,4 +74,50 @@ else
 {
     Console.WriteLine("⚠️ Cảnh báo: Không tìm thấy firebase-adminsdk.json");
 }
+
+var app = builder.Build();
+
+// Configure Pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+// 7. Migration & Seeding Data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        var context = services.GetRequiredService<AuthDbContext>();
+
+        logger.LogInformation("Identity Service: Đang kiểm tra Database...");
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            await context.Database.MigrateAsync();
+        }
+
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+
+        logger.LogInformation("Identity Service: Đang Seed dữ liệu mẫu...");
+        // Lưu ý thứ tự tham số seed phải đúng với file IdentityDataSeeder.cs
+        await IdentityDataSeeder.SeedAsync(userManager, roleManager, context);
+
+        logger.LogInformation("Identity Service: Khởi động thành công!");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Lỗi nghiêm trọng trong quá trình khởi tạo Database.");
+    }
+}
+
 app.Run();

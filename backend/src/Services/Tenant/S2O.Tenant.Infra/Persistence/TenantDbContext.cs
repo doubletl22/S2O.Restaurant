@@ -15,13 +15,12 @@ public class TenantDbContext : BaseDbContext, ITenantDbContext
 
     public DbSet<Domain.Entities.Tenant> Tenants { get; set; }
     public DbSet<Table> Tables { get; set; }
-
+    public DbSet<Branch> Branches { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        // Config cho Table
         modelBuilder.Entity<Table>().HasKey(x => x.Id);
-        // Tenant là root, không cần filter theo TenantId của chính nó
         modelBuilder.Entity<Domain.Entities.Tenant>().HasKey(x => x.Id);
+        modelBuilder.Entity<Branch>().HasKey(x => x.Id);
     }
 }

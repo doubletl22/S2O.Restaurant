@@ -11,19 +11,19 @@ export const OrderStatus = {
 // Tạo type từ object trên để dùng làm kiểu dữ liệu
 export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
 
-export interface StaffOrderItemDto {
+export interface OrderItemDto {
   productId: string;
+  productName?: string; // Tên món (Map từ Catalog)
   quantity: number;
-  unitPrice: number;
+  note?: string;
 }
-
 export interface StaffOrderDto {
   id: string;
-  tableId: string;
-  note: string;
-  totalAmount: number;
+  tableId: string; // Tên/Số bàn
+  tableName?: string;
   status: OrderStatus;
-  statusName: string; // Backend trả về string tên enum
+  statusName: string;
+  note?: string; // Ghi chú toàn đơn
   createdAtUtc: string;
-  items: StaffOrderItemDto[];
+  items: OrderItemDto[];
 }
