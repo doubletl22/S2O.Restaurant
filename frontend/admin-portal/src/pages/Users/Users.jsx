@@ -3,7 +3,7 @@ import "./Users.css";
 
 const Users = () => {
   const users = [
-    { id: 1, name: "John Doe", role: "Admin", email: "admin@foodscan.com" },
+    { id: 1, name: "admin", role: "Admin", email: "admin@foodscan.com" },
     { id: 2, name: "Alice Nguyen", role: "Manager", email: "alice@kfc.com" },
     { id: 3, name: "Tran Van B", role: "Customer", email: "btran@gmail.com" },
   ];
