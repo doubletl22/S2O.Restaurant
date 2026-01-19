@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Catalog.App.Features.Products.Commands; // Namespace chứa Command tạo món
 using S2O.Catalog.App.Features.Public;            // Namespace chứa Query xem menu
 
@@ -11,10 +12,12 @@ namespace S2O.Catalog.Api.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly ISender _sender;
+    private readonly ITenantContext _tenantContext;
 
-    public ProductsController(ISender sender)
+    public ProductsController(ISender sender, ITenantContext tenantContext)
     {
         _sender = sender;
+        _tenantContext = tenantContext;
     }
 
     // 1. GET: Lấy Menu (Dành cho Khách & App đặt món)
@@ -32,17 +35,22 @@ public class ProductsController : ControllerBase
     // 2. POST: Thêm món mới (Dành cho Chủ quán)
     // URL: POST api/products
     [HttpPost]
-    [Authorize(Roles = "RestaurantOwner")] // <-- Bắt buộc là Chủ quán
-    public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
+    [Authorize(Roles = "RestaurantOwner")] 
+    public async Task<IActionResult> CreateProduct([FromForm] CreateProductCommand command)
     {
-        // Có thể lấy TenantId từ Token nếu muốn bảo mật hơn
-        // var tenantId = User.FindFirst("tenant_id")?.Value;
+        var tenantId = _tenantContext.TenantId;
 
-        var result = await _sender.Send(command);
+        if (tenantId == null || tenantId == Guid.Empty)
+        {
+            return BadRequest("Thiếu thông tin TenantId trong Token.");
+        }
 
-        return result.IsSuccess
-            ? Ok(new { ProductId = result.Value })
-            : BadRequest(result.Error);
+        // 4. Gán TenantId vào Command
+        var commandWithTenant = command with { TenantId = tenantId.Value };
+
+        var result = await _sender.Send(commandWithTenant);
+
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
     [HttpPut("{id}")]
