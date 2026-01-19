@@ -7,5 +7,6 @@ public interface ITenantDbContext
 {
     DbSet<Domain.Entities.Tenant> Tenants { get; }
     DbSet<Table> Tables { get; }
+    DbSet<Branch> Branches { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

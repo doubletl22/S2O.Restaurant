@@ -32,33 +32,6 @@ public static class IdentityDataSeeder
             await userManager.AddToRoleAsync(adminUser, "SystemAdmin");
         }
 
-        // 3. SEED CHI NHÁNH (Nếu chưa có)
-        if (!await context.Branches.AnyAsync())
-        {
-            var branches = new List<Branch>
-            {
-                new Branch
-                {
-                    Id = Branch1Id,
-                    TenantId = FixedTenantId,
-                    Name = "S2O Phở - Cầu Giấy",
-                    Address = "123 Cầu Giấy, Hà Nội",
-                    IsActive = true,
-                    // CreatedAtUtc = DateTime.UtcNow // Dùng cái này nếu Entity bạn sửa tên biến
-                },
-                new Branch
-                {
-                    Id = Branch2Id,
-                    TenantId = FixedTenantId,
-                    Name = "S2O Phở - Hoàn Kiếm",
-                    Address = "1 Bờ Hồ, Hà Nội",
-                    IsActive = true
-                }
-            };
-            context.Branches.AddRange(branches);
-            await context.SaveChangesAsync();
-        }
-
         // 4. SEED CHỦ NHÀ HÀNG (Owner) - Quản lý Branch 1
         var ownerEmail = "chuquan@s2o.com";
         if (await userManager.FindByEmailAsync(ownerEmail) == null)

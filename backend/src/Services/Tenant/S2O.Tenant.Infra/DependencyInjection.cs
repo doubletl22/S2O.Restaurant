@@ -16,7 +16,7 @@ public static class DependencyInjection
         services.AddDbContext<TenantDbContext>((sp, options) =>
         {
             var interceptor = sp.GetRequiredService<TenantInterceptor>();
-            options.UseNpgsql(configuration.GetConnectionString("Database"))
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
                    .AddInterceptors(interceptor);
         });
 

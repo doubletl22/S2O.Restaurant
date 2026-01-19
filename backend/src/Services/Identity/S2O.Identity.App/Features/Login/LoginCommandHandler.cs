@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore; 
+using S2O.Identity.App.Abstractions;
+using S2O.Identity.App.Services;
 using S2O.Identity.Domain.Entities;
 using S2O.Shared.Kernel.Results;
-using S2O.Identity.App.Services;
-using S2O.Identity.App.Abstractions;
+using System.Data;
 namespace S2O.Identity.App.Features.Login;
 
 public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<string>>
@@ -36,9 +37,8 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<string>>
 
         if (!isPasswordValid)
             return Result<string>.Failure(new Error("Auth.InvalidPassword", "Mật khẩu không đúng"));
-
-        var token = _tokenService.CreateToken(user);
-
+        var roles = await _userManager.GetRolesAsync(user);
+        var token = _tokenService.CreateToken(user, roles);
         return Result<string>.Success(token);
     }
 }
