@@ -41,6 +41,11 @@ public class AuthController : ControllerBase
     [Authorize(Roles = "SystemAdmin")]
     public async Task<IActionResult> CreateTenant([FromBody] RegisterTenantCommand command)
     {
+        Console.WriteLine("=== ADMIN DEBUG CLAIMS ===");
+        foreach (var claim in User.Claims)
+        {
+            Console.WriteLine($"Key: {claim.Type} | Value: {claim.Value}");
+        }
         var result = await _sender.Send(command);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }

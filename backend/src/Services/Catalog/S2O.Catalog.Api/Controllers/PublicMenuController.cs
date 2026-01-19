@@ -22,8 +22,6 @@ public class PublicMenuController : ControllerBase
     [AllowAnonymous] // Cho phép truy cập không cần Token
     public async Task<IActionResult> GetMenu(Guid tenantId, [FromQuery] string? categoryId)
     {
-        // 2. Sử dụng GetPublicMenuQuery (Feature dành riêng cho khách)
-        // Query này sẽ đi kèm với GetPublicMenuHandler có logic .IgnoreQueryFilters()
         var query = new GetPublicMenuQuery(tenantId, categoryId);
 
         var result = await _sender.Send(query);
