@@ -4,16 +4,13 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-
-COPY ["src/Gateways/S2O.Gateway/S2O.Gateway.csproj", "src/Gateways/S2O.Gateway/"]
-
+COPY ["src/Gateways/S2O.GateWay/S2O.Gateway.csproj", "src/Gateways/S2O.GateWay/"]
 COPY ["src/BuildingBlocks/S2O.Shared.Kernel/S2O.Shared.Kernel.csproj", "src/BuildingBlocks/S2O.Shared.Kernel/"]
 COPY ["src/BuildingBlocks/S2O.Shared.Infra/S2O.Shared.Infra.csproj", "src/BuildingBlocks/S2O.Shared.Infra/"]
 
-RUN dotnet restore "src/Gateways/S2O.Gateway/S2O.Gateway.csproj"
-
+RUN dotnet restore "src/Gateways/S2O.GateWay/S2O.Gateway.csproj"
 COPY . .
-WORKDIR "/src/src/Gateways/S2O.Gateway"
+WORKDIR "/src/src/Gateways/S2O.GateWay"
 RUN dotnet build "S2O.Gateway.csproj" -c Release -o /app/build
 
 FROM build AS publish
