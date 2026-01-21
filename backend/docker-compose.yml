@@ -156,6 +156,5 @@ services:
       - "8081:80"
     depends_on:
       - s2o.db  
-
 volumes:
   postgres_data:
