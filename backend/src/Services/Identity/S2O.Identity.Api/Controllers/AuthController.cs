@@ -49,4 +49,17 @@ public class AuthController : ControllerBase
         var result = await _sender.Send(command);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
+
+    [HttpPost("firebase-login")]
+    public async Task<IActionResult> FirebaseLogin([FromBody] LoginWithFirebaseCommand command)
+    {
+        var result = await _sender.Send(command);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok(new { Token = result.Value });
+    }
 }
