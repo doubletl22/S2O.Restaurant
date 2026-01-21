@@ -7,5 +7,6 @@ public enum OrderStatus
     Cooking = 2,    // Đang nấu
     Ready = 3,      // Đã xong, chờ bưng
     Completed = 4,  // Đã thanh toán/hoàn tất
-    Cancelled = 5   // Đã hủy
+    Cancelled = 5,   // Đã hủy
+    Paid = 6         // Đã thanh toán
 }

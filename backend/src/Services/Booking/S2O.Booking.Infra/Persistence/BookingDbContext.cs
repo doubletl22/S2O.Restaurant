@@ -13,6 +13,7 @@ public class BookingDbContext : BaseDbContext, IBookingDbContext
     }
 
     public DbSet<Domain.Entities.Booking> Bookings { get; set; }
+    public DbSet<Domain.Entities.Table> Tables { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -21,14 +22,13 @@ public class BookingDbContext : BaseDbContext, IBookingDbContext
         builder.Entity<Domain.Entities.Booking>(entity =>
         {
             entity.HasKey(e => e.Id);
-
-            // Index TenantId để query nhanh
             entity.HasIndex(e => e.TenantId);
+            entity.HasIndex(e => e.BranchId); // Index mới cho Chi nhánh
+            entity.HasIndex(e => e.BookingTime); // Index để query theo ngày
 
-            // Validate dữ liệu cơ bản
             entity.Property(e => e.GuestName).IsRequired().HasMaxLength(100);
             entity.Property(e => e.PhoneNumber).IsRequired().HasMaxLength(20);
-            entity.Property(e => e.Status).HasConversion<string>(); // Lưu Enum dạng string cho dễ đọc trong DB
+            entity.Property(e => e.Status).HasConversion<string>();
         });
     }
 }
