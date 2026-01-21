@@ -87,5 +87,23 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        // Lưu ý: Thay 'TenantsDbContext' bằng tên DbContext tương ứng của Service đó
+        // Ví dụ: CatalogDbContext, OrderDbContext...
+        var context = services.GetRequiredService<S2O.Booking.Infra.Persistence.BookingDbContext>();
 
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Lỗi Migration: {ex.Message}");
+    }
+}
 app.Run();
