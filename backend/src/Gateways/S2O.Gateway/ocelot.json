@@ -17,7 +17,7 @@
       "UpstreamPathTemplate": "/api/auth/firebase-login",
       "UpstreamHttpMethod": [ "POST" ]
     },
-    // API tạo nhân viên (Dành cho Admin/Owner)
+    // API tạo nhân viên (Dành cho Admin/Owner).
     {
       "DownstreamPathTemplate": "/api/auth/staff", 
       "DownstreamScheme": "http",
