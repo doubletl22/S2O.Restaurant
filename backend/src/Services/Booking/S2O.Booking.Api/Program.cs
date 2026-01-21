@@ -1,8 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using S2O.Booking.App.Abstractions;
 using S2O.Booking.App.Features.Bookings.Commands;
 using S2O.Booking.Infra; 
-using S2O.Booking.Infra.Persistence; 
-using S2O.Shared.Infra; 
+using S2O.Booking.Infra.Data;
+using S2O.Booking.Infra.Persistence;
+using S2O.Booking.Infra.Services;
+using S2O.Shared.Infra;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +14,11 @@ builder.Services.AddBookingInfra(builder.Configuration);
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreateBookingCommand).Assembly));
-
+builder.Services.AddDbContext<BookingDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<TenantReadOnlyDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("TenantConnection"))); 
+builder.Services.AddScoped<ITenantTableChecker, TenantTableChecker>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
