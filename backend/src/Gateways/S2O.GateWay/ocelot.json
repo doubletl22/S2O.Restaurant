@@ -278,6 +278,37 @@
       }
     },
 
+    {
+      "DownstreamPathTemplate": "/api/admin/tenants",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [{"Host": "tenant-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/tenants",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+
+    // 2. POST: Khóa hoặc Mở khóa nhà hàng
+    // Dùng {everything} để bắt cả "/lock" và "/unlock"
+    {
+      "DownstreamPathTemplate": "/api/admin/tenants/{id}/{action}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "tenant-api",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/admin/tenants/{id}/{action}",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+
     // ==============================================================================
     // 5. BOOKING & PAYMENT 
     // ==============================================================================
