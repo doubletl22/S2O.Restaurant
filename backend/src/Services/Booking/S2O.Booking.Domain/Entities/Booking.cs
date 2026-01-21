@@ -5,25 +5,37 @@ namespace S2O.Booking.Domain.Entities;
 public class Booking : Entity, IAuditableEntity, IMustHaveTenant
 {
     public new Guid Id { get; set; }
-    public string GuestName { get; set; } = string.Empty;
-    public string PhoneNumber { get; set; } = string.Empty;
-    public DateTime BookingTime { get; set; } // Giờ khách hứa đến
-    public int PartySize { get; set; }        // Số lượng người
-    public string? Note { get; set; }         // Ghi chú (VD: Cần ghế trẻ em)
+    public Guid? TenantId { get; set; }
+    public Guid BranchId { get; set; } // BỔ SUNG: Đặt bàn phải theo chi nhánh
+    public Guid? TableId { get; set; } // BỔ SUNG: Có thể gán bàn trước hoặc không
+
+    public string GuestName { get; set; } = default!;
+    public string PhoneNumber { get; set; } = default!;
+    public DateTime BookingTime { get; set; }
+    public int PartySize { get; set; }
+    public string? Note { get; set; }
+
     public BookingStatus Status { get; set; } = BookingStatus.Pending;
-    public string? Reason { get; set; }       // Lý do từ chối/hủy (nếu có)
-    public Guid? TenantId { get; set; }    
+
     public string? CreatedBy { get; set; }
-    public DateTime? LastModifiedAtUtc { get; set; }
     public string? LastModifiedBy { get; set; }
+    public DateTime? LastModifiedAtUtc { get; set; }
+
+    // Logic thay đổi trạng thái
+    public void Confirm()
+    {
+        if (Status == BookingStatus.Cancelled)
+            throw new InvalidOperationException("Không thể duyệt đơn đã hủy.");
+        Status = BookingStatus.Confirmed;
+    }
+    public void Cancel() => Status = BookingStatus.Cancelled;
+    public void CheckIn() => Status = BookingStatus.Completed;
 }
 
 public enum BookingStatus
 {
-    Pending,    // Mới tạo, chờ nhà hàng xác nhận
-    Confirmed,  // Nhà hàng đã đồng ý (Giữ bàn)
-    Rejected,   // Nhà hàng từ chối (Full bàn)
-    Cancelled,  // Khách hủy
-    Completed,  // Khách đã đến ăn xong
-    NoShow      // Khách đặt nhưng không đến
+    Pending,
+    Confirmed,
+    Cancelled,
+    Completed // Khách đã đến
 }
