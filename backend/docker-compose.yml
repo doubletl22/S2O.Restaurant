@@ -147,6 +147,15 @@ services:
       - tenant-api
       - booking-api
       - payment-api
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8081:80"
+    depends_on:
+      - s2o.db  
 
 volumes:
   postgres_data:
