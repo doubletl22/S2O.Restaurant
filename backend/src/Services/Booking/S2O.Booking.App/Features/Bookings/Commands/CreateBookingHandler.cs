@@ -1,20 +1,26 @@
-﻿using S2O.Booking.App.Abstractions;
-using S2O.Booking.Domain.Entities; // Alias
+﻿using S2O.Booking.App.Abstractions; // Using Interface vừa tạo
+using S2O.Booking.Domain.Entities;
 using S2O.Shared.Kernel.Abstractions;
 using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Results;
+using Microsoft.EntityFrameworkCore; // Để dùng AnyAsync
 
 namespace S2O.Booking.App.Features.Bookings.Commands;
 
 public class CreateBookingHandler : ICommandHandler<CreateBookingCommand, Guid>
 {
-    private readonly IBookingDbContext _context;
+    private readonly IBookingDbContext _bookingContext;
     private readonly ITenantContext _tenantContext;
+    private readonly ITenantTableChecker _tableChecker; // [THAY ĐỔI]: Dùng Interface
 
-    public CreateBookingHandler(IBookingDbContext context, ITenantContext tenantContext)
+    public CreateBookingHandler(
+        IBookingDbContext bookingContext,
+        ITenantContext tenantContext,
+        ITenantTableChecker tableChecker) // Inject Interface
     {
-        _context = context;
+        _bookingContext = bookingContext;
         _tenantContext = tenantContext;
+        _tableChecker = tableChecker;
     }
 
     public async Task<Result<Guid>> Handle(CreateBookingCommand request, CancellationToken ct)
@@ -23,28 +29,56 @@ public class CreateBookingHandler : ICommandHandler<CreateBookingCommand, Guid>
         if (_tenantContext.TenantId == null)
             return Result<Guid>.Failure(new Error("Booking.TenantMissing", "Không xác định được nhà hàng."));
 
-        if (request.BookingTime < DateTime.UtcNow)
-            return Result<Guid>.Failure(new Error("Booking.InvalidTime", "Thời gian đặt bàn phải ở tương lai."));
+        if (request.BranchId == Guid.Empty)
+            return Result<Guid>.Failure(new Error("Booking.BranchMissing", "Vui lòng chọn chi nhánh."));
 
-        if (request.PartySize <= 0)
-            return Result<Guid>.Failure(new Error("Booking.InvalidSize", "Số lượng khách phải lớn hơn 0."));
+        // 2. Validate Bàn (Dùng Interface cầu nối)
+        if (request.TableId.HasValue)
+        {
+            // Gọi sang Infra để check
+            var tableCapacity = await _tableChecker.GetTableCapacityAsync(request.TableId.Value, request.BranchId);
 
-        // 2. Tạo Entity
-        var booking = new Domain.Entities.Booking
+            if (tableCapacity == null)
+            {
+                return Result<Guid>.Failure(new Error("Booking.TableNotFound", "Bàn không tồn tại hoặc sai chi nhánh (Check Tenant DB)."));
+            }
+
+            if (tableCapacity < request.PartySize)
+            {
+                // Warning sức chứa (nếu cần)
+            }
+
+            // 3. Check trùng lịch (Booking DB)
+            bool isTableBooked = await _bookingContext.Bookings.AnyAsync(b =>
+                b.TableId == request.TableId
+                && b.Status != BookingStatus.Cancelled
+                && b.BookingTime <= request.BookingTime.AddHours(2)
+                && b.BookingTime >= request.BookingTime.AddHours(-2), ct);
+
+            if (isTableBooked)
+            {
+                return Result<Guid>.Failure(new Error("Booking.TableBusy", "Bàn này đã có người đặt."));
+            }
+        }
+
+        // 4. Lưu Booking
+        var booking = new Booking.Domain.Entities.Booking
         {
             Id = Guid.NewGuid(),
             TenantId = _tenantContext.TenantId.Value,
+            BranchId = request.BranchId,
+            TableId = request.TableId,
             GuestName = request.GuestName,
             PhoneNumber = request.PhoneNumber,
             BookingTime = request.BookingTime,
             PartySize = request.PartySize,
             Note = request.Note,
-            Status = BookingStatus.Pending // Mặc định chờ duyệt
+            Status = BookingStatus.Pending,
+            CreatedAtUtc = DateTime.UtcNow
         };
 
-        // 3. Lưu DB
-        _context.Bookings.Add(booking);
-        await _context.SaveChangesAsync(ct);
+        _bookingContext.Bookings.Add(booking);
+        await _bookingContext.SaveChangesAsync(ct);
 
         return Result<Guid>.Success(booking.Id);
     }

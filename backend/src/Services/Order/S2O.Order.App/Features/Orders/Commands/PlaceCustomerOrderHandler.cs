@@ -70,7 +70,7 @@ public class PlaceCustomerOrderHandler : IRequestHandler<PlaceCustomerOrderComma
                     OrderId = order.Id,
                     ProductId = itemDto.ProductId,
                     Quantity = itemDto.Quantity,
-                    UnitPrice = productInfo.Price // Lấy giá thực tế từ Database
+                    UnitPrice = productInfo.Price 
                 };
 
                 order.TotalAmount += orderItem.UnitPrice * orderItem.Quantity;

@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using S2O.Tenant.Infra.Persistence;
+using S2O.Booking.Infra.Persistence;
 
 #nullable disable
 
-namespace S2O.Tenant.Infra.Migrations
+namespace S2O.Booking.Infra.Migrations
 {
-    [DbContext(typeof(TenantDbContext))]
-    partial class TenantDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(BookingDbContext))]
+    [Migration("20260120150454_AddTablesToBookingDb")]
+    partial class AddTablesToBookingDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,40 +25,71 @@ namespace S2O.Tenant.Infra.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("S2O.Tenant.Domain.Entities.Branch", b =>
+            modelBuilder.Entity("S2O.Booking.Domain.Entities.Booking", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("BookingTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("BranchId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GuestName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("LastModifiedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PartySize")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
+                    b.Property<Guid?>("TableId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Branches");
+                    b.HasIndex("BookingTime");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("Bookings");
                 });
 
-            modelBuilder.Entity("S2O.Tenant.Domain.Entities.Table", b =>
+            modelBuilder.Entity("S2O.Booking.Domain.Entities.Table", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -70,6 +104,9 @@ namespace S2O.Tenant.Infra.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsOccupied")
                         .HasColumnType("boolean");
 
@@ -80,52 +117,12 @@ namespace S2O.Tenant.Infra.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("QrCodeUrl")
-                        .HasColumnType("text");
-
                     b.Property<Guid?>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
                     b.ToTable("Tables");
-                });
-
-            modelBuilder.Entity("S2O.Tenant.Domain.Entities.Tenant", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("ModifiedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("SubscriptionExpiry")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("SubscriptionPlan")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tenants");
                 });
 #pragma warning restore 612, 618
         }
