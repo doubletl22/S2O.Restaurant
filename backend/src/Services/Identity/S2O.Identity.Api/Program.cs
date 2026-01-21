@@ -76,7 +76,37 @@ else
 }
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
 
+    try
+    {
+        // 1. Lấy các Service cần thiết từ Container (Khớp với tham số trong Seeder của bạn)
+        var context = services.GetRequiredService<AuthDbContext>();
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+
+        // 2. Chạy Migration tự động (Tạo bảng trước khi Seed)
+        // Kiểm tra xem có bản cập nhật DB nào chưa chạy không
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            logger.LogInformation("Đang cập nhật Database (Migration)...");
+            await context.Database.MigrateAsync();
+        }
+
+        // 3. Gọi hàm Seeder của bạn
+        logger.LogInformation("Đang khởi tạo dữ liệu mẫu (Seeding)...");
+        await IdentityDataSeeder.SeedAsync(userManager, roleManager, context);
+
+        logger.LogInformation("✅ Khởi tạo dữ liệu thành công!");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "❌ Lỗi xảy ra trong quá trình Migration/Seeding.");
+    }
+}
 // Configure Pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -93,30 +123,20 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
-
     try
     {
-        var context = services.GetRequiredService<AuthDbContext>();
+        // Lưu ý: Thay 'TenantsDbContext' bằng tên DbContext tương ứng của Service đó
+        // Ví dụ: CatalogDbContext, OrderDbContext...
+        var context = services.GetRequiredService<S2O.Identity.Infra.Persistence.AuthDbContext>();
 
-        logger.LogInformation("Identity Service: Đang kiểm tra Database...");
         if (context.Database.GetPendingMigrations().Any())
         {
-            await context.Database.MigrateAsync();
+            context.Database.Migrate();
         }
-
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
-
-        logger.LogInformation("Identity Service: Đang Seed dữ liệu mẫu...");
-        // Lưu ý thứ tự tham số seed phải đúng với file IdentityDataSeeder.cs
-        await IdentityDataSeeder.SeedAsync(userManager, roleManager, context);
-
-        logger.LogInformation("Identity Service: Khởi động thành công!");
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "Lỗi nghiêm trọng trong quá trình khởi tạo Database.");
+        Console.WriteLine($"Lỗi Migration: {ex.Message}");
     }
 }
 

@@ -66,28 +66,20 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
-
     try
     {
-        var context = services.GetRequiredService<CatalogDbContext>();
+        // Lưu ý: Thay 'TenantsDbContext' bằng tên DbContext tương ứng của Service đó
+        // Ví dụ: CatalogDbContext, OrderDbContext...
+        var context = services.GetRequiredService<S2O.Catalog.Infra.Persistence.CatalogDbContext>();
 
-        // Chạy Migration
-        logger.LogInformation("Catalog Service: Đang cập nhật Database...");
         if (context.Database.GetPendingMigrations().Any())
         {
-            await context.Database.MigrateAsync();
+            context.Database.Migrate();
         }
-
-        // Chạy Seeder
-        logger.LogInformation("Catalog Service: Đang Seed dữ liệu mẫu...");
-        await CatalogDataSeeder.SeedAsync(context);
-
-        logger.LogInformation("Catalog Service: Khởi động thành công!");
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "Lỗi nghiêm trọng khi khởi tạo Catalog Database.");
+        Console.WriteLine($"Lỗi Migration: {ex.Message}");
     }
 }
 
