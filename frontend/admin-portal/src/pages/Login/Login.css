@@ -1,4 +1,3 @@
-/* src/pages/Login/Login.css */
 .login-container {
   height: 100vh;
   width: 100vw;
@@ -20,8 +19,19 @@
   text-align: center;
 }
 
+.login-logo {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  margin-bottom: 15px; 
+  object-fit: contain;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .login-header h2 {
-  margin-top: 20px;
+  margin-top: 10px;
   color: #1f2937;
   font-size: 24px;
   font-weight: bold;
@@ -73,10 +83,16 @@
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
+  margin-top: 10px;
 }
 
 .btn-login:hover {
   background-color: #2563eb;
+}
+
+.btn-login:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
 }
 
 .error-msg {
@@ -84,6 +100,8 @@
   font-size: 13px;
   margin-bottom: 15px;
   background: #fee2e2;
-  padding: 8px;
+  padding: 10px;
   border-radius: 6px;
+  border: 1px solid #fecaca;
+  text-align: left;
 }
