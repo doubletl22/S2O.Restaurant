@@ -12,43 +12,47 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userToken, setUserToken] = useState<string | null>(null);
 
+  // 👇 CẤU HÌNH ĐỊA CHỈ SERVER (QUAN TRỌNG)
+  // Nếu là Android Emulator thì dùng 10.0.2.2, còn lại dùng localhost
+  // Port 5201 là port backend đang chạy trên máy bạn
+  const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5201' : 'http://localhost:5201';
 
- const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5201' : 'http://localhost:5201';
-
-  const login = async (email: string, pass: string) => {
+const login = async (email: string, pass: string) => {
     try {
-      console.log(`Dang ket noi toi: ${BASE_URL}/api/auth/login`);
+      console.log(`🚀 Đang gửi yêu cầu tới: ${BASE_URL}/api/auth/login`);
 
       const response = await fetch(`${BASE_URL}/api/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email,
-          password: pass,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: pass }),
       });
 
+      const data = await response.json();
+      console.log("🟢 SERVER TRẢ VỀ:", JSON.stringify(data, null, 2));
+
       if (!response.ok) {
-        // Nếu server trả về lỗi (400, 401, 500...)
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Đăng nhập thất bại');
+        throw new Error(data.message || 'Đăng nhập thất bại');
       }
 
-      const data = await response.json();
-      // Giả sử server trả về { token: "..." }
-      setUserToken(data.token);
+      // 👇 SỬA Ở ĐÂY: Thêm data.value
+      const myToken = data.value || data.token || data.accessToken;
+
+      if (myToken) {
+        console.log("✅ Đã lấy được Token!");
+        setUserToken(myToken);
+      } else {
+        Alert.alert("Lỗi", "Không tìm thấy Token trong phản hồi của Server");
+      }
 
     } catch (error: any) {
-      console.error("Lỗi Login:", error);
-      // Nếu vẫn lỗi mạng, fallback về token ảo để bạn test tiếp giao diện
-      Alert.alert("Lỗi mạng", "Không kết nối được Server. Đang dùng chế độ Offline để test.");
-      setUserToken('token_ao_de_test_giao_dien');
+      console.error("🔴 Lỗi Login:", error);
+      Alert.alert("Đăng nhập thất bại", error.message);
     }
   };
 
-  const logout = () => setUserToken(null);
+  const logout = () => {
+    setUserToken(null);
+  };
 
   return (
     <AuthContext.Provider value={{ userToken, login, logout }}>
