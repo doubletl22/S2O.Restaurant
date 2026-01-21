@@ -13,4 +13,6 @@ public class Tenant : Entity
     // Gói đăng ký: Free, Premium...
     public string SubscriptionPlan { get; set; } = "Free";
     public DateTime SubscriptionExpiry { get; set; }
+    public bool IsLocked { get; set; } = false;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
