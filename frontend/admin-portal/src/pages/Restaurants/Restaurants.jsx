@@ -7,23 +7,23 @@ const Restaurants = () => {
   const initialData = [
     {
       id: 1,
-      name: "KFC Nguyễn Văn Cừ",
-      address: "Q5, TP.HCM",
-      revenue: "5,000",
+      name: "CN Quận 1",
+      address: "Q1, TP.HCM",
+      revenue: "0,000",
       status: "Active",
     },
     {
       id: 2,
-      name: "Burger King",
-      address: "Q1, TP.HCM",
-      revenue: "3,200",
+      name: "CN Quận 2",
+      address: "Q2, TP.HCM",
+      revenue: "0,000",
       status: "Active",
     },
     {
       id: 3,
-      name: "Phở 24",
+      name: "CN Quận 3",
       address: "Q3, TP.HCM",
-      revenue: "1,500",
+      revenue: "0,000",
       status: "Blocked",
     },
   ];
