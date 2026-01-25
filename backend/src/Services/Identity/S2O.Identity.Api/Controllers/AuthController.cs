@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginCommand command)
     {
         var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
     // 2. Tạo Staff (Chỉ Owner mới được gọi)
     // URL: POST /api/auth/staff
