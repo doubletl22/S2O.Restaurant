@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // 1. Import chuẩn từ next/navigation
+import { getCookie } from "cookies-next";    // 2. Import để kiểm tra đăng nhập
 import { OrderTicket } from "@/components/staff/order-ticket";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Flame, Utensils, CheckCircle, RefreshCcw } from "lucide-react";
@@ -28,13 +30,27 @@ export interface Order {
   items: OrderItem[];
 }
 
-// --- Main Page Component (Phải có export default) ---
 export default function KitchenPage() {
+  // 3. Khởi tạo router (viết thường)
+  const router = useRouter();
+  
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
 
+  // 4. Kiểm tra đăng nhập ngay khi vào trang
+  useEffect(() => {
+    const token = getCookie("access_token");
+    if (!token) {
+      // Nếu không có token, đá về trang login
+      router.push("/login"); // Dùng router viết thường
+    }
+  }, [router]);
+
   const fetchOrders = async () => {
+    // Chỉ fetch nếu đã có token (tránh gọi API khi chưa login)
+    if (!getCookie("access_token")) return;
+
     setIsLoading(true);
     try {
       const response = await api.get<Order[]>('/orders/branch-orders', {
@@ -43,12 +59,13 @@ export default function KitchenPage() {
       setOrders(response.data);
     } catch (error) {
       console.error("Lỗi tải đơn:", error);
-      toast.error("Không thể kết nối đến Bếp.");
+      // Không cần toast lỗi 401 vì interceptor đã lo rồi
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Setup Polling (Gọi lại mỗi 30s)
   useEffect(() => {
     fetchOrders();
     const interval = setInterval(fetchOrders, 30000);
@@ -77,10 +94,10 @@ export default function KitchenPage() {
   });
 
   return (
-    <div className="h-full flex flex-col space-y-4 p-4 md:p-6 bg-[var(--bg)] min-h-screen">
+    <div className="h-full flex flex-col space-y-4 p-4 md:p-6 bg-(--bg) min-h-screen">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-[var(--text)]">
+          <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-(--text)">
             <Flame className="text-orange-500 fill-orange-500" /> Bếp Trung Tâm
           </h1>
           <p className="text-muted-foreground text-sm">
@@ -93,7 +110,7 @@ export default function KitchenPage() {
              <RefreshCcw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
           <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3 sm:w-[400px]">
+            <TabsList className="grid w-full grid-cols-3 sm:w-100">
               <TabsTrigger value="all">Tất cả</TabsTrigger>
               <TabsTrigger value="Pending" className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700">
                 <Utensils className="w-4 h-4 mr-2" /> Chờ nấu

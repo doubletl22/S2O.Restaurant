@@ -59,12 +59,12 @@ export function OrderTicket({ order, onStatusChange }: OrderTicketProps) {
 
       {/* Body */}
       <CardContent className="p-0">
-        <ScrollArea className="h-[200px] w-full p-3">
+        <ScrollArea className="h-50 w-full p-3">
           <div className="space-y-3">
             {order.items.map((item, idx) => (
               <div key={idx} className="flex justify-between items-start text-sm group">
                 <div className="flex gap-2">
-                  <span className="font-bold text-[var(--g1)] w-5 text-right">{item.quantity}x</span>
+                  <span className="font-bold text-(--g1) w-5 text-right">{item.quantity}x</span>
                   <div>
                     <span className={`font-medium ${['done', 'served', 'cancelled'].includes(item.status.toLowerCase()) ? 'line-through text-gray-400' : 'text-gray-800'}`}>
                       {item.name}
@@ -99,7 +99,7 @@ export function OrderTicket({ order, onStatusChange }: OrderTicketProps) {
         
         {currentStatus === "cooking" && (
           <Button 
-            className="w-full bg-gradient-to-r from-[var(--g1)] to-[var(--g2)] text-white font-bold shadow-md hover:opacity-90"
+            className="w-full bg-linear-to-r from-(--g1) to-(--g2) text-white font-bold shadow-md hover:opacity-90"
             onClick={() => onStatusChange(order.id, "Ready")}
           >
             <CheckCircle2 className="mr-2 h-4 w-4" /> Hoàn tất
