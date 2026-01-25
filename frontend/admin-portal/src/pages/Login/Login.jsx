@@ -18,38 +18,45 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // Gọi API đăng nhập
+      console.log("1. Đang gửi đăng nhập...");
+
       const response = await adminApi.post("/api/auth/login", {
         email: email,
         password: password,
       });
 
-      // Lấy token từ biến "value" (theo đúng Backend của bạn)
-      const token = response.data.value;
+      console.log("2. Server trả về:", response.data);
+
+
+      const token = response.data.accessToken;
+      const userData = response.data.user;
 
       if (token) {
         localStorage.setItem("accessToken", token);
 
-        // Lưu thông tin user giả định
-        const userInfo = {
-          fullName: "Quản trị viên",
-          email: email,
-          role: "Admin",
-        };
-        localStorage.setItem("userInfo", JSON.stringify(userInfo));
+        // Lưu thông tin user
+        localStorage.setItem("userInfo", JSON.stringify({
+            fullName: userData?.fullName || "Admin",
+            email: userData?.email || email,
+            role: userData?.roles?.[0] || "Admin",
+            id: userData?.id
+        }));
 
-        navigate("/"); // Chuyển hướng vào trang chủ
+        console.log("3. Đăng nhập thành công! Chuyển trang...");
+        navigate("/");
       } else {
+        console.error("Lỗi: Không tìm thấy accessToken trong phản hồi");
         setError("Lỗi: Server không trả về Token.");
       }
+
+
     } catch (err) {
       console.error("Lỗi đăng nhập:", err);
       if (err.response) {
-        setError(
-          err.response.data.message || "Email hoặc mật khẩu không chính xác!",
-        );
+        const msg = err.response.data.description || err.response.data.message || "Tên đăng nhập hoặc mật khẩu không đúng!";
+        setError(msg);
       } else if (err.request) {
-        setError("Không thể kết nối đến Server (Port 5000).");
+        setError("Không thể kết nối đến Server.");
       } else {
         setError("Đã có lỗi xảy ra. Vui lòng thử lại.");
       }
