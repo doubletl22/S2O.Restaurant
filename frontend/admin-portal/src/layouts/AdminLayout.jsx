@@ -21,7 +21,7 @@ const AdminLayout = ({ children }) => {
       <div className="main-content">
         <header className="top-header">
           <div className="welcome-text">
-            Chào buổi chiều!{" "}
+            Xin chào!{" "}
             <span style={{ color: "#3B82F6", fontWeight: "bold" }}>Admin</span>
           </div>
 

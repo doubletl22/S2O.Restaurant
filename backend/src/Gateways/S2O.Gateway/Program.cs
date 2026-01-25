@@ -10,10 +10,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-    policy.WithOrigins("http://localhost:5173", "http://localhost:3000") // Chỉ đích danh React được vào
+    policy.WithOrigins("http://localhost:5173", "http://localhost:5174") 
       .AllowAnyMethod()
       .AllowAnyHeader()
-      .AllowCredentials(); // Cho phép gửi kèm cookie/token nếu cần sau này
+      .AllowCredentials();
     });
 });
 
