@@ -1,207 +1,153 @@
-'use client'
+"use client";
 
-import React, { useState } from "react"
-import { useRouter } from 'next/navigation'
-import { Mail, Lock, Loader2 } from 'lucide-react'
-import api from '@/lib/api'
-// 👇 Import các hằng số quan trọng từ file cấu hình auth
-import { AUTH_COOKIE_NAME, ROLE_COOKIE_NAME } from '@/lib/auth' 
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { setCookie } from "cookies-next";
+import { Eye, EyeOff, Loader2, LogIn, ChefHat } from "lucide-react";
+import { toast } from "sonner";
+import api from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
-  const router = useRouter()
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  
+  // State form
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      // 1. Gọi API Login thật
-      const response = await api.post('/api/auth/login', {
-        email: email, 
-        password: password
+      // 1. Gọi API đăng nhập (Backend Identity Service)
+      // POST /auth/login -> Trả về { accessToken, role, fullName, ... }
+      const response = await api.post('/auth/login', {
+        email: formData.email,
+        password: formData.password
       });
 
-      const data = response.data;
+      const { accessToken, role, fullName } = response.data;
 
-      // 2. Lưu Token và Role vào Cookie với tên chuẩn (để Middleware đọc được)
-      if (data.accessToken) {
-        // Cookie token
-        document.cookie = `${AUTH_COOKIE_NAME}=${data.accessToken}; path=/; max-age=86400`;
+      // 2. Lưu Token vào Cookie (Hết hạn sau 1 ngày)
+      setCookie('access_token', accessToken, { maxAge: 60 * 60 * 24 });
+      setCookie('user_role', role);
+      setCookie('user_name', fullName);
+
+      toast.success(`Xin chào, ${fullName}!`);
+
+      // 3. Phân luồng điều hướng (Routing Logic)
+      switch (role) {
+        case "SystemAdmin":
+        case "RestaurantOwner":
+          // Admin & Chủ quán -> Vào trang quản trị
+          router.push('/admin/menu'); 
+          break;
         
-        // Xử lý Role: Lấy role đầu tiên hoặc role chính
-        // Backend có thể trả về array "roles": ["SystemAdmin"] hoặc string "role": "SystemAdmin"
-        let role = 'Staff';
-        if (data.user?.roles && Array.isArray(data.user.roles)) {
-            role = data.user.roles[0];
-        } else if (data.user?.role) {
-            role = data.user.role;
-        }
+        case "Staff":
+          // Nhân viên -> Vào thẳng Bếp
+          router.push('/staff/kitchen');
+          break;
 
-        // Lưu Cookie role
-        document.cookie = `${ROLE_COOKIE_NAME}=${role}; path=/; max-age=86400`;
-
-        // 3. Logic chuyển hướng
-        // Kiểm tra kỹ các tên Role mà Backend trả về
-        if (['SystemAdmin', 'SuperAdmin', 'RestaurantOwner', 'Admin'].includes(role)) {
-            router.push('/admin/dashboard');
-        } else {
-            // Mặc định cho Staff hoặc các role khác
-            router.push('/staff/kitchen');
-        }
-        
-        // Refresh để Middleware chạy lại và xác nhận cookie mới
-        router.refresh();
-      } else {
-        setError('Không nhận được token từ hệ thống.');
+        case "Customer":
+        default:
+          // Khách hàng -> Về trang chủ đặt món
+          router.push('/');
+          break;
       }
 
-    } catch (err: any) {
-      console.error(err);
-
-      if (err.response && err.response.data) {
-        // Backend trả về object Error: { code: "...", description: "..." }
-        // Chúng ta ưu tiên hiển thị 'description'
-        const serverError = err.response.data;
-        setError(serverError.description || serverError.message || 'Thông tin đăng nhập không chính xác.');
-      } else {
-        setError('Có lỗi xảy ra khi kết nối tới server.');
-      }
+    } catch (error: any) {
+      console.error("Login Error:", error);
+      const msg = error.response?.data?.message || "Email hoặc mật khẩu không đúng.";
+      toast.error(msg);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--bg)' }}>
-      <div className="w-full max-w-md">
-        {/* Login Card */}
-        <div 
-          className="overflow-hidden"
-          style={{ 
-            background: 'var(--card)',
-            boxShadow: 'var(--shadow)',
-            borderRadius: 'var(--r20)'
-          }}
-        >
-          {/* Header */}
-          <div 
-            className="px-6 py-8 text-center text-white"
-            style={{ 
-              background: 'linear-gradient(135deg, var(--g1), var(--g2))'
-            }}
-          >
-            <h1 className="text-2xl font-bold">S2O.Restaurant</h1>
-            <p className="text-sm mt-1 opacity-90">Hệ thống quản lý nhà hàng</p>
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)] p-4">
+      <Card className="w-full max-w-md shadow-lg border-none">
+        <CardHeader className="space-y-1 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-[var(--g1)] to-[var(--g2)] rounded-xl flex items-center justify-center text-white shadow-brand">
+              <ChefHat size={28} strokeWidth={2.5} />
+            </div>
           </div>
+          <CardTitle className="text-2xl font-black tracking-tight text-[var(--text)]">
+            S2O Restaurant
+          </CardTitle>
+          <CardDescription>
+            Đăng nhập để truy cập hệ thống quản lý
+          </CardDescription>
+        </CardHeader>
 
-          {/* Form */}
-          <div className="p-6">
-            <h2 className="text-lg font-semibold mb-6" style={{ color: 'var(--text)' }}>
-              Đăng nhập
-            </h2>
-
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              {/* Email Input */}
-              <div className="flex flex-col gap-2">
-                <label 
-                  htmlFor="email" 
-                  className="text-sm font-medium"
-                  style={{ color: 'var(--text)' }}
-                >
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail 
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" 
-                    style={{ color: 'var(--muted)' }} 
-                  />
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@example.com"
-                    className="w-full pl-12 pr-4 py-3 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-[#f97316]/30"
-                    style={{ 
-                      background: 'var(--bg)',
-                      border: '1px solid var(--line)',
-                      color: 'var(--text)'
-                    }}
-                    required
-                  />
-                </div>
+        <form onSubmit={handleLogin}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="staff@s2o.vn" 
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                className="bg-gray-50 border-gray-200 focus:bg-white transition-all"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Mật khẩu</Label>
+                <a href="#" className="text-xs font-medium text-[var(--g1)] hover:underline">Quên mật khẩu?</a>
               </div>
-
-              {/* Password Input */}
-              <div className="flex flex-col gap-2">
-                <label 
-                  htmlFor="password" 
-                  className="text-sm font-medium"
-                  style={{ color: 'var(--text)' }}
+              <div className="relative">
+                <Input 
+                  id="password" 
+                  type={showPassword ? "text" : "password"} 
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  className="bg-gray-50 border-gray-200 focus:bg-white transition-all pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
                 >
-                  Mật khẩu
-                </label>
-                <div className="relative">
-                  <Lock 
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" 
-                    style={{ color: 'var(--muted)' }} 
-                  />
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Nhập mật khẩu"
-                    className="w-full pl-12 pr-4 py-3 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-[#f97316]/30"
-                    style={{ 
-                      background: 'var(--bg)',
-                      border: '1px solid var(--line)',
-                      color: 'var(--text)'
-                    }}
-                    required
-                  />
-                </div>
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
+            </div>
+          </CardContent>
 
-              {/* Error Message */}
-              {error && (
-                <div 
-                  className="px-4 py-3 rounded-xl text-sm"
-                  style={{ 
-                    background: 'rgba(239, 68, 68, 0.1)',
-                    color: '#ef4444'
-                  }}
-                >
-                  {error}
-                </div>
+          <CardFooter>
+            <Button 
+              type="submit" 
+              className="w-full bg-gradient-to-r from-[var(--g1)] to-[var(--g2)] text-white font-bold h-11 shadow-md hover:opacity-90 transition-opacity"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Đang xử lý...
+                </>
+              ) : (
+                <>
+                  <LogIn className="mr-2 h-4 w-4" /> Đăng nhập
+                </>
               )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="bg-brand w-full py-3.5 rounded-xl text-white font-semibold text-sm flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-70 mt-2"
-                style={{ boxShadow: '0 8px 20px rgba(249, 115, 22, 0.25)' }}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Đang đăng nhập...
-                  </>
-                ) : (
-                  'Đăng nhập'
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
     </div>
-  )
+  );
 }

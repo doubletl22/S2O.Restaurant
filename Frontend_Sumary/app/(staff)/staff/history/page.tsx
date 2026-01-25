@@ -44,7 +44,7 @@ export default function OrderHistoryPage() {
           >
             {/* Icon */}
             <div 
-              className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+              className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
               style={{ background: 'rgba(34, 197, 94, 0.12)' }}
             >
               <CheckCircle2 className="w-6 h-6" style={{ color: '#22c55e' }} />
@@ -70,7 +70,7 @@ export default function OrderHistoryPage() {
 
             {/* Total */}
             <span 
-              className="font-bold text-lg flex-shrink-0"
+              className="font-bold text-lg shrink-0"
               style={{ color: 'var(--text)' }}
             >
               {formatPrice(order.total)}

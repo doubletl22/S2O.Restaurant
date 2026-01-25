@@ -1,188 +1,140 @@
-'use client'
+"use client";
 
-import React from "react"
-
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import {
+import React from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation"; // Thêm useRouter
+import { deleteCookie } from "cookies-next"; // Thêm deleteCookie
+import { 
+  Flame, 
+  LayoutGrid, 
+  History, 
+  LogOut, 
   ChefHat,
-  Table2,
-  History,
-  LogOut,
-  ChevronLeft,
-  Menu,
-  Utensils,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+  Settings
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner"; // Thêm toast để thông báo
 
-interface NavItem {
-  label: string
-  href: string
-  icon: React.ReactNode
-}
-
-const navItems: NavItem[] = [
+const menuItems = [
   {
-    label: 'Kitchen Board',
-    href: '/kitchen',
-    icon: <ChefHat className="w-5 h-5" />,
+    title: "Bếp Trung Tâm",
+    href: "/staff/kitchen",
+    icon: Flame,
+    color: "text-orange-500",
   },
   {
-    label: 'Tables',
-    href: '/kitchen/tables',
-    icon: <Table2 className="w-5 h-5" />,
+    title: "Sơ Đồ Bàn",
+    href: "/staff/tables",
+    icon: LayoutGrid,
+    color: "text-blue-500",
   },
   {
-    label: 'Order History',
-    href: '/kitchen/history',
-    icon: <History className="w-5 h-5" />,
+    title: "Lịch Sử Đơn",
+    href: "/staff/history",
+    icon: History,
+    color: "text-purple-500",
   },
-]
+];
 
 export function StaffSidebar() {
-  const pathname = usePathname()
-  const router = useRouter()
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const pathname = usePathname();
+  const router = useRouter(); // Hook điều hướng
 
+  // Hàm xử lý đăng xuất
   const handleLogout = () => {
-    document.cookie = 'role=; path=/; max-age=0'
-    router.push('/login')
-    router.refresh()
-  }
+    // 1. Xóa toàn bộ cookie liên quan đến phiên đăng nhập
+    deleteCookie("access_token");
+    deleteCookie("user_role");
+    deleteCookie("user_name");
+
+    // 2. Thông báo nhẹ
+    toast.info("Đã đăng xuất hệ thống");
+
+    // 3. Chuyển hướng về trang login
+    router.push("/login");
+  };
 
   return (
-    <>
-      {/* Mobile Header */}
-      <header 
-        className="lg:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3"
-        style={{ 
-          background: 'var(--card)',
-          borderBottom: '1px solid var(--line)'
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <div className="bg-brand w-9 h-9 rounded-xl flex items-center justify-center">
-            <Utensils className="w-5 h-5 text-white" />
-          </div>
-          <span className="font-semibold" style={{ color: 'var(--text)' }}>
-            Kitchen Display
-          </span>
+    <div className="h-full w-64 bg-white border-r flex flex-col shadow-sm">
+      {/* 1. Header Logo */}
+      <div className="p-6 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--g1)] to-[var(--g2)] flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
+          <ChefHat size={24} strokeWidth={2} />
         </div>
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="p-2 rounded-xl"
-          style={{ background: 'var(--bg)' }}
-        >
-          <Menu className="w-5 h-5" style={{ color: 'var(--text)' }} />
-        </button>
-      </header>
-
-      {/* Mobile Overlay */}
-      {mobileOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          'fixed top-0 left-0 h-full z-50 transition-all duration-300',
-          'lg:translate-x-0 lg:static',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full',
-          isCollapsed ? 'lg:w-20' : 'w-64'
-        )}
-        style={{ 
-          background: 'var(--card)',
-          borderRight: '1px solid var(--line)'
-        }}
-      >
-        {/* Logo */}
-        <div className="hidden lg:flex items-center justify-between p-4 h-16">
-          <div className={cn('flex items-center gap-3', isCollapsed && 'lg:justify-center lg:w-full')}>
-            <div className="bg-brand w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Utensils className="w-5 h-5 text-white" />
-            </div>
-            {!isCollapsed && (
-              <span className="font-bold text-lg" style={{ color: 'var(--text)' }}>
-                Kitchen
-              </span>
-            )}
-          </div>
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className={cn(
-              'p-2 rounded-lg transition-colors hover:bg-[var(--bg)]',
-              isCollapsed && 'lg:hidden'
-            )}
-          >
-            <ChevronLeft 
-              className={cn('w-5 h-5 transition-transform', isCollapsed && 'rotate-180')} 
-              style={{ color: 'var(--muted)' }}
-            />
-          </button>
+        <div>
+          <h1 className="font-black text-xl tracking-tighter text-[var(--text)]">
+            S2O<span className="text-[var(--g1)]">.Staff</span>
+          </h1>
+          <p className="text-xs text-muted-foreground font-medium">Kitchen Display System</p>
         </div>
+      </div>
 
-        {/* Mobile Logo */}
-        <div className="lg:hidden flex items-center gap-3 p-4 pt-5">
-          <div className="bg-brand w-10 h-10 rounded-xl flex items-center justify-center">
-            <Utensils className="w-5 h-5 text-white" />
-          </div>
-          <span className="font-bold text-lg" style={{ color: 'var(--text)' }}>
-            Kitchen Display
-          </span>
-        </div>
+      <Separator />
 
-        {/* Navigation */}
-        <nav className="flex flex-col gap-1 px-3 py-2">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || 
-              (item.href !== '/kitchen' && pathname.startsWith(item.href))
-            
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
+      {/* 2. Menu Chính */}
+      <div className="flex-1 py-6 px-3 space-y-1">
+        <p className="px-4 text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+          Menu Điều Khiển
+        </p>
+        
+        {menuItems.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          
+          return (
+            <Link key={item.href} href={item.href}>
+              <div
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all',
-                  isCollapsed && 'lg:justify-center lg:px-0',
-                  isActive 
-                    ? 'bg-brand text-white shadow-brand' 
-                    : 'hover:bg-[var(--bg)]'
+                  "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group font-medium text-sm",
+                  isActive
+                    ? "bg-orange-50 text-orange-700 font-bold shadow-sm"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 )}
-                style={{ color: isActive ? '#fff' : 'var(--text)' }}
               >
-                {item.icon}
-                {!isCollapsed && (
-                  <span className="text-sm font-medium">{item.label}</span>
+                <item.icon
+                  size={20}
+                  className={cn(
+                    "transition-colors",
+                    isActive ? "text-orange-600" : "text-gray-400 group-hover:text-gray-600"
+                  )}
+                />
+                {item.title}
+                {isActive && (
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-orange-600" />
                 )}
-              </Link>
-            )
-          })}
-        </nav>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
 
-        {/* Logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-3">
-          <button
-            onClick={handleLogout}
-            className={cn(
-              'w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors',
-              'hover:bg-red-50 hover:text-red-500',
-              isCollapsed && 'lg:justify-center lg:px-0'
-            )}
-            style={{ color: 'var(--muted)' }}
-          >
-            <LogOut className="w-5 h-5" />
-            {!isCollapsed && (
-              <span className="text-sm font-medium">Đăng xuất</span>
-            )}
-          </button>
+      {/* 3. Footer User Info & Logout */}
+      <div className="p-4 border-t bg-gray-50/50">
+        <div className="flex items-center gap-3 mb-4">
+          <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
+            <AvatarImage src="/images/chef-avatar.jpg" />
+            <AvatarFallback className="bg-orange-100 text-orange-700 font-bold">B</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 overflow-hidden">
+            <p className="text-sm font-bold truncate">Bếp Trưởng Lâm</p>
+            <p className="text-xs text-muted-foreground truncate">Ca sáng: 06:00 - 14:00</p>
+          </div>
+          <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-600">
+            <Settings size={18} />
+          </Button>
         </div>
-      </aside>
-    </>
-  )
+        
+        <Button 
+          variant="outline" 
+          onClick={handleLogout} // Gắn sự kiện onClick vào đây
+          className="w-full justify-start text-red-600 border-red-100 hover:bg-red-50 hover:text-red-700 font-bold"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          Đăng xuất
+        </Button>
+      </div>
+    </div>
+  );
 }

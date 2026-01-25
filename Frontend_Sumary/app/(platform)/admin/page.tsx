@@ -119,7 +119,7 @@ export default function AdminDashboard() {
           ].map((action) => (
             <button
               key={action.label}
-              className="p-4 rounded-xl text-sm font-medium transition-colors hover:bg-[var(--bg)]"
+              className="p-4 rounded-xl text-sm font-medium transition-colors hover:bg-(--bg)"
               style={{ 
                 border: '1px dashed var(--line)',
                 color: 'var(--text)'

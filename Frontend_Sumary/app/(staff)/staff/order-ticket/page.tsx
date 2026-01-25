@@ -8,13 +8,15 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
-// Interface đơn giản hóa để tránh conflict type
+// 1. Cập nhật Type khớp hoàn toàn với Backend (PascalCase)
+export type TicketStatus = "Pending" | "Cooking" | "Ready" | "Served" | "Cancelled";
+
 export interface OrderItem {
   id: number;
   name: string;
   quantity: number;
   note?: string;
-  status: string;
+  status: string; 
 }
 
 export interface OrderTicketProps {
@@ -22,20 +24,17 @@ export interface OrderTicketProps {
     id: string;
     tableNumber: string;
     startTime: Date;
-    // QUAN TRỌNG: Để string để chấp nhận cả "Pending" lẫn "pending"
-    status: string; 
+    status: TicketStatus; // Type mới (Viết hoa)
     items: OrderItem[];
   };
   onStatusChange: (orderId: string, newStatus: string) => void;
 }
 
 export function OrderTicket({ order, onStatusChange }: OrderTicketProps) {
+  // Tính thời gian đã trôi qua
   const elapsedMinutes = Math.floor((new Date().getTime() - order.startTime.getTime()) / 60000);
-  const isUrgent = elapsedMinutes > 15;
   
-  // Chuẩn hóa status về chữ thường để so sánh cho dễ (Case-insensitive)
-  const currentStatus = order.status.toLowerCase(); 
-
+  const isUrgent = elapsedMinutes > 15;
   const timeColor = isUrgent ? "text-red-600 bg-red-50" : "text-blue-600 bg-blue-50";
   const borderColor = isUrgent ? "border-red-200" : "border-gray-200";
 
@@ -66,7 +65,8 @@ export function OrderTicket({ order, onStatusChange }: OrderTicketProps) {
                 <div className="flex gap-2">
                   <span className="font-bold text-[var(--g1)] w-5 text-right">{item.quantity}x</span>
                   <div>
-                    <span className={`font-medium ${['done', 'served', 'cancelled'].includes(item.status.toLowerCase()) ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+                    {/* Kiểm tra status 'Done' (Backend thường trả về Done hoặc Served) */}
+                    <span className={`font-medium ${['Done', 'Served', 'Cancelled'].includes(item.status) ? 'line-through text-gray-400' : 'text-gray-800'}`}>
                       {item.name}
                     </span>
                     {item.note && (
@@ -74,9 +74,8 @@ export function OrderTicket({ order, onStatusChange }: OrderTicketProps) {
                     )}
                   </div>
                 </div>
-                <div className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center">
-                   {/* Icon trạng thái món */}
-                   {['done', 'served'].includes(item.status.toLowerCase()) && <div className="w-3 h-3 bg-orange-500 rounded-full" />}
+                <div className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center cursor-pointer hover:border-orange-500">
+                   {(item.status === 'Done' || item.status === 'Served') && <div className="w-3 h-3 bg-orange-500 rounded-full" />}
                 </div>
               </div>
             ))}
@@ -86,27 +85,29 @@ export function OrderTicket({ order, onStatusChange }: OrderTicketProps) {
 
       <Separator />
 
-      {/* Footer Actions */}
+      {/* Footer: Cập nhật điều kiện so sánh sang PascalCase */}
       <CardFooter className="p-3 bg-gray-50/50 rounded-b-lg">
-        {currentStatus === "pending" && (
+        {order.status === "Pending" && (
           <Button 
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
+            // Gửi 'Cooking' (Viết hoa)
             onClick={() => onStatusChange(order.id, "Cooking")}
           >
             <ChefHat className="mr-2 h-4 w-4" /> Nhận nấu
           </Button>
         )}
         
-        {currentStatus === "cooking" && (
+        {order.status === "Cooking" && (
           <Button 
             className="w-full bg-gradient-to-r from-[var(--g1)] to-[var(--g2)] text-white font-bold shadow-md hover:opacity-90"
+            // Gửi 'Ready' (Viết hoa)
             onClick={() => onStatusChange(order.id, "Ready")}
           >
             <CheckCircle2 className="mr-2 h-4 w-4" /> Hoàn tất
           </Button>
         )}
 
-        {(currentStatus === "ready" || currentStatus === "served") && (
+        {order.status === "Ready" && (
           <Button variant="outline" className="w-full text-green-600 border-green-200 bg-green-50" disabled>
             <CheckCircle2 className="mr-2 h-4 w-4" /> Đã xong
           </Button>
