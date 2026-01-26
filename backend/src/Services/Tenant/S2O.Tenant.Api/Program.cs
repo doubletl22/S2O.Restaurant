@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using S2O.Shared.Infra;
 using S2O.Shared.Infra.Services;
 using S2O.Shared.Kernel.Interfaces;
@@ -8,6 +9,17 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<TenantCreatedConsumer>(); // Đăng ký Consumer
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        var rabbitConfig = builder.Configuration.GetSection("MessageBroker");
+        cfg.Host(rabbitConfig["Host"] ?? "localhost");
+        cfg.ConfigureEndpoints(context);
+    });
+});
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
