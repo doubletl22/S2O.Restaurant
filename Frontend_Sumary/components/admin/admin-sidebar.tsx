@@ -17,6 +17,7 @@ import {
   LogOut,
   Menu,
   X,
+  QrCode
 } from 'lucide-react'
 
 interface MenuItem {
@@ -45,6 +46,7 @@ const menuItems: MenuSection[] = [
       { name: 'Quản lý doanh thu', icon: DollarSign, path: '/admin/revenue' },
       { name: 'Quản lý người dùng', icon: Users, path: '/admin/users' },
       { name: 'Cấu hình AI', icon: BrainCircuit, path: '/admin/ai-config' },
+      { name: 'In mã QR bàn', icon: QrCode, path: '/admin/qr-codes' },
     ],
   },
   {

@@ -7,6 +7,7 @@ using S2O.Identity.App.Services;
 using S2O.Identity.Domain.Entities;
 using S2O.Identity.Infra.Authentication;
 using S2O.Identity.Infra.Persistence;
+using MassTransit;
 using S2O.Infra.Services;
 using S2O.Kernel.Interfaces;
 using S2O.Shared.Infra; // Chứa AddSharedInfrastructure
@@ -61,6 +62,26 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(S2O.Identity.App.Features.Login.LoginCommand).Assembly));
+
+builder.Services.AddMassTransit(x =>
+{
+    // Identity Service chỉ đóng vai trò Publisher (người gửi), 
+    // nhưng vẫn cần cấu hình Bus để kết nối RabbitMQ.
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        // Lấy cấu hình Host từ appsettings.json hoặc biến môi trường Docker
+        // Nếu chạy Docker, giá trị này sẽ là "rabbitmq" (nhờ biến MessageBroker__Host)
+        var rabbitHost = builder.Configuration["MessageBroker:Host"] ?? "localhost";
+
+        cfg.Host(rabbitHost, "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 // 6. Config Firebase
 if (File.Exists("firebase-adminsdk.json"))
