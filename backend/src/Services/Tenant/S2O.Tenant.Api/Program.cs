@@ -11,12 +11,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<TenantCreatedConsumer>(); // Đăng ký Consumer
+    // Đăng ký Consumer để lắng nghe sự kiện tạo Tenant
+    x.AddConsumer<TenantCreatedConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
         var rabbitConfig = builder.Configuration.GetSection("MessageBroker");
-        cfg.Host(rabbitConfig["Host"] ?? "localhost");
+
+        // Cấu hình Host RabbitMQ
+        cfg.Host(rabbitConfig["Host"] ?? "localhost", "/", h => {
+            h.Username(rabbitConfig["Username"] ?? "guest");
+            h.Password(rabbitConfig["Password"] ?? "guest");
+        });
+
+        // Tự động cấu hình các Endpoint dựa trên Consumer đã đăng ký
         cfg.ConfigureEndpoints(context);
     });
 });
@@ -57,23 +65,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        // Lưu ý: Thay 'TenantsDbContext' bằng tên DbContext tương ứng của Service đó
-        // Ví dụ: CatalogDbContext, OrderDbContext...
-        var context = services.GetRequiredService<S2O.Tenant.Infra.Persistence.TenantDbContext>();
 
-        if (context.Database.GetPendingMigrations().Any())
-        {
-            context.Database.Migrate();
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Lỗi Migration: {ex.Message}");
-    }
-}
 app.Run();

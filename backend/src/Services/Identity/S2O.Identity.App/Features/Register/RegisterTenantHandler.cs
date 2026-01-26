@@ -35,7 +35,7 @@ public class RegisterTenantHandler : IRequestHandler<RegisterTenantCommand, Resu
 
         // 2. Sinh ID định danh
         var newTenantId = Guid.NewGuid();
-        var defaultBranchId = Guid.NewGuid(); // Tạo luôn BrandId/BranchId mặc định ở đây
+        var defaultBranchId = Guid.NewGuid(); 
 
         // 3. Tạo User (Owner) gán trực tiếp vào Tenant và Branch vừa tạo
         var user = new ApplicationUser

@@ -51,8 +51,6 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
 
-// --- [ĐÃ XÓA] ĐOẠN CODE GÂY LỖI TRÙNG LẶP JWT TẠI ĐÂY ---
-
 // 4. Shared Infrastructure (Nó sẽ tự lo việc Config JWT/Bearer cho bạn)
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 
@@ -62,15 +60,11 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(S2O.Identity.App.Features.Login.LoginCommand).Assembly));
-
+Environment.SetEnvironmentVariable("MT_LICENSE", "Guest");
 builder.Services.AddMassTransit(x =>
 {
-    // Identity Service chỉ đóng vai trò Publisher (người gửi), 
-    // nhưng vẫn cần cấu hình Bus để kết nối RabbitMQ.
     x.UsingRabbitMq((context, cfg) =>
     {
-        // Lấy cấu hình Host từ appsettings.json hoặc biến môi trường Docker
-        // Nếu chạy Docker, giá trị này sẽ là "rabbitmq" (nhờ biến MessageBroker__Host)
         var rabbitHost = builder.Configuration["MessageBroker:Host"] ?? "localhost";
 
         cfg.Host(rabbitHost, "/", h =>

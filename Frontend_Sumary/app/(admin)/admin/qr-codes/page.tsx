@@ -44,10 +44,12 @@ export default function QrCodesPage() {
   const [baseUrl, setBaseUrl] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({ name: "", capacity: 4 });
+  const [origin, setOrigin] = useState("");
 
   useEffect(() => {
+    // Lấy domain hiện tại (VD: http://localhost:3000 hoặc https://s2o-restaurant.com)
     if (typeof window !== "undefined") {
-      setBaseUrl(window.location.origin);
+      setOrigin(window.location.origin);
     }
     fetchTables();
   }, []);
@@ -121,8 +123,8 @@ export default function QrCodesPage() {
     }
   };
 
-  const generateLocalLink = (tenantId: string, qrGuid: string) => {
-    return `${baseUrl}/menu/${tenantId}/${qrGuid}`;
+  const generateMenuLink = (qrGuid: string) => {
+    return `${origin}/guest/t/${qrGuid}/menu`;
   };
 
   const filteredTables = tables.filter(t => 
@@ -213,7 +215,7 @@ export default function QrCodesPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 print:grid-cols-4 print:gap-4 print:w-full">
           {filteredTables.map((table) => {
-            const finalLink = generateLocalLink(table.tenantId, table.qrCodeGuid);
+            const finalLink = generateMenuLink(table.qrCodeGuid);
             return (
               <Card 
                 key={table.id} 
@@ -251,6 +253,17 @@ export default function QrCodesPage() {
                        GUID: {table.qrCodeGuid.slice(0, 8)}...
                     </code>
                   </div>
+
+                  <div className="print:hidden mt-3 w-full px-2">
+                        <a 
+                          href={finalLink} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="text-[10px] text-blue-500 hover:underline font-mono truncate block"
+                        >
+                           Test: /guest/menu/...
+                        </a>
+                     </div>
                 </CardContent>
               </Card>
             );

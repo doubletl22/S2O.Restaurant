@@ -10,6 +10,8 @@ services:
       - "15672:15672" # Cổng quản lý (UI)
    
   identity-api:
+    volumes:
+      - ./infra/keys:/root/.aspnet/DataProtection-Keys
     build:
       context: .
       dockerfile: src/Services/Identity/S2O.Identity.Api/Dockerfile
@@ -62,6 +64,8 @@ services:
       - "5003:8080"
 
   tenant-api:
+    volumes:
+      - ./infra/keys:/root/.aspnet/DataProtection-Keys
     build:
       context: .
       dockerfile: src/Services/Tenant/S2O.Tenant.Api/Dockerfile

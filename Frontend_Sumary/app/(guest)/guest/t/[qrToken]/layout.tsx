@@ -1,5 +1,5 @@
 import React from "react"
-import { BottomNav } from '@/components/guest/bottom-nav'
+import { BottomNavV2 } from '@/components/guest/bottom-nav-v2'
 
 export default async function GuestLayout({
   children,
@@ -11,14 +11,9 @@ export default async function GuestLayout({
   const { qrToken } = await params
 
   return (
-    <div 
-      className="min-h-screen max-w-[420px] mx-auto relative"
-      style={{ background: 'var(--bg)' }}
-    >
-      <div style={{ paddingBottom: 'calc(88px + env(safe-area-inset-bottom))' }}>
-        {children}
-      </div>
-      <BottomNav qrToken={qrToken} />
+    <div className="bg-gray-50 pb-24 max-w-md mx-auto relative shadow-2xl min-h-dvh">
+      {children}
+      <BottomNavV2 qrToken={qrToken} />
     </div>
   )
 }

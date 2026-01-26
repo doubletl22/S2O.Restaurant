@@ -1,18 +1,21 @@
 'use client'
 
 import Image from 'next/image'
+import { Plus } from 'lucide-react'
 
-interface Product {
+// 1. Định nghĩa chuẩn Interface tại đây để xuất khẩu
+export interface GuestProduct {
   id: number
   name: string
   price: number
   image: string
   isAvailable: boolean
+  category: string // Đã thêm trường này để khớp với MenuPage
 }
 
 interface MenuItemCardProps {
-  product: Product
-  onAddToCart: (product: Product) => void
+  product: GuestProduct
+  onAddToCart: (product: GuestProduct) => void
 }
 
 function formatPrice(price: number) {
@@ -24,11 +27,10 @@ export function MenuItemCardV2({ product, onAddToCart }: MenuItemCardProps) {
 
   return (
     <div className="bg-white border rounded-[20px] p-3 shadow-sm flex gap-3">
-      {/* Product Image - Legacy style: w-[92px] h-[92px] rounded-[18px] */}
-      <div className="relative w-[92px] h-[92px] flex-shrink-0">
+      <div className="relative w-23 h-23 shrink-0">
         {image ? (
           <Image
-            src={image || "/placeholder.svg"}
+            src={image}
             alt={name}
             fill
             className="rounded-[18px] bg-gray-100 object-cover"
@@ -40,7 +42,6 @@ export function MenuItemCardV2({ product, onAddToCart }: MenuItemCardProps) {
           </div>
         )}
         
-        {/* Unavailable Overlay */}
         {!isAvailable && (
           <div className="absolute inset-0 rounded-[18px] bg-black/50 flex items-center justify-center">
             <span className="text-white text-xs font-semibold px-2 py-1 rounded-full bg-black/60">
@@ -50,31 +51,23 @@ export function MenuItemCardV2({ product, onAddToCart }: MenuItemCardProps) {
         )}
       </div>
 
-      {/* Content */}
       <div className="flex flex-col flex-1 justify-between py-0.5">
         <div>
-          <h4 
-            className="font-bold text-sm line-clamp-2 leading-tight"
-            style={{ color: 'var(--text)' }}
-          >
+          <h4 className="font-bold text-sm line-clamp-2 leading-tight text-gray-800">
             {name}
           </h4>
-          <p 
-            className="font-extrabold text-base mt-1"
-            style={{ color: '#f97316' }}
-          >
+          <p className="font-extrabold text-base mt-1 text-orange-600">
             {formatPrice(price)}
           </p>
         </div>
         
-        {/* Add Button - Legacy style: bg-gradient-to-r from-(--g1) to-(--g2) */}
         <button
           onClick={() => isAvailable && onAddToCart(product)}
           disabled={!isAvailable}
-          className="bg-gradient-to-r from-(--g1) to-(--g2) text-white rounded-xl px-4 py-2 font-bold text-sm self-start transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label={`Add ${name} to cart`}
+          className="self-end flex items-center gap-1 bg-orange-100 text-orange-600 rounded-full px-3 py-1.5 font-bold text-xs transition-transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-orange-200"
         >
-          Thêm
+          <Plus size={14} strokeWidth={3} />
+          <span>Thêm</span>
         </button>
       </div>
     </div>

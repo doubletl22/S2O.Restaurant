@@ -10,52 +10,48 @@ interface BottomNavProps {
 
 export function BottomNavV2({ qrToken }: BottomNavProps) {
   const pathname = usePathname()
-  const basePath = `/t/${qrToken}`
+  
+  // QUAN TRỌNG: Sửa đường dẫn cơ sở đúng với folder app/guest/t/...
+  const basePath = `/guest/t/${qrToken}`
 
   const navItems = [
     { icon: Home, href: `${basePath}/menu`, label: 'Menu' },
-    { icon: ShoppingBag, href: `${basePath}/cart`, label: 'Cart' },
-    { icon: Clock, href: `${basePath}/tracking`, label: 'Tracking' },
+    { icon: ShoppingBag, href: `${basePath}/cart`, label: 'Giỏ hàng' },
+    { icon: Clock, href: `${basePath}/tracking`, label: 'Đơn hàng' }, // Đổi label cho ngắn gọn
   ]
 
   return (
     <nav 
-      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around px-6"
+      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around px-6 bg-white border-t border-gray-100"
       style={{
-        background: 'var(--card)',
-        borderTop: '1px solid var(--line)',
         paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
         paddingTop: '12px',
       }}
     >
       {navItems.map((item) => {
-        const isActive = pathname.startsWith(item.href)
+        // Logic active: Kiểm tra nếu pathname chứa href
+        const isActive = pathname.includes(item.href)
         const Icon = item.icon
 
         return (
           <Link
             key={item.href}
             href={item.href}
-            className="flex flex-col items-center gap-1"
+            className="flex flex-col items-center gap-1 min-w-15"
           >
             <div
-              className="flex items-center justify-center w-10 h-10 rounded-xl transition-all"
-              style={
-                isActive
-                  ? {
-                      background: 'linear-gradient(135deg, var(--g1), var(--g2))',
-                    }
-                  : undefined
-              }
+              className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
+                isActive 
+                  ? 'bg-linear-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-200' 
+                  : 'text-gray-400 hover:bg-gray-50'
+              }`}
             >
-              <Icon 
-                className="w-5 h-5" 
-                style={{ color: isActive ? '#ffffff' : 'var(--muted)' }}
-              />
+              <Icon className="w-5 h-5" />
             </div>
             <span 
-              className="text-xs font-medium"
-              style={{ color: isActive ? 'var(--g1)' : 'var(--muted)' }}
+              className={`text-[10px] font-bold ${
+                isActive ? 'text-orange-600' : 'text-gray-400'
+              }`}
             >
               {item.label}
             </span>
