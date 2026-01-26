@@ -1,14 +1,13 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using S2O.Tenant.App.Features.Tables;
-using System.Drawing.Imaging;
-using QRCoder;
-using System.Drawing;
 
 namespace S2O.Tenant.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+//[Authorize]
 public class TablesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -25,28 +24,34 @@ public class TablesController : ControllerBase
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
+ 
     [HttpGet]
-    public async Task<IActionResult> GetTables()
+    public async Task<IActionResult> GetTables([FromQuery] Guid? branchId)
     {
-        var result = await _mediator.Send(new GetTablesQuery());
+        // Gửi Query sang Handler xử lý (GetTablesQuery.cs mà bạn đã có)
+        var query = new GetTablesQuery(branchId);
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+        {
+            return BadRequest(result.Error);
+        }
+
+        // Trả về đúng cấu trúc JSON mà Frontend đang đợi (có .value, .isSuccess)
         return Ok(result);
     }
-    [HttpGet("{id}/qr")]
-    public IActionResult GetTableQrCode(Guid id, [FromQuery] Guid tenantId, [FromQuery] Guid branchId)
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "RestaurantOwner, SystemAdmin")]
+    public async Task<IActionResult> DeleteTable(Guid id)
     {
-        // 1. Cấu trúc Link Frontend (Bạn thay domain thật vào đây)
-        // Ví dụ Frontend chạy localhost:3000
-        string frontendUrl = $"http://localhost:3000/menu?tenantId={tenantId}&branchId={branchId}&tableId={id}";
+        var result = await _mediator.Send(new DeleteTableCommand(id));
 
-        // 2. Tạo QR Code
-        using (QRCodeGenerator qrGenerator = new QRCodeGenerator())
+        if (result.IsFailure)
         {
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(frontendUrl, QRCodeGenerator.ECCLevel.Q);
-            PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
-            byte[] qrCodeBytes = qrCode.GetGraphic(20); // 20 là kích thước pixel
-
-            // 3. Trả về file ảnh
-            return File(qrCodeBytes, "image/png");
+            return BadRequest(result.Error);
         }
+
+        return Ok(new { Message = "Xóa bàn thành công." });
     }
 }

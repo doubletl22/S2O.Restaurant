@@ -7,7 +7,6 @@ services:
       dockerfile: src/Services/Identity/S2O.Identity.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      # 👇 Đổi sang định dạng chuẩn Key-Value
       - ConnectionStrings__DefaultConnection=Host=ep-lingering-shape-a19hwreb-pooler.ap-southeast-1.aws.neon.tech;Database=S2O_Identity_Db;Username=neondb_owner;Password=npg_dtoyQ4T8Uwjv;SSL Mode=Require;Trust Server Certificate=true
       - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
       - Jwt__Issuer=S2O.Identity

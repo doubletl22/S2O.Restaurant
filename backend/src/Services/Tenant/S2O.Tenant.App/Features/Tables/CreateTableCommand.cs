@@ -43,14 +43,16 @@ public class CreateTableHandler : IRequestHandler<CreateTableCommand, Result<Gui
         if (request.BranchId == Guid.Empty)
             return Result<Guid>.Failure(new Error("Table.BranchRequired", "Vui lòng chọn chi nhánh."));
 
+        var tableId = Guid.NewGuid();
+
         var table = new Table
         {
-            Id = Guid.NewGuid(),
+            Id = tableId,
             Name = request.Name,
             Capacity = request.Capacity, // Gán Capacity
             TenantId = _tenantContext.TenantId.Value,
             BranchId = request.BranchId, // [QUAN TRỌNG] Gán BranchId để không bị null
-            QrCodeUrl = $"https://s2o-app.com/menu/{_tenantContext.TenantId.Value}/{Guid.NewGuid()}"
+            QrCodeUrl = tableId.ToString()
         };
 
         _context.Tables.Add(table);
@@ -59,10 +61,6 @@ public class CreateTableHandler : IRequestHandler<CreateTableCommand, Result<Gui
         try
         {
             var client = _httpClientFactory.CreateClient();
-
-            // Địa chỉ của Booking Service trong Docker là "booking-api:8080"
-            // Nếu chạy local ngoài Docker thì là "localhost:5005"
-            // Tốt nhất là cấu hình trong appsettings.json, nhưng tạm thời hardcode để test:
             var bookingUrl = "http://booking-api:8080/api/internal/tables/sync";
 
             var syncPayload = new
