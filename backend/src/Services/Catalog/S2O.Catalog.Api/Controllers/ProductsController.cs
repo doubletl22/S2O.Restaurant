@@ -68,4 +68,12 @@ public class ProductsController : ControllerBase
         // Nếu thành công trả về 200 OK (hoặc 204 No Content)
         return result.IsSuccess ? Ok() : BadRequest(result.Error);
     }
+
+    // DELETE: api/products/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProduct(Guid id)
+    {
+        var result = await _sender.Send(new DeleteProductCommand(id));
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
+    }
 }

@@ -46,7 +46,8 @@ public class GetPublicMenuHandler : IRequestHandler<GetPublicMenuQuery, Result<P
                 Price = p.Price,
                 Description = p.Description,
                 ImageUrl = p.ImageUrl,
-                CategoryId = p.CategoryId
+                CategoryId = p.CategoryId,
+                IsAvailable = p.IsAvailable
             })
             .ToListAsync(ct);
 

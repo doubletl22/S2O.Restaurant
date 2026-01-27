@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using S2O.Identity.Domain.Entities;
 using S2O.Shared.Kernel.Interfaces;
 
-public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, string>, IAuthDbContext
+public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>, IAuthDbContext
 {
     private readonly ITenantContext _tenantContext;
 
@@ -17,6 +17,7 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole,
     }
 
     public new DbSet<ApplicationUser> Users => Set<ApplicationUser>();
+    public DbSet<UserBranch> UserBranches { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -4,7 +4,7 @@ using S2O.Catalog.App.Abstractions;
 using S2O.Catalog.App.DTOs;
 using S2O.Shared.Kernel.Results;
 
-namespace S2O.Catalog.App.Features.Products;
+namespace S2O.Catalog.App.Features.Products.Queries;
 
 public record GetProductByIdQuery(Guid Id) : IRequest<Result<ProductResponse>>;
 

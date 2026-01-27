@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation' // Hook lấy tham số URL
 import { MenuItemCardV2 } from '@/components/guest/menu-item-card-v2'
 import { CategoryChips } from '@/components/guest/category-chips'
+import { useGuestCart } from '@/components/guest/guest-cart-context';
 import { guestService } from '@/services/guest.service'
 import { ProductDto, CategoryDto } from '@/lib/types'
 import { Loader2 } from 'lucide-react'
-import { toast } from 'sonner' // Hoặc thư viện toast bạn đang dùng
+import { toast } from 'sonner' 
 
 export default function MenuPage() {
   const params = useParams();
@@ -16,7 +17,7 @@ export default function MenuPage() {
   const [categories, setCategories] = useState<CategoryDto[]>([])
   const [tableInfo, setTableInfo] = useState<any>(null) 
   const [loading, setLoading] = useState(true)
-  const [cart, setCart] = useState<ProductDto[]>([])
+  const { addToCart, totalItems } = useGuestCart();
   const [activeCategoryId, setActiveCategoryId] = useState<string>('all')
 
   useEffect(() => {
@@ -45,20 +46,16 @@ export default function MenuPage() {
     initPage();
   }, [tableId]);
 
-  // 4. Xử lý thêm vào giỏ
-  const handleAddToCart = (product: ProductDto) => {
-    setCart((prev) => [...prev, product])
-    toast.success(`Đã thêm ${product.name} vào giỏ`);
+ const handleAddToCart = (product: ProductDto) => {
+    addToCart(product); 
   }
 
-  // 5. Lọc sản phẩm theo danh mục
   const filteredProducts = activeCategoryId === 'all'
     ? products
     : products.filter((p) => p.categoryId === activeCategoryId)
 
   const categoryNames = ['Tất cả', ...categories.map(c => c.name)];
   
-  // Logic xử lý index của CategoryChips (nếu component dùng index)
   const handleCategorySelect = (index: number) => {
      if (index === 0) setActiveCategoryId('all');
      else setActiveCategoryId(categories[index - 1].id);
@@ -81,9 +78,9 @@ export default function MenuPage() {
             <h1 className="text-2xl font-black text-gray-800">Thực đơn</h1>
             <p className="text-sm text-gray-500 mt-1">{tableInfo?.tenantName} • {tableInfo?.tableName || 'Bàn chưa xác định'}</p>
           </div>
-          {cart.length > 0 && (
+          {totalItems > 0 && (
             <div className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-              {cart.length} món
+              {totalItems} món
             </div>
           )}
         </div>
@@ -100,13 +97,11 @@ export default function MenuPage() {
 
       {/* List Products */}
       <section className="px-4 pt-4 flex flex-col gap-3">
-        {filteredProducts.map((product) => (
-          // Cần map ProductDto sang interface mà MenuItemCardV2 yêu cầu nếu khác biệt
-          <MenuItemCardV2
+        {filteredProducts.map((product) => (<MenuItemCardV2
             key={product.id}
-            // Spread properties nếu trùng tên, hoặc map thủ công
             product={{
-                id: product.id, // Lưu ý: Backend trả về string Guid, Frontend đang dùng number ở mock cũ. Cần sửa component con nhận string.
+                id: product.id, 
+                description: product.description,
                 name: product.name,
                 price: product.price,
                 image: product.imageUrl || '/placeholder.svg?height=200&width=200',

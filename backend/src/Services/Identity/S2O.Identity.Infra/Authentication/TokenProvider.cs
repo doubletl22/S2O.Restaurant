@@ -19,7 +19,7 @@ public class TokenProvider : ITokenProvider
     {
         var claims = new List<Claim>
         {
-             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
              new Claim(JwtRegisteredClaimNames.Email, user.Email!),
              new Claim(ClaimConstants.TenantId, user.TenantId?.ToString() ?? string.Empty)
         };

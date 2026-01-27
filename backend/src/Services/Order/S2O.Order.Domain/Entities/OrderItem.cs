@@ -9,7 +9,7 @@ public class OrderItem : Entity, IMustHaveTenant
     public string ProductName { get; set; } = string.Empty;
     public decimal UnitPrice { get; set; }
     public int Quantity { get; set; }
-    public decimal TotalPrice => UnitPrice * Quantity;
+    public decimal TotalPrice { get; set; }
     public string? Note { get; set; }
     public Order Order { get; set; } = null!;
     public Guid? TenantId { get; set; }

@@ -152,7 +152,7 @@ export function Sidebar({ type = 'admin' }: { type?: 'admin' | 'staff' }) {
         <div className="hidden lg:flex items-center justify-between p-4 h-16">
           <div className={cn('flex items-center gap-3', isCollapsed && 'lg:justify-center lg:w-full')}>
             <div 
-              className="bg-brand w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              className="bg-brand w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
             >
               <Utensils className="w-5 h-5 text-white" />
             </div>
@@ -165,7 +165,7 @@ export function Sidebar({ type = 'admin' }: { type?: 'admin' | 'staff' }) {
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className={cn(
-              'p-2 rounded-lg transition-colors hover:bg-[var(--bg)]',
+              'p-2 rounded-lg transition-colors hover:bg-(--bg)',
               isCollapsed && 'lg:hidden'
             )}
           >
@@ -202,7 +202,7 @@ export function Sidebar({ type = 'admin' }: { type?: 'admin' | 'staff' }) {
                   isCollapsed && 'lg:justify-center lg:px-0',
                   isActive 
                     ? 'bg-brand text-white shadow-brand' 
-                    : 'hover:bg-[var(--bg)]'
+                    : 'hover:bg-(--bg)'
                 )}
                 style={{ color: isActive ? '#fff' : 'var(--text)' }}
               >

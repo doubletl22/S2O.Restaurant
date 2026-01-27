@@ -10,4 +10,5 @@ public class Table : Entity, IMustHaveTenant
     public int Capacity { get; set; }
     public string? QrCodeUrl { get; set; } 
     public bool IsOccupied { get; set; } = false;
+    public bool IsActive { get; set; } = true;
 }

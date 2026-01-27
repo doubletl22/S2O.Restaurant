@@ -41,4 +41,28 @@ public class AdminTenantsController : ControllerBase
         var result = await _mediator.Send(new ToggleTenantLockCommand(id, false));
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
+
+    // PUT: api/admin/tenants/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateTenant(Guid id, [FromBody] UpdateTenantCommand command)
+    {
+        if (id != command.Id) return BadRequest("ID không khớp");
+
+        var result = await _mediator.Send(command);
+        if (result.IsFailure) return BadRequest(result.Error);
+
+        return Ok(result.Value);
+    }
+
+    // DELETE: api/admin/tenants/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteTenant(Guid id)
+    {
+        var command = new DeleteTenantCommand(id);
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure) return BadRequest(result.Error);
+
+        return NoContent(); // 204 Deleted
+    }
 }

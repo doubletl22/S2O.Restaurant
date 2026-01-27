@@ -53,6 +53,6 @@ public class RegisterStaffHandler : IRequestHandler<RegisterStaffCommand, Result
         // 3. Thêm Claim BranchId (Để sau này Token có thông tin chi nhánh)
         await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("branch_id", request.BranchId.ToString()));
 
-        return Result<Guid>.Success(Guid.Parse(user.Id));
+        return Result<Guid>.Success((user.Id));
     }
 }

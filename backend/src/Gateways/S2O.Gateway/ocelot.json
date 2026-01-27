@@ -17,6 +17,22 @@
       "UpstreamPathTemplate": "/api/auth/firebase-login",
       "UpstreamHttpMethod": [ "POST" ]
     },
+    // Delete User
+    {
+      "DownstreamPathTemplate": "/api/users/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/users/{id}",
+      "UpstreamHttpMethod": [ "DELETE" ]
+    },
+    // Reset Password
+    {
+      "DownstreamPathTemplate": "/api/users/{id}/reset-password",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/users/{id}/reset-password",
+      "UpstreamHttpMethod": [ "PUT" ]
+    },
     // API tạo nhân viên (Dành cho Admin/Owner).
     {
       "DownstreamPathTemplate": "/api/auth/staff", 
@@ -32,6 +48,13 @@
         "X-Tenant-ID": "Claims[tenant_id] > value"
       }
     },
+    {
+      "DownstreamPathTemplate": "/api/users/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/owner/staff/{id}",
+      "UpstreamHttpMethod": [ "PUT", "DELETE" ]
+    },
     // API tạo Tenant (Dành cho SysAdmin)
     {
       "DownstreamPathTemplate": "/api/auth/create-tenant",
@@ -39,6 +62,18 @@
       "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
       "UpstreamPathTemplate": "/api/sysadmin/tenants",
       "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    // edit role 
+    {
+      "DownstreamPathTemplate": "/api/users/{id}/role",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/owner/staff/{id}/role", 
+      "UpstreamHttpMethod": [ "PUT" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -106,6 +141,20 @@
       "UpstreamHeaderTransform": {
         "X-User-ID": "Claims[sub] > value"
       }
+    },
+    {
+      "DownstreamPathTemplate": "/api/products/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "catalog-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/products/{id}",
+      "UpstreamHttpMethod": [ "DELETE" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/categories/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "catalog-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/categories/{id}",
+      "UpstreamHttpMethod": [ "DELETE" ]
     },
 
     // ==============================================================================
@@ -246,6 +295,20 @@
     // 4. TENANT SERVICE (Bàn & Chi nhánh)
     // ==============================================================================
     {
+      "DownstreamPathTemplate": "/api/tables/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/tables/{id}",
+      "UpstreamHttpMethod": [ "PUT", "DELETE" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/branches/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/branches/{id}",
+      "UpstreamHttpMethod": [ "PUT", "DELETE" ]
+    },
+    {
       "DownstreamPathTemplate": "/api/tables/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
@@ -301,29 +364,12 @@
         "AllowedScopes": []
       }
     },
-    {
-      "DownstreamPathTemplate": "/api/tables/{id}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [{"Host": "tenant-api","Port": 8080}
-      ],
-      "UpstreamPathTemplate": "/api/tables/{id}",
-      "UpstreamHttpMethod": [ "DELETE" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
-    },
-
+    
      // 2. POST: Khóa hoặc Mở khóa nhà hàng
     {
       "DownstreamPathTemplate": "/api/admin/tenants/{id}/{action}",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "tenant-api",
-          "Port": 8080
-        }
-      ],
+      "DownstreamHostAndPorts": [{"Host": "tenant-api","Port": 8080 } ],
       "UpstreamPathTemplate": "/api/admin/tenants/{id}/{action}",
       "UpstreamHttpMethod": [ "POST" ],
       "AuthenticationOptions": {
@@ -337,6 +383,22 @@
       "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
       "UpstreamPathTemplate": "/api/public/tenant/{everything}",
       "UpstreamHttpMethod": [ "GET" ]
+    },
+    // Update Tenant
+    {
+      "DownstreamPathTemplate": "/api/admin/tenants/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/tenants/{id}",
+      "UpstreamHttpMethod": [ "PUT" ]
+    },
+    // Delete Tenant
+    {
+      "DownstreamPathTemplate": "/api/admin/tenants/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/admin/tenants/{id}",
+      "UpstreamHttpMethod": [ "DELETE" ]
     },
 
     // ==============================================================================
@@ -369,6 +431,47 @@
       "UpstreamHeaderTransform": {
         "X-User-ID": "Claims[sub] > value"
       }
+    },
+    //GET
+    {
+      "DownstreamPathTemplate": "/api/owner/products?page={page}&size={size}&keyword={keyword}&categoryId={categoryId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "catalog-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/owner/products?page={page}&size={size}&keyword={keyword}&categoryId={categoryId}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    // Backup route (không param)
+    {
+      "DownstreamPathTemplate": "/api/owner/products",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "catalog-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/owner/products",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+
+    // 2. Owner Branches
+    {
+      "DownstreamPathTemplate": "/api/owner/branches",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/owner/branches",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+
+    // 3. Owner Staff
+    {
+      "DownstreamPathTemplate": "/api/owner/staff?keyword={keyword}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/owner/staff?keyword={keyword}",
+      "UpstreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/owner/staff",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "identity-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/owner/staff",
+      "UpstreamHttpMethod": [ "GET" ]
     }
   ],
   "GlobalConfiguration": {

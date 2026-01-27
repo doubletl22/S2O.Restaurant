@@ -3,7 +3,6 @@
 import Image from 'next/image'
 import { Plus } from 'lucide-react'
 
-// 1. Định nghĩa chuẩn Interface tại đây để xuất khẩu
 export interface GuestProduct {
   id: string | number
   name: string
@@ -11,6 +10,7 @@ export interface GuestProduct {
   image: string
   isAvailable: boolean
   category: string 
+  description: string | undefined
 }
 
 interface MenuItemCardProps {
@@ -23,7 +23,7 @@ function formatPrice(price: number) {
 }
 
 export function MenuItemCardV2({ product, onAddToCart }: MenuItemCardProps) {
-  const { name, price, image, isAvailable } = product
+  const { name, price, image, isAvailable, description } = product
 
   return (
     <div className="bg-white border rounded-[20px] p-3 shadow-sm flex gap-3">
@@ -58,6 +58,9 @@ export function MenuItemCardV2({ product, onAddToCart }: MenuItemCardProps) {
           </h4>
           <p className="font-extrabold text-base mt-1 text-orange-600">
             {formatPrice(price)}
+          </p>
+          <p className="font-medium text-sm line-clamp-2 leading-tight text-gray-500">
+            {description}
           </p>
         </div>
         

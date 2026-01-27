@@ -9,10 +9,16 @@ public class CatalogClient : ICatalogClient
 
     public CatalogClient(HttpClient httpClient) => _httpClient = httpClient;
 
-    public async Task<ProductResponse?> GetProductAsync(Guid productId)
+    public async Task<ProductResponse?> GetProductAsync(Guid productId, CancellationToken ct = default)
     {
-        // Gọi sang Catalog API: GET /api/products/{id}
-        var response = await _httpClient.GetFromJsonAsync<ProductResponse>($"api/products/{productId}");
-        return response;
+        try
+        {
+            var response = await _httpClient.GetFromJsonAsync<ProductResponse>($"api/products/{productId}", ct);
+            return response;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 }

@@ -51,6 +51,6 @@ public class RegisterCustomerCommandHandler : IRequestHandler<RegisterCustomerCo
         // (Role này đã được tạo sẵn trong Seeder)
         await _userManager.AddToRoleAsync(user, "Customer");
 
-        return Result<Guid>.Success(Guid.Parse(user.Id));
+        return Result<Guid>.Success((user.Id));
     }
 }
