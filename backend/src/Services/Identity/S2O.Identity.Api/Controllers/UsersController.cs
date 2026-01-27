@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using S2O.Identity.App.Features.Users.Commands;
 using S2O.Identity.Domain.Entities;
 using System.Security.Claims;
 
@@ -12,10 +14,12 @@ namespace S2O.Identity.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly ISender _sender;
 
-    public UsersController(UserManager<ApplicationUser> userManager)
+    public UsersController(UserManager<ApplicationUser> userManager, ISender sender)
     {
         _userManager = userManager;
+        _sender = sender;
     }
 
     // DTO: Khuôn mẫu dữ liệu gửi lên
@@ -104,4 +108,51 @@ public class UsersController : ControllerBase
             Role = request.Role
         });
     }
+
+    [HttpPut("{id}/reset-password")]
+    // [Authorize(Roles = "SysAdmin")] // Bật lại khi chạy thật
+    public async Task<IActionResult> ResetPassword(Guid id, [FromBody] string newPassword)
+    {
+        // Lưu ý: Frontend gửi chuỗi string raw hoặc object { newPassword: "..." }
+        // Để đơn giản nên wrap vào DTO, ở đây tôi demo nhận object
+        var command = new AdminResetPasswordCommand(id, newPassword);
+        var result = await _sender.Send(command);
+
+        if (result.IsFailure) return BadRequest(result.Error);
+        return Ok(result.Value);
+    }
+
+    // DELETE: api/users/{id}
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
+    public async Task<IActionResult> DeleteUser(Guid id)
+    {
+        var command = new DeleteUserCommand(id);
+        var result = await _sender.Send(command);
+
+        if (result.IsFailure) return BadRequest(result.Error);
+        return NoContent();
+    }
+
+    [HttpPut("{id}/role")]
+    [Authorize(Roles = "SystemAdmin,RestaurantOwner")] // Chỉ Admin hoặc Chủ quán mới được sửa quyền
+    public async Task<IActionResult> UpdateUserRole(Guid id, [FromBody] UpdateUserRoleCommand command)
+    {
+        if (id != command.UserId) return BadRequest("ID không khớp");
+
+        var result = await _sender.Send(command);
+
+        if (result.IsFailure) return BadRequest(result.Error);
+        return Ok(result.Value);
+    }
+    [HttpPut("{id}")]
+    [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
+    public async Task<IActionResult> UpdateStaff(Guid id, [FromBody] UpdateStaffCommand command)
+    {
+        if (id != command.UserId) return BadRequest();
+        var result = await _sender.Send(command);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
+
 }

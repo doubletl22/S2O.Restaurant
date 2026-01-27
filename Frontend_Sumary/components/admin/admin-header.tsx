@@ -48,7 +48,7 @@ export function AdminHeader() {
       {/* Welcome Text */}
       <div className="text-sm text-gray-600">
         {greeting}!{' '}
-        <span className="text-[#f97316] font-bold">Admin</span>
+        <span className="text-[#f97316] font-bold">User</span>
       </div>
 
       {/* User Profile */}
@@ -65,7 +65,7 @@ export function AdminHeader() {
           <div className="w-8 h-8 rounded-full bg-lient-to-r from-[#f97316] to-[#ef4444] flex items-center justify-center">
             <User className="w-4 h-4 text-white" />
           </div>
-          <span className="text-sm font-medium text-gray-700">Admin</span>
+          <span className="text-sm font-medium text-gray-700">Đăng xuất</span>
           <ChevronDown 
             className={`w-4 h-4 text-gray-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} 
           />
@@ -79,7 +79,6 @@ export function AdminHeader() {
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               onClick={() => {
                 setShowDropdown(false)
-                // Navigate to edit profile page when implemented
               }}
             >
               <Edit className="w-4 h-4 text-gray-500" />

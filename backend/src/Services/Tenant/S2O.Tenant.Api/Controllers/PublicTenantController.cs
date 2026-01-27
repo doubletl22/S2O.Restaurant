@@ -44,7 +44,8 @@ public class PublicTenantController : ControllerBase
             TableId = table.Id,
             TableName = table.Name,
             TenantId = tenant.Id,
-            TenantName = tenant.Name
+            TenantName = tenant.Name,
+            BranchId = table.BranchId ?? Guid.Empty
         });
     }
 }

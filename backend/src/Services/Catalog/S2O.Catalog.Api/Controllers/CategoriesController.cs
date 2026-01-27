@@ -49,6 +49,13 @@ public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryCommand
         var result = await _sender.Send(new GetCategoriesQuery());
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteCategory(Guid id)
+    {
+        var result = await _sender.Send(new DeleteCategoryCommand(id));
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
+    }
 }
 
 public record CreateCategoryRequest(string Name, string? Description);

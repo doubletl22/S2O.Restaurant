@@ -54,4 +54,14 @@ public class TablesController : ControllerBase
 
         return Ok(new { Message = "Xóa bàn thành công." });
     }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateTable(Guid id, [FromBody] UpdateTableCommand command)
+    {
+        if (id != command.Id) return BadRequest();
+        var result = await _mediator.Send(command);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
+   
 }

@@ -1,58 +1,68 @@
 ﻿using MediatR;
 using S2O.Order.App.Abstractions;
-using S2O.Order.Domain.Entities; // Entity Order của bạn
-using S2O.Shared.Kernel.Results;
+using S2O.Order.Domain.Entities;
 using S2O.Order.Domain.Enums;
+using S2O.Shared.Kernel.Results;
 
 namespace S2O.Order.App.Features.Orders.Commands;
 
 public class PlaceGuestOrderHandler : IRequestHandler<PlaceGuestOrderCommand, Result<Guid>>
 {
     private readonly IOrderDbContext _context;
-    private readonly IOrderNotifier _notifier;
-    // (Có thể inject thêm CatalogClient để check giá tiền nếu cần)
+    private readonly ICatalogClient _catalogClient; // Service gọi sang Catalog
 
-    public PlaceGuestOrderHandler(IOrderDbContext context, IOrderNotifier notifier)
+    public PlaceGuestOrderHandler(IOrderDbContext context, ICatalogClient catalogClient)
     {
         _context = context;
-        _notifier = notifier;
+        _catalogClient = catalogClient;
     }
 
-    public async Task<Result<Guid>> Handle(PlaceGuestOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(PlaceGuestOrderCommand request, CancellationToken ct)
     {
-        // 1. Tạo đơn hàng mới
+        // 1. Tạo đơn hàng (Order Header)
         var order = new Domain.Entities.Order
         {
             Id = Guid.NewGuid(),
-            TenantId = request.TenantId,   // Gán thủ công
-            BranchId = request.BranchId,   // Gán thủ công
-            // UserId = null,             // Khách vãng lai -> Null
-            TableId = request.TableId,     // Bàn số mấy
-            Status = OrderStatus.Pending,           // Trạng thái chờ bếp nhận
-            TotalAmount = 0,               // Tính sau hoặc tính ngay ở đây
-            CreatedAtUtc = DateTime.UtcNow,
-            Note = $"Khách lẻ: {request.GuestName} - {request.GuestPhone}"
+            TableId = request.TableId,
+            TenantId = request.TenantId,
+            Status = OrderStatus.Pending, // Mới đặt, chờ bếp
+            OrderDate = DateTime.UtcNow,
+            TotalAmount = 0 // Sẽ cộng dồn bên dưới
         };
 
-        // 2. Thêm món (Logic đơn giản, nên gọi Catalog check giá thực tế)
-        foreach (var item in request.Items)
+        // 2. Duyệt qua từng món khách chọn
+        foreach (var itemDto in request.Items)
         {
+            // 3. QUAN TRỌNG: Gọi Catalog Service để lấy thông tin món ăn mới nhất
+            // Giả sử hàm GetProductAsync trả về { Id, Name, Price, ImageUrl }
+            var productInfo = await _catalogClient.GetProductAsync(itemDto.ProductId, ct);
+
+            if (productInfo == null)
+            {
+                return Result<Guid>.Failure(new Error("Order.ProductNotFound", $"Món ăn với ID {itemDto.ProductId} không tồn tại hoặc đã bị xóa."));
+            }
+
+            // 4. Tạo OrderItem với giá từ Database (Backend), không phải từ Frontend
             var orderItem = new OrderItem
             {
                 Id = Guid.NewGuid(),
                 OrderId = order.Id,
-                ProductId = item.ProductId,
-                Quantity = item.Quantity,
-                UnitPrice = 50000 // Tạm fix cứng hoặc phải gọi Catalog để lấy giá chuẩn
+                ProductId = itemDto.ProductId,
+                ProductName = productInfo.Name, // Lưu cứng tên tại thời điểm đặt
+                UnitPrice = productInfo.Price,  // Lưu cứng giá tại thời điểm đặt
+                Quantity = itemDto.Quantity,
+                Note = itemDto.Note,
+                TotalPrice = productInfo.Price * itemDto.Quantity
             };
-            order.TotalAmount += orderItem.UnitPrice * orderItem.Quantity;
-            order.Items.Add(orderItem); // Giả sử bạn có List<OrderItem> trong Order
+
+            order.Items.Add(orderItem);
+            order.TotalAmount += orderItem.TotalPrice;
         }
 
-        // 3. Lưu xuống DB
+        // 5. Lưu vào Database
         _context.Orders.Add(order);
-        await _context.SaveChangesAsync(cancellationToken);
-        await _notifier.NotifyNewOrderAsync(order.BranchId, order.Id);
+        await _context.SaveChangesAsync(ct);
+
         return Result<Guid>.Success(order.Id);
     }
 }

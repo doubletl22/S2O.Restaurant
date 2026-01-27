@@ -17,6 +17,7 @@ public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole,
     }
 
     public new DbSet<ApplicationUser> Users => Set<ApplicationUser>();
+    public DbSet<UserBranch> UserBranches { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

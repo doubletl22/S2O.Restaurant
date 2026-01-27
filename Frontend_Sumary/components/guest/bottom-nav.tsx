@@ -23,7 +23,7 @@ export function BottomNav({ qrToken }: BottomNavProps) {
 
   return (
     <nav 
-      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[420px] z-50 flex items-center justify-between px-4"
+      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-105 z-50 flex items-center justify-between px-4"
       style={{
         background: 'var(--card)',
         borderTop: '1px solid var(--line)',

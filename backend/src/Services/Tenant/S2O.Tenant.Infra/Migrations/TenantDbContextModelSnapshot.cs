@@ -70,6 +70,9 @@ namespace S2O.Tenant.Infra.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsOccupied")
                         .HasColumnType("boolean");
 
