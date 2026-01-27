@@ -123,6 +123,31 @@ export interface ProductFormPayload {
   imageFile?: File; // File ảnh từ input type="file"
 }
 
+export interface CategoryDto {
+  id: string;
+  name: string;
+  description?: string;
+}
+
+// Khớp với cấu trúc Product từ Backend
+export interface ProductDto {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  imageUrl?: string;
+  categoryId: string;
+  isAvailable: boolean;
+}
+
+// Khớp với response của GetPublicMenuQuery
+export interface PublicMenuResponse {
+  tenantId: string;
+  tenantName: string;
+  categories: CategoryDto[];
+  products: ProductDto[];
+}
+
 // ==========================================
 // 6. BOOKING SERVICE (Đặt bàn)
 // ==========================================

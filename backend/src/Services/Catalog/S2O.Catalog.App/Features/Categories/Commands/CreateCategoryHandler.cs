@@ -20,7 +20,8 @@ public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, Resu
         {
             Id = Guid.NewGuid(),
             Name = request.Name,
-            Description = request.Description
+            Description = request.Description,
+            TenantId = request.TenantId
         };
 
         _context.Categories.Add(category);

@@ -1,12 +1,12 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using S2O.Catalog.App.Abstractions;
-using S2O.Catalog.Domain.Entities; // Sử dụng Entity Product
+using S2O.Catalog.App.DTOs; 
 using S2O.Shared.Kernel.Results;
 
 namespace S2O.Catalog.App.Features.Public;
 
-public class GetPublicMenuHandler : IRequestHandler<GetPublicMenuQuery, Result<List<Product>>>
+public class GetPublicMenuHandler : IRequestHandler<GetPublicMenuQuery, Result<PublicMenuDto>>
 {
     private readonly ICatalogDbContext _context;
 
@@ -15,20 +15,48 @@ public class GetPublicMenuHandler : IRequestHandler<GetPublicMenuQuery, Result<L
         _context = context;
     }
 
-    public async Task<Result<List<Product>>> Handle(GetPublicMenuQuery request, CancellationToken ct)
+    public async Task<Result<PublicMenuDto>> Handle(GetPublicMenuQuery request, CancellationToken ct)
     {
-        var query = _context.Products
-            .IgnoreQueryFilters()
+        var categories = await _context.Categories
             .AsNoTracking()
-            .Where(p => p.TenantId == request.TenantId); 
+            .Where(c => c.TenantId == request.TenantId && c.IsActive)
+            .OrderBy(c => c.Name) 
+            .Select(c => new CategoryResponse
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description
+            })
+            .ToListAsync(ct);
+
+        var productQuery = _context.Products
+            .AsNoTracking()
+            .Where(p => p.TenantId == request.TenantId && p.IsActive);
 
         if (!string.IsNullOrEmpty(request.CategoryId) && Guid.TryParse(request.CategoryId, out var catId))
         {
-            query = query.Where(p => p.CategoryId == catId);
+            productQuery = productQuery.Where(p => p.CategoryId == catId);
         }
 
-        var products = await query.ToListAsync(ct);
+        var products = await productQuery
+            .Select(p => new ProductResponse
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Description = p.Description,
+                ImageUrl = p.ImageUrl,
+                CategoryId = p.CategoryId
+            })
+            .ToListAsync(ct);
 
-        return Result<List<Product>>.Success(products);
+        var result = new PublicMenuDto
+        {
+            TenantId = request.TenantId,
+            Categories = categories,
+            Products = products
+        };
+
+        return Result<PublicMenuDto>.Success(result);
     }
 }

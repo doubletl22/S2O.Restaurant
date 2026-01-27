@@ -11,13 +11,12 @@ interface BottomNavProps {
 export function BottomNavV2({ qrToken }: BottomNavProps) {
   const pathname = usePathname()
   
-  // QUAN TRỌNG: Sửa đường dẫn cơ sở đúng với folder app/guest/t/...
   const basePath = `/guest/t/${qrToken}`
 
   const navItems = [
     { icon: Home, href: `${basePath}/menu`, label: 'Menu' },
     { icon: ShoppingBag, href: `${basePath}/cart`, label: 'Giỏ hàng' },
-    { icon: Clock, href: `${basePath}/tracking`, label: 'Đơn hàng' }, // Đổi label cho ngắn gọn
+    { icon: Clock, href: `${basePath}/tracking`, label: 'Đơn hàng' }, 
   ]
 
   return (
@@ -29,7 +28,6 @@ export function BottomNavV2({ qrToken }: BottomNavProps) {
       }}
     >
       {navItems.map((item) => {
-        // Logic active: Kiểm tra nếu pathname chứa href
         const isActive = pathname.includes(item.href)
         const Icon = item.icon
 
