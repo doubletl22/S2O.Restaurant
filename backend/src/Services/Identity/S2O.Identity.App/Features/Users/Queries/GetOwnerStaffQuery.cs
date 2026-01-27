@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using S2O.Identity.App.Abstractions;
 using S2O.Identity.App.DTOs;
-using S2O.Shared.Kernel.Interfaces; // Chứa ICurrentUserService
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Results;
 
 namespace S2O.Identity.App.Features.Users.Queries;

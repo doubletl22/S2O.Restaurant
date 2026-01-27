@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using S2O.Infra.Services;
-using S2O.Kernel.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Order.Api.Hubs;
 using S2O.Order.Api.Services;
 using S2O.Order.App.Abstractions;
@@ -11,7 +11,6 @@ using S2O.Order.Infra.Persistence;
 using S2O.Shared.Infra;
 using S2O.Shared.Infra.Interceptors;
 using S2O.Shared.Infra.Services;
-using S2O.Shared.Kernel.Interfaces;
 using System.Text.Json.Serialization;
 using System.Text;
 

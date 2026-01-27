@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
-using S2O.Kernel.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 
 namespace S2O.Infra.Services;
 
@@ -32,4 +32,7 @@ public class CurrentUserService : ICurrentUserService
             return Guid.TryParse(tenantId, out var guid) ? guid : null;
         }
     }
+
+    public string? Email => _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
+    public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
 }

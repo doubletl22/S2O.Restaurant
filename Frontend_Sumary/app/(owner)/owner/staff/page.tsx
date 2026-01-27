@@ -136,7 +136,7 @@ export default function StaffPage() {
               <Plus className="mr-2 h-4 w-4" /> Thêm nhân viên
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-150">
             <DialogHeader>
               <DialogTitle>Thêm nhân viên mới</DialogTitle>
             </DialogHeader>
@@ -210,7 +210,7 @@ export default function StaffPage() {
         <Search className="w-4 h-4 text-gray-500 ml-2" />
         <Input 
           placeholder="Tìm theo tên, email..." 
-          className="border-0 focus-visible:ring-0 min-w-[300px]"
+          className="border-0 focus-visible:ring-0 min-w-75"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />

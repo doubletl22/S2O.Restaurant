@@ -137,7 +137,7 @@ export default function BranchesPage() {
               <Plus className="mr-2 h-4 w-4" /> Thêm chi nhánh
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-125">
             <DialogHeader>
               <DialogTitle>{editingId ? 'Cập nhật chi nhánh' : 'Thêm chi nhánh mới'}</DialogTitle>
             </DialogHeader>
@@ -170,7 +170,7 @@ export default function BranchesPage() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-2 bg-white p-2 rounded-lg border w-fit min-w-[300px]">
+      <div className="flex items-center gap-2 bg-white p-2 rounded-lg border w-fit min-w-75">
         <Search className="w-4 h-4 text-gray-500 ml-2" />
         <Input 
           placeholder="Tìm theo tên, địa chỉ..." 

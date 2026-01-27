@@ -364,19 +364,7 @@
         "AllowedScopes": []
       }
     },
-    {
-      "DownstreamPathTemplate": "/api/tables/{id}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [{"Host": "tenant-api","Port": 8080}
-      ],
-      "UpstreamPathTemplate": "/api/tables/{id}",
-      "UpstreamHttpMethod": [ "DELETE" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
-    },
-
+    
      // 2. POST: Khóa hoặc Mở khóa nhà hàng
     {
       "DownstreamPathTemplate": "/api/admin/tenants/{id}/{action}",

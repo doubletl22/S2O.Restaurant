@@ -9,5 +9,5 @@ public class ProductResponse
     public string? ImageUrl { get; set; }
     public Guid CategoryId { get; set; }
     public bool IsAvailable { get; set; }
-    public bool IsAcitve { get; set; }
+    public bool IsActive { get; set; }
 }

@@ -9,7 +9,7 @@ using S2O.Identity.Infra.Authentication;
 using S2O.Identity.Infra.Persistence;
 using MassTransit;
 using S2O.Infra.Services;
-using S2O.Kernel.Interfaces;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Infra; // Chứa AddSharedInfrastructure
 using S2O.Shared.Infra.Interceptors;
 
