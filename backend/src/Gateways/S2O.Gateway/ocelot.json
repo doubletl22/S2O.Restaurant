@@ -51,10 +51,10 @@
     
     // 2.1 Public Menu (Khách xem - Không cần Auth)
     {
-      "DownstreamPathTemplate": "/api/public/menu/{tenantId}", 
+      "DownstreamPathTemplate": "/api/public/menu/{everything}", 
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [ { "Host": "catalog-api", "Port": 8080 } ],
-      "UpstreamPathTemplate": "/api/public/menu/{tenantId}",
+      "UpstreamPathTemplate": "/api/public/menu/{everything}",
       "UpstreamHttpMethod": [ "GET" ]
     },
 
@@ -330,6 +330,13 @@
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       }
+    },
+    {
+      "DownstreamPathTemplate": "/api/public/tenant/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/public/tenant/{everything}",
+      "UpstreamHttpMethod": [ "GET" ]
     },
 
     // ==============================================================================

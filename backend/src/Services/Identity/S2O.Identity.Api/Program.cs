@@ -60,7 +60,6 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(S2O.Identity.App.Features.Login.LoginCommand).Assembly));
-Environment.SetEnvironmentVariable("MT_LICENSE", "Guest");
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>

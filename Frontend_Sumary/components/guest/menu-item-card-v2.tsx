@@ -5,12 +5,12 @@ import { Plus } from 'lucide-react'
 
 // 1. Định nghĩa chuẩn Interface tại đây để xuất khẩu
 export interface GuestProduct {
-  id: number
+  id: string | number
   name: string
   price: number
   image: string
   isAvailable: boolean
-  category: string // Đã thêm trường này để khớp với MenuPage
+  category: string 
 }
 
 interface MenuItemCardProps {
