@@ -31,6 +31,10 @@ export default function LoginPage() {
       localStorage.setItem('token', data.accessToken)
       document.cookie = `token=${data.accessToken}; path=/; max-age=${data.expiresIn}; SameSite=Lax`
       const decoded: any = jwtDecode(data.accessToken)
+      const tenantId = decoded?.tenant_id;
+      if (tenantId) {
+        document.cookie = `tenant_id=${tenantId}; path=/; SameSite=Lax`;
+      }
       console.log("Decoded Token:", decoded) 
       const role = decoded.role || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
       console.log("User Role:", role)

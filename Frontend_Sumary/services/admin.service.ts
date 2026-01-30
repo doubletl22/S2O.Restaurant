@@ -13,35 +13,48 @@ export interface TenantDto {
   validUntil: string;
 }
 
+/* ✅ ĐÃ BỔ SUNG ownerName */
 export interface CreateTenantPayload {
   name: string;
+  ownerName: string; // 👈 thêm dòng này
   email: string;
-  password?: string; // Optional nếu tự sinh
+  password?: string;
   phone: string;
   address: string;
   subscriptionPlan: 'Basic' | 'Pro' | 'Enterprise';
 }
 
 export const adminService = {
-  // 1. Lấy danh sách Tenant (Gọi qua Gateway -> Tenant Service)
+
+  // 1. Lấy danh sách Tenant
   getAllTenants: async () => {
-    // API: GET /api/admin/tenants
     const response = await api.get<TenantDto[]>('/admin/tenants');
     return response.data;
   },
 
-  // 2. Tạo Tenant mới (Gọi qua Gateway -> Identity Service)
+  // 2. Tạo Tenant mới ✅ FIX FULL FLOW
   createTenant: async (payload: CreateTenantPayload) => {
-    // API: POST /api/sysadmin/tenants
-    // Backend Identity sẽ tạo User -> Publish Event -> Tenant Service tạo Tenant
-    const response = await api.post('/sysadmin/tenants', payload);
+
+    /* ✅ Build body đúng backend Identity cần */
+    const body = {
+      RestaurantName: payload.name,
+      OwnerName: payload.ownerName || payload.name, // nếu chưa nhập thì lấy tạm name
+      Email: payload.email,
+      Password: payload.password || "Password123!",
+      Address: payload.address,
+      PhoneNumber: payload.phone,
+      PlanType: payload.subscriptionPlan,
+    };
+
+    /* ✅ API đúng */
+    const response = await api.post('/auth/create-tenant', body);
+
     return response.data;
   },
 
   // 3. Khóa/Mở khóa Tenant
   toggleLockTenant: async (tenantId: string, isLocked: boolean) => {
-    // API: POST /api/admin/tenants/{id}/lock hoặc unlock
-    const action = isLocked ? 'unlock' : 'lock'; 
+    const action = isLocked ? 'unlock' : 'lock';
     const response = await api.post(`/admin/tenants/${tenantId}/${action}`);
     return response.data;
   }

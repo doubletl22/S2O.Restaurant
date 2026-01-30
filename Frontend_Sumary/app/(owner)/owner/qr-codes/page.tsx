@@ -46,13 +46,32 @@ export default function QrCodesPage() {
   const [formData, setFormData] = useState({ name: "", capacity: 4 });
   const [origin, setOrigin] = useState("");
 
-  useEffect(() => {
-    // Lấy domain hiện tại (VD: http://localhost:3000 hoặc https://s2o-restaurant.com)
-    if (typeof window !== "undefined") {
-      setOrigin(window.location.origin);
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    setOrigin(window.location.origin);
+  }
+
+  const init = async () => {
+    // Nếu chưa có branch_id thì lấy branch đầu tiên và set cookie
+    const existed = getCookie("branch_id");
+    if (!existed) {
+      try {
+        const res = await api.get("/owner/branches"); // backend trả về List<BranchDto>
+        const list = Array.isArray(res.data) ? res.data : (res.data?.value ?? []);
+        const first = list?.[0];
+        if (first?.id) {
+          document.cookie = `branch_id=${first.id}; path=/; SameSite=Lax`;
+        }
+      } catch (e) {
+        // nếu chưa có chi nhánh nào thì thôi
+      }
     }
+
     fetchTables();
-  }, []);
+  };
+
+  init();
+}, []);
 
   // 1. Hàm lấy danh sách bàn
   const fetchTables = async () => {

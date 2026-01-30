@@ -26,7 +26,7 @@ export const branchService = {
   // Lấy danh sách chi nhánh
   getAll: async () => {
     // API: GET /api/branches
-    const response = await api.get<BranchDto[]>('/branches');
+    const response = await api.get<BranchDto[]>('/owner/branches');
     return response.data;
   },
 
