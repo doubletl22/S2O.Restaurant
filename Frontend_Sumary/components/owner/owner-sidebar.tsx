@@ -1,78 +1,68 @@
-'use client'
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { 
-  LayoutDashboard, UtensilsCrossed, QrCode, 
-  BarChart3, Settings, Users, 
-  Store
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+  LayoutDashboard, 
+  UtensilsCrossed, 
+  ListOrdered, 
+  Store, 
+  Settings, 
+  LogOut,
+  Menu
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { authService } from "@/services/auth.service";
 
-const sidebarItems = [
-  {
-    title: "Tổng quan",
-    href: "/owner/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Quản lý Món ăn",
-    href: "/owner/products", // Menu cũ
-    icon: UtensilsCrossed,
-  },
-  {
-    title: "Bàn & Mã QR",
-    href: "/owner/qr-codes", // Qr-codes cũ
-    icon: QrCode,
-  },
-  {
-    title: "Quản lý chi nhánh",
-    href: "/owner/branches",
-    icon: Store,
-  },
-  {
-    title: "Báo cáo Doanh thu",
-    href: "/owner/revenue",
-    icon: BarChart3,
-  },
-  {
-    title: "Nhân viên",
-    href: "/owner/staff",
-    icon: Users,
-  },
-  {
-    title: "Thiết lập Quán",
-    href: "/owner/settings",
-    icon: Settings,
-  },
-]
+const menuItems = [
+  { title: "Tổng quan", href: "/owner/dashboard", icon: LayoutDashboard },
+  { title: "Quản lý Món", href: "/owner/products", icon: UtensilsCrossed },
+  { title: "Danh mục", href: "/owner/categories", icon: Menu },
+  { title: "Chi nhánh", href: "/owner/branches", icon: Store },
+  { title: "Doanh thu", href: "/owner/revenue", icon: ListOrdered },
+  { title: "Cài đặt", href: "/owner/settings", icon: Settings },
+];
 
 export function OwnerSidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
-    <div className="w-64 bg-white border-r min-h-screen p-4 flex flex-col">
-      <div className="flex items-center gap-2 mb-8 px-2">
-        <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center text-white font-bold">O</div>
-        <span className="text-xl font-bold text-gray-800">Chủ Nhà Hàng</span>
+    <div className="flex h-screen w-64 flex-col border-r bg-card">
+      <div className="flex h-14 items-center border-b px-4">
+        <span className="text-lg font-bold text-primary">S2O.Restaurant</span>
       </div>
-      <nav className="space-y-1">
-        {sidebarItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-              pathname.startsWith(item.href)
-                ? "bg-orange-50 text-orange-600"
-                : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
-            )}
-          >
-            <item.icon className="w-5 h-5" />
-            {item.title}
-          </Link>
-        ))}
-      </nav>
+      
+      <div className="flex-1 overflow-auto py-4">
+        <nav className="grid items-start px-2 text-sm font-medium">
+          {menuItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "group flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
+                pathname === item.href 
+                  ? "bg-accent text-accent-foreground" 
+                  : "text-muted-foreground"
+              )}
+            >
+              <item.icon className="h-4 w-4" />
+              {item.title}
+            </Link>
+          ))}
+        </nav>
+      </div>
+
+      <div className="border-t p-4">
+        <Button 
+          variant="outline" 
+          className="w-full justify-start gap-2 text-destructive hover:text-destructive"
+          onClick={() => authService.logout()}
+        >
+          <LogOut className="h-4 w-4" />
+          Đăng xuất
+        </Button>
+      </div>
     </div>
-  )
+  );
 }

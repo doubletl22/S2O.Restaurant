@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using S2O.Identity.App.Features.Users.Commands;
 using S2O.Identity.Domain.Entities;
-using System.Security.Claims;
+using S2O.Identity.Infra.Persistence;
+using System.Security.Claims; 
 
 namespace S2O.Identity.Api.Controllers;
 
@@ -15,11 +17,13 @@ public class UsersController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ISender _sender;
+    private readonly AuthDbContext _context;
 
-    public UsersController(UserManager<ApplicationUser> userManager, ISender sender)
+    public UsersController(UserManager<ApplicationUser> userManager, ISender sender, AuthDbContext context)
     {
         _userManager = userManager;
         _sender = sender;
+        _context = context;
     }
 
     // DTO: Khuôn mẫu dữ liệu gửi lên
@@ -113,8 +117,8 @@ public class UsersController : ControllerBase
     // [Authorize(Roles = "SysAdmin")] // Bật lại khi chạy thật
     public async Task<IActionResult> ResetPassword(Guid id, [FromBody] string newPassword)
     {
-        // Lưu ý: Frontend gửi chuỗi string raw hoặc object { newPassword: "..." }
-        // Để đơn giản nên wrap vào DTO, ở đây tôi demo nhận object
+        // Lưu ý: Frontendnên gửi chuỗi string raw hoặc object { newPassword: "..." }
+        // Để đơn giản  wrap vào DTO, ở đây tôi demo nhận object
         var command = new AdminResetPasswordCommand(id, newPassword);
         var result = await _sender.Send(command);
 
@@ -154,5 +158,53 @@ public class UsersController : ControllerBase
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetUsers(
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 20,
+        [FromQuery] string? keyword = null)
+    {
+        var query = _context.Users.AsQueryable();
+
+        // 1. Tìm kiếm theo tên hoặc email
+        if (!string.IsNullOrEmpty(keyword))
+        {
+            keyword = keyword.ToLower();
+            query = query.Where(u =>
+                (u.FullName != null && u.FullName.ToLower().Contains(keyword)) ||
+                (u.Email != null && u.Email.ToLower().Contains(keyword)));
+        }
+
+        // 2. Đếm tổng số lượng
+        var totalCount = await query.CountAsync();
+
+        // 3. Phân trang & Lấy dữ liệu
+        var users = await query
+            .OrderByDescending(u => u.CreatedOn) // Sắp xếp mới nhất lên đầu (nếu có trường CreatedOn)
+            .Skip((page - 1) * size)
+            .Take(size)
+            .Select(u => new
+            {
+                u.Id,
+                u.FullName,
+                u.Email,
+                u.PhoneNumber,
+                u.IsActive,
+                // Lấy Role đầu tiên (nếu cần join bảng Roles thì code sẽ dài hơn chút)
+                // Đây là cách đơn giản lấy info cơ bản
+                TenantId = u.TenantId
+            })
+            .ToListAsync();
+
+        // 4. Trả về format PagedResult chuẩn
+        return Ok(new
+        {
+            Items = users,
+            TotalCount = totalCount,
+            Page = page,
+            Size = size,
+            TotalPages = (int)Math.Ceiling(totalCount / (double)size)
+        });
+    }
 
 }

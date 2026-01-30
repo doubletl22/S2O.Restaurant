@@ -1,158 +1,128 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Eye, EyeOff, Loader2, LogIn } from 'lucide-react'
-import { jwtDecode } from 'jwt-decode'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { authService } from '@/services/auth.service'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { jwtDecode } from "jwt-decode"; 
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { authService, LoginRequest } from "@/services/auth.service";
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [formData, setFormData] = useState({ email: '', password: '' })
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const { register, handleSubmit } = useForm<LoginRequest>();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!formData.email || !formData.password) {
-      toast.error('Vui lòng nhập đầy đủ thông tin')
-      return
-    }
+  const onSubmit = async (data: LoginRequest) => {
+    setIsLoading(true);
+    console.log("Đang gửi request login...", data); // DEBUG
 
     try {
-      setLoading(true)
-      const data = await authService.login(formData.email, formData.password)
-      localStorage.setItem('token', data.accessToken)
-      document.cookie = `token=${data.accessToken}; path=/; max-age=${data.expiresIn}; SameSite=Lax`
-      const decoded: any = jwtDecode(data.accessToken)
-      console.log("Decoded Token:", decoded) 
-      const role = decoded.role || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-      console.log("User Role:", role)
-      toast.success('Đăng nhập thành công')
+      // 1. Gọi API
+      const res = await authService.login(data);
+      console.log("Kết quả trả về từ API:", res); // DEBUG
 
-      switch (role) {
-        case 'SystemAdmin':
-          router.push('/sysadmin/restaurants')
-          break
-        case 'RestaurantOwner':
-          router.push('/owner/dashboard')
-          break
-        case 'RestaurantStaff':
-          router.push('/staff/tables')
-          break
-        case 'Chef':
-           router.push('/staff/kitchen')
-           break
-        default:
-          console.warn("Role không được hỗ trợ:", role)
-          router.push('/') 
+      // 2. Kiểm tra kết quả
+      if (res.isSuccess && res.value) {
+        const { accessToken, user } = res.value;
+
+        if (!accessToken) {
+          throw new Error("Không nhận được Access Token từ Server");
+        }
+
+        // 3. Lưu LocalStorage
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        // 4. Giải mã JWT để lấy thời gian hết hạn (exp)
+        let maxAge = 86400; // Mặc định 1 ngày
+        try {
+          const decoded: any = jwtDecode(accessToken);
+          const currentTime = Math.floor(Date.now() / 1000);
+          if (decoded.exp) {
+            maxAge = decoded.exp - currentTime;
+          }
+        } catch (e) {
+          console.error("Lỗi decode token:", e);
+        }
+        
+        // 5. Lưu Cookie
+        document.cookie = `token=${accessToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
+
+        toast.success(`Xin chào, ${user.fullName}`);
+
+        // 6. Điều hướng
+        const roles = user.roles || [];
+        console.log("User Roles:", roles); // DEBUG
+
+        if (roles.includes("SystemAdmin")) {
+          router.push("/sysadmin/dashboard");
+        } else if (roles.includes("RestaurantOwner")) {
+          router.push("/owner/dashboard");
+        } else if (roles.includes("RestaurantStaff") || roles.includes("Chef")) {
+          router.push("/staff/order-ticket");
+        } else {
+          router.push("/");
+        }
+      } else {
+        // Xử lý lỗi nghiệp vụ (Sai pass, user not found...)
+        console.error("Login thất bại:", res.error); // DEBUG
+        toast.error("Đăng nhập thất bại", {
+          description: res.error?.message || "Thông tin không chính xác.",
+        });
       }
-
     } catch (error: any) {
-      console.error(error)
-      toast.error(error.response?.data?.detail || "Đăng nhập thất bại")
+      // Xử lý lỗi mạng / server crash
+      console.error("Lỗi hệ thống:", error); // DEBUG
+      
+      let msg = "Không thể kết nối đến máy chủ.";
+      if (error?.message) msg = error.message;
+      // Nếu backend trả về validation error 400
+      if (error?.response?.data?.detail) msg = error.response.data.detail;
+
+      toast.error("Lỗi đăng nhập", { description: msg });
     } finally {
-      setLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl">
-        {/* Logo & Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 text-orange-600 mb-2">
-            <LogIn className="h-6 w-6" />
-          </div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-            Đăng nhập
-          </h2>
-          <p className="text-sm text-gray-500">
-            Truy cập vào hệ thống quản lý nhà hàng S2O
-          </p>
+    <div className="flex min-h-screen w-full items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-sm space-y-6 bg-white p-6 rounded-lg shadow-md">
+        <div className="space-y-2 text-center">
+          <h1 className="text-3xl font-bold">Đăng nhập</h1>
+          <p className="text-gray-500">Nhập email và mật khẩu hệ thống</p>
         </div>
-
-        {/* Form */}
-        <form onSubmit={handleLogin} className="space-y-6 mt-8">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Nhập email"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                disabled={loading}
-                className="h-11"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Mật khẩu</Label>
-                <Link 
-                  href="/forgot-password" 
-                  className="text-xs font-medium text-orange-600 hover:text-orange-500"
-                >
-                  Quên mật khẩu?
-                </Link>
-              </div>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Nhập mật khẩu"
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  disabled={loading}
-                  className="h-11 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
-            </div>
+        
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="admin@example.com" 
+              required 
+              {...register("email")}
+            />
           </div>
-
-          <Button
-            type="submit"
-            className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-base font-medium shadow-lg shadow-orange-200 transition-all hover:scale-[1.01]"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang xử lý...
-              </>
-            ) : (
-              "Đăng nhập"
-            )}
+          <div className="space-y-2">
+            <Label htmlFor="password">Mật khẩu</Label>
+            <Input 
+              id="password" 
+              type="password" 
+              required 
+              {...register("password")}
+            />
+          </div>
+          <Button className="w-full" type="submit" disabled={isLoading}>
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Đăng nhập"}
           </Button>
-
-          {/* Footer Link (Optional) */}
-          <p className="text-center text-sm text-gray-500">
-            Bạn chưa có tài khoản?{' '}
-            <Link href="/register" className="font-semibold text-orange-600 hover:text-orange-500 hover:underline">
-              Đăng ký dùng thử
-            </Link>
-          </p>
         </form>
       </div>
     </div>
-  )
+  );
 }

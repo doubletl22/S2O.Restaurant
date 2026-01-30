@@ -1,234 +1,187 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { 
-  Plus, Search, MoreHorizontal, Building2, 
-  MapPin, Phone, Mail, Lock, Unlock, Loader2 
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { useEffect, useState } from "react";
+import { Plus, Search, Building2, Lock, Unlock, Trash2, MoreHorizontal } from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
-  Table, TableBody, TableCell, TableHead, 
-  TableHeader, TableRow
-} from '@/components/ui/table'
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
-  DropdownMenuLabel, DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
-  Dialog, DialogContent, DialogHeader, 
-  DialogTitle, DialogTrigger, DialogFooter
-} from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { toast } from 'sonner'
-import { adminService, TenantDto, CreateTenantPayload } from '@/services/admin.service'
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+import { TenantDialog } from "@/components/sysadmin/tenant-dialog";
+import { tenantService } from "@/services/tenant.service"; // Dùng tenantService
+import { Tenant } from "@/lib/types";
 
 export default function RestaurantsPage() {
-  const [tenants, setTenants] = useState<TenantDto[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
   
-  // State cho Modal tạo mới
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formData, setFormData] = useState<CreateTenantPayload>({
-    name: '',
-    email: '',
-    password: 'Password123!', // Mặc định hoặc cho nhập
-    phone: '',
-    address: '',
-    subscriptionPlan: 'Basic'
-  })
+  // Dialog State
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // Delete Confirmation State
+  const [tenantToDelete, setTenantToDelete] = useState<string | null>(null);
 
-  // 1. Fetch dữ liệu
-  const fetchTenants = async () => {
+  const loadData = async () => {
     try {
-      setLoading(true)
-      const data = await adminService.getAllTenants()
-      // Backend có thể trả về wrapped result hoặc mảng trực tiếp, kiểm tra log nếu lỗi
-      // Giả sử backend trả về: { value: [...] } hoặc [...]
-      const list = Array.isArray(data) ? data : (data as any).value || [];
-      setTenants(list)
+      setLoading(true);
+      const res = await tenantService.getAll();
+      if (res.isSuccess) setTenants(res.value);
     } catch (error) {
-      console.error(error)
-      toast.error("Không thể tải danh sách nhà hàng")
+      console.error(error);
+      toast.error("Không thể tải danh sách nhà hàng");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchTenants()
-  }, [])
+    loadData();
+  }, []);
 
-  // 2. Xử lý tạo mới
-  const handleCreate = async () => {
+  // Xử lý Khóa / Mở khóa
+  const handleToggleLock = async (tenant: Tenant) => {
+    const action = tenant.isLocked ? "mở khóa" : "khóa";
+    if (!confirm(`Bạn có chắc muốn ${action} nhà hàng ${tenant.name}?`)) return;
+
     try {
-      setIsSubmitting(true)
-      await adminService.createTenant(formData)
-      toast.success("Đã tạo nhà hàng thành công!")
-      setIsOpen(false)
-      fetchTenants() // Reload list
-      
-      // Reset form
-      setFormData({
-        name: '', email: '', password: 'Password123!', 
-        phone: '', address: '', subscriptionPlan: 'Basic'
-      })
-    } catch (error: any) {
-      toast.error(error.response?.data?.detail || "Lỗi khi tạo nhà hàng")
+      const res = await tenantService.toggleLock(tenant.id, !tenant.isLocked);
+      if (res.isSuccess) {
+        toast.success(`Đã ${action} thành công`);
+        loadData();
+      } else {
+        toast.error("Thao tác thất bại", { description: res.error?.message });
+      }
+    } catch (e) {
+      toast.error("Lỗi kết nối");
+    }
+  };
+
+  // Xử lý Xóa
+  const handleDelete = async () => {
+    if (!tenantToDelete) return;
+    try {
+      const res = await tenantService.delete(tenantToDelete);
+      if (res.isSuccess) {
+        toast.success("Đã xóa nhà hàng vĩnh viễn");
+        loadData();
+      } else {
+         toast.error("Không thể xóa", { description: res.error?.message });
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Lỗi khi xóa nhà hàng");
     } finally {
-      setIsSubmitting(false)
+      setTenantToDelete(null);
     }
-  }
+  };
 
-  // 3. Xử lý Khóa/Mở khóa
-  const handleToggleLock = async (tenant: TenantDto) => {
-    try {
-      await adminService.toggleLockTenant(tenant.id, tenant.isLocked)
-      toast.success(tenant.isLocked ? "Đã mở khóa nhà hàng" : "Đã khóa nhà hàng")
-      
-      // Cập nhật UI cục bộ để đỡ phải fetch lại
-      setTenants(prev => prev.map(t => 
-        t.id === tenant.id ? { ...t, isLocked: !t.isLocked } : t
-      ))
-    } catch (error) {
-      toast.error("Thao tác thất bại")
-    }
-  }
-
-  // Filter local
   const filteredTenants = tenants.filter(t => 
-    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.email.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+    t.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Quản lý Nhà hàng</h1>
-          <p className="text-muted-foreground">Danh sách các đối tác sử dụng hệ thống</p>
+           <h1 className="text-2xl font-bold tracking-tight">Quản lý Đối tác</h1>
+           <p className="text-muted-foreground text-sm">Danh sách các nhà hàng (Tenants) trên hệ thống.</p>
         </div>
-        
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-orange-600 hover:bg-orange-700">
-              <Plus className="mr-2 h-4 w-4" /> Thêm nhà hàng
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-125">
-            <DialogHeader>
-              <DialogTitle>Thêm đối tác mới</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Tên quán</Label>
-                <Input className="col-span-3" value={formData.name} 
-                  onChange={e => setFormData({...formData, name: e.target.value})} />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Email Admin</Label>
-                <Input className="col-span-3" type="email" value={formData.email} 
-                  onChange={e => setFormData({...formData, email: e.target.value})} />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">SĐT</Label>
-                <Input className="col-span-3" value={formData.phone} 
-                  onChange={e => setFormData({...formData, phone: e.target.value})} />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Địa chỉ</Label>
-                <Input className="col-span-3" value={formData.address} 
-                   onChange={e => setFormData({...formData, address: e.target.value})} />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                 <Label className="text-right">Gói</Label>
-                 <select 
-                    className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    value={formData.subscriptionPlan}
-                    onChange={e => setFormData({...formData, subscriptionPlan: e.target.value as any})}
-                 >
-                    <option value="Basic">Basic</option>
-                    <option value="Pro">Pro</option>
-                    <option value="Enterprise">Enterprise</option>
-                 </select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit" onClick={handleCreate} disabled={isSubmitting}>
-                {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : null} Tạo mới
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => setIsDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Đăng ký mới
+        </Button>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex items-center gap-2 bg-white p-2 rounded-lg border">
-        <Search className="w-4 h-4 text-gray-500 ml-2" />
+      {/* Search */}
+      <div className="flex items-center gap-2 bg-card p-2 rounded-md border w-full sm:max-w-sm">
+        <Search className="h-4 w-4 text-muted-foreground ml-2" />
         <Input 
-          placeholder="Tìm kiếm theo tên, email..." 
-          className="border-0 focus-visible:ring-0"
+          placeholder="Tìm kiếm nhà hàng..." 
+          className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
       {/* Table */}
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Thông tin</TableHead>
-              <TableHead>Liên hệ</TableHead>
-              <TableHead>Gói dịch vụ</TableHead>
+              <TableHead>Tên Nhà hàng</TableHead>
+              <TableHead>Gói cước</TableHead>
               <TableHead>Trạng thái</TableHead>
+              <TableHead>Ngày tạo</TableHead>
               <TableHead className="text-right">Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-               <TableRow><TableCell colSpan={5} className="text-center py-10">Đang tải...</TableCell></TableRow>
+               <TableRow>
+                 <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">Đang tải dữ liệu...</TableCell>
+               </TableRow>
             ) : filteredTenants.length === 0 ? (
-               <TableRow><TableCell colSpan={5} className="text-center py-10">Chưa có dữ liệu</TableCell></TableRow>
+              <TableRow>
+                <TableCell colSpan={5} className="text-center h-32 text-muted-foreground">
+                  Chưa có nhà hàng nào.
+                </TableCell>
+              </TableRow>
             ) : (
               filteredTenants.map((tenant) => (
                 <TableRow key={tenant.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                        <Building2 className="w-5 h-5" />
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 rounded bg-primary/10 flex items-center justify-center">
+                        <Building2 className="h-4 w-4 text-primary" />
                       </div>
-                      <div>
-                        <div className="font-medium">{tenant.name}</div>
-                        <div className="text-xs text-muted-foreground">ID: {tenant.id.substring(0, 8)}...</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-3 h-3 text-gray-400" /> {tenant.email}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Phone className="w-3 h-3 text-gray-400" /> {tenant.phoneNumber || '---'}
+                      <div className="flex flex-col">
+                        <span>{tenant.name}</span>
+                        {/* Owner Email có thể undefined nếu tenant chưa link owner */}
+                        <span className="text-xs text-muted-foreground">{tenant.ownerEmail || "N/A"}</span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                      {tenant.subscriptionPlan}
-                    </Badge>
+                    <Badge variant="outline" className="uppercase text-xs">{tenant.planType || tenant.subscriptionPlan}</Badge>
                   </TableCell>
                   <TableCell>
                     {tenant.isLocked ? (
-                      <Badge variant="destructive">Đang khóa</Badge>
+                      <Badge variant="destructive" className="gap-1"><Lock className="h-3 w-3" /> Đã khóa</Badge>
                     ) : (
-                      <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100">Hoạt động</Badge>
+                      <Badge variant="secondary" className="gap-1 bg-green-100 text-green-700 hover:bg-green-200">
+                        <Unlock className="h-3 w-3" /> Hoạt động
+                      </Badge>
                     )}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-sm">
+                    {tenant.createdAt ? new Date(tenant.createdAt).toLocaleDateString("vi-VN") : '---'}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -238,13 +191,19 @@ export default function RestaurantsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
+                        <DropdownMenuLabel>Quản trị</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleToggleLock(tenant)}>
                           {tenant.isLocked ? (
-                            <><Unlock className="mr-2 h-4 w-4" /> Mở khóa</>
+                            <><Unlock className="mr-2 h-4 w-4" /> Mở khóa dịch vụ</>
                           ) : (
-                            <><Lock className="mr-2 h-4 w-4" /> Khóa tài khoản</>
+                            <><Lock className="mr-2 h-4 w-4" /> Khóa dịch vụ</>
                           )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          className="text-red-600 focus:text-red-600"
+                          onClick={() => setTenantToDelete(tenant.id)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" /> Xóa dữ liệu
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -255,6 +214,30 @@ export default function RestaurantsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <TenantDialog 
+        open={isDialogOpen} 
+        onOpenChange={setIsDialogOpen} 
+        onSuccess={loadData}
+      />
+
+      {/* Alert Confirm Delete */}
+      <AlertDialog open={!!tenantToDelete} onOpenChange={(open) => !open && setTenantToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>CẢNH BÁO: Xóa nhà hàng?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hành động này sẽ xóa vĩnh viễn toàn bộ dữ liệu (Database, User, Menu...) của nhà hàng này. Không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              Xóa vĩnh viễn
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
-  )
+  );
 }

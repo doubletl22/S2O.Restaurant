@@ -1,118 +1,91 @@
 "use client";
 
-import React from "react";
-import { Clock, CheckCircle2, ChefHat, AlertCircle } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
+import { BellRing, Check } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { OrderStatus } from "@/lib/types";
+import { staffService, StaffOrderDto } from "@/services/staff.service";
 
-// 1. Cập nhật Type khớp hoàn toàn với Backend (PascalCase)
-export type TicketStatus = "Pending" | "Cooking" | "Ready" | "Served" | "Cancelled";
+export default function OrderTicketPage() {
+  const [readyItems, setReadyItems] = useState<{order: StaffOrderDto, item: any}[]>([]);
 
-export interface OrderItem {
-  id: number;
-  name: string;
-  quantity: number;
-  note?: string;
-  status: string; 
-}
-
-export interface OrderTicketProps {
-  order: {
-    id: string;
-    tableNumber: string;
-    startTime: Date;
-    status: TicketStatus; // Type mới (Viết hoa)
-    items: OrderItem[];
+  const fetchReadyItems = async () => {
+    try {
+      const res = await staffService.getOrders();
+      if (res.isSuccess) {
+        // Flatten list: Lấy tất cả item có status = Ready
+        const items: {order: StaffOrderDto, item: any}[] = [];
+        res.value.forEach(order => {
+          order.items.forEach(item => {
+            if (item.status === OrderStatus.Ready) {
+              items.push({ order, item });
+            }
+          });
+        });
+        setReadyItems(items);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
-  onStatusChange: (orderId: string, newStatus: string) => void;
-}
 
-export function OrderTicket({ order, onStatusChange }: OrderTicketProps) {
-  // Tính thời gian đã trôi qua
-  const elapsedMinutes = Math.floor((new Date().getTime() - order.startTime.getTime()) / 60000);
-  
-  const isUrgent = elapsedMinutes > 15;
-  const timeColor = isUrgent ? "text-red-600 bg-red-50" : "text-blue-600 bg-blue-50";
-  const borderColor = isUrgent ? "border-red-200" : "border-gray-200";
+  useEffect(() => {
+    fetchReadyItems();
+    const interval = setInterval(fetchReadyItems, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleServe = async (orderId: string, itemId: string) => {
+    try {
+      const res = await staffService.updateOrderItemStatus(orderId, itemId, OrderStatus.Served);
+      if (res.isSuccess) {
+        toast.success("Đã phục vụ khách");
+        fetchReadyItems();
+      }
+    } catch (e) {
+      toast.error("Có lỗi xảy ra");
+    }
+  };
 
   return (
-    <Card className={`w-full shadow-sm hover:shadow-md transition-shadow border-2 ${borderColor}`}>
-      {/* Header */}
-      <CardHeader className="p-3 pb-2 flex flex-row items-center justify-between bg-gray-50/50 rounded-t-lg">
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-lg font-black px-2 py-1 bg-white border-black/10">
-            Bàn {order.tableNumber}
-          </Badge>
-          {isUrgent && <AlertCircle size={16} className="text-red-500 animate-pulse" />}
-        </div>
-        <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-bold ${timeColor}`}>
-          <Clock size={12} />
-          <span>{elapsedMinutes}p</span>
-        </div>
-      </CardHeader>
+    <div className="space-y-4 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold flex items-center gap-2">
+        <BellRing className="h-6 w-6 text-orange-500" />
+        Món chờ phục vụ (Ready)
+      </h1>
 
-      <Separator />
-
-      {/* Body */}
-      <CardContent className="p-0">
-        <ScrollArea className="h-50 w-full p-3">
-          <div className="space-y-3">
-            {order.items.map((item, idx) => (
-              <div key={idx} className="flex justify-between items-start text-sm group">
-                <div className="flex gap-2">
-                  <span className="font-bold text-(--g1) w-5 text-right">{item.quantity}x</span>
-                  <div>
-                    {/* Kiểm tra status 'Done' (Backend thường trả về Done hoặc Served) */}
-                    <span className={`font-medium ${['Done', 'Served', 'Cancelled'].includes(item.status) ? 'line-through text-gray-400' : 'text-gray-800'}`}>
-                      {item.name}
-                    </span>
-                    {item.note && (
-                      <p className="text-xs text-gray-500 italic mt-0.5">Note: {item.note}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center cursor-pointer hover:border-orange-500">
-                   {(item.status === 'Done' || item.status === 'Served') && <div className="w-3 h-3 bg-orange-500 rounded-full" />}
-                </div>
+      {readyItems.length === 0 ? (
+        <div className="text-center py-20 bg-white rounded-lg border border-dashed">
+          <p className="text-muted-foreground">Tất cả món đã được phục vụ.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {readyItems.map(({ order, item }) => (
+            <Card key={`${order.id}-${item.id}`} className="p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-4">
+                 <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-700">
+                    {order.tableName}
+                 </div>
+                 <div>
+                   <h3 className="font-bold text-lg">{item.productName}</h3>
+                   <div className="flex gap-2 text-sm text-muted-foreground">
+                     <Badge variant="outline">x{item.quantity}</Badge>
+                     {item.note && <span className="text-red-500">Note: {item.note}</span>}
+                   </div>
+                 </div>
               </div>
-            ))}
-          </div>
-        </ScrollArea>
-      </CardContent>
 
-      <Separator />
-
-      {/* Footer: Cập nhật điều kiện so sánh sang PascalCase */}
-      <CardFooter className="p-3 bg-gray-50/50 rounded-b-lg">
-        {order.status === "Pending" && (
-          <Button 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
-            // Gửi 'Cooking' (Viết hoa)
-            onClick={() => onStatusChange(order.id, "Cooking")}
-          >
-            <ChefHat className="mr-2 h-4 w-4" /> Nhận nấu
-          </Button>
-        )}
-        
-        {order.status === "Cooking" && (
-          <Button 
-            className="w-full bg-linear-to-r from-(--g1) to-(--g2) text-white font-bold shadow-md hover:opacity-90"
-            // Gửi 'Ready' (Viết hoa)
-            onClick={() => onStatusChange(order.id, "Ready")}
-          >
-            <CheckCircle2 className="mr-2 h-4 w-4" /> Hoàn tất
-          </Button>
-        )}
-
-        {order.status === "Ready" && (
-          <Button variant="outline" className="w-full text-green-600 border-green-200 bg-green-50" disabled>
-            <CheckCircle2 className="mr-2 h-4 w-4" /> Đã xong
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
+              <Button onClick={() => handleServe(order.id, item.id)}>
+                <Check className="mr-2 h-4 w-4" />
+                Đã bưng
+              </Button>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

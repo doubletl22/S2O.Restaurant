@@ -1,181 +1,201 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Trash2, Send, Minus, Plus, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { toast } from 'sonner'
-import { guestService } from '@/services/guest.service'
-// 1. Import Hook Context
-import { useGuestCart } from '@/components/guest/guest-cart-context';
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Minus, Plus, Trash2, ChevronLeft, UtensilsCrossed } from "lucide-react";
+import { toast } from "sonner";
 
-export default function CartPage() {
-  const params = useParams();
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+import { useGuestCart } from "@/components/guest/guest-cart-context";
+import { guestService } from "@/services/guest.service";
+
+export default function CartPage({ params }: { params: { qrToken: string } }) {
   const router = useRouter();
-  const tableId = params?.qrToken as string;
-  const [branchId, setBranchId] = useState<string | null>(null);
-  const [tableName, setTableName] = useState("Khách");
-  const { cartItems, updateQuantity, removeFromCart, clearCart, totalAmount } = useGuestCart();
+  const { cart, removeFromCart, updateQuantity, clearCart, totalAmount } = useGuestCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [tenantId, setTenantId] = useState<string | null>(null);
+  const [orderNote, setOrderNote] = useState("");
 
-  // 3. Lấy thông tin Tenant (để biết gửi đơn cho quán nào)
-  useEffect(() => {
-    const fetchTenant = async () => {
-        if (!tableId) return;
-        const info = await guestService.getTableInfo(tableId);
-        if(info) {
-            setTenantId(info.tenantId);
-            setBranchId(info.branchId); 
-            setTableName(info.tableName);
-        }
-    }
-    fetchTenant();
-  }, [tableId]);
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
 
   const handlePlaceOrder = async () => {
-    // Kiểm tra đủ thông tin
-    if (!tenantId || !branchId) {
-        toast.error("Đang tải thông tin bàn...");
-        const info = await guestService.getTableInfo(tableId);
-        if (info) {
-            setTenantId(info.tenantId);
-            setBranchId(info.branchId);
-        } else {
-            return;
-        }
-    }
+    if (cart.length === 0) return;
 
+    setIsSubmitting(true);
     try {
-      setIsSubmitting(true);
-      
-      const payload = {
-        tableId: tableId,
-        tenantId: tenantId!,
-        branchId: branchId!,
-        guestName: tableName, 
-        guestPhone: "",      
-        items: cartItems.map(item => ({
-            productId: item.id,
-            quantity: item.quantity,
-            note: item.note || ''
-        }))
-      };
+      const res = await guestService.placeOrder({
+        qrToken: params.qrToken,
+        items: cart.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+          note: item.note || "", // Gửi kèm ghi chú món (nếu có)
+        })),
+        // Nếu API hỗ trợ ghi chú chung cho cả đơn hàng, thêm field note ở đây
+      });
 
-      const result = await guestService.placeGuestOrder(payload);
-      
-      if (result.isSuccess || result) { // Check linh hoạt tùy backend trả về
-        toast.success("Đặt món thành công! Bếp đang chuẩn bị.");
-        
-        // 4. Xóa giỏ hàng trong Context sau khi đặt thành công
+      if (res.isSuccess) {
+        toast.success("Đặt món thành công!", {
+          description: "Nhà bếp đã nhận được đơn của bạn.",
+        });
         clearCart();
-        
-        // Chuyển sang trang theo dõi
-        router.push(`/guest/t/${tableId}/tracking`); 
+        // Chuyển hướng sang trang theo dõi đơn (Tracking)
+        router.push(`/guest/t/${params.qrToken}/tracking`);
       } else {
-        toast.error("Đặt món thất bại. Vui lòng thử lại.");
+        toast.error("Đặt món thất bại", {
+          description: res.error?.message || "Vui lòng thử lại hoặc gọi nhân viên.",
+        });
       }
-
     } catch (error) {
       console.error(error);
-      toast.error("Có lỗi xảy ra khi gửi đơn.");
+      toast.error("Lỗi kết nối", { description: "Vui lòng kiểm tra lại mạng." });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (cartItems.length === 0) {
+  if (cart.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-50 p-4">
-        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-            <Trash2 className="text-gray-400 w-8 h-8" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center space-y-4">
+        <div className="bg-muted p-6 rounded-full">
+          <UtensilsCrossed className="h-10 w-10 text-muted-foreground" />
         </div>
-        <p className="text-gray-500 mb-4 font-medium">Giỏ hàng của bạn đang trống</p>
-        <Button onClick={() => router.back()} variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50">
-            Quay lại Menu
-        </Button>
+        <h2 className="text-xl font-bold">Giỏ hàng trống</h2>
+        <p className="text-muted-foreground">Bạn chưa chọn món ăn nào.</p>
+        <Link href={`/guest/t/${params.qrToken}`}>
+          <Button>Quay lại Thực đơn</Button>
+        </Link>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col pb-20">
-      {/* Header */}
-      <header className="bg-white p-4 sticky top-0 shadow-sm z-10 flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <h1 className="font-bold text-lg">Giỏ hàng ({cartItems.length} món)</h1>
-      </header>
-
-      {/* List Items */}
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-        {cartItems.map((item) => (
-          <div key={item.id} className="bg-white p-3 rounded-xl shadow-sm flex gap-3">
-            {/* Ảnh món */}
-            <div className="w-20 h-20 shrink-0 rounded-lg overflow-hidden bg-gray-100">
-               <img 
-                 src={item.imageUrl || "/placeholder.jpg"} 
-                 alt={item.name}
-                 className="w-full h-full object-cover" 
-                 onError={(e) => (e.currentTarget.src = '/placeholder.svg')}
-               />
-            </div>
-
-            {/* Thông tin & Nút bấm */}
-            <div className="flex-1 flex flex-col justify-between">
-                <div>
-                    <h4 className="font-bold text-gray-800 line-clamp-1">{item.name}</h4>
-                    <p className="text-orange-600 font-semibold">{item.price.toLocaleString()}đ</p>
-                </div>
-                <div className="flex items-center justify-between mt-2">
-                    {/* Bộ tăng giảm số lượng từ Context */}
-                    <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-1 border border-gray-100">
-                        <button 
-                            onClick={() => updateQuantity(item.id, -1)} 
-                            className="w-7 h-7 flex items-center justify-center bg-white rounded shadow-sm active:scale-95 transition-all"
-                        >
-                            <Minus className="w-3 h-3 text-gray-600" />
-                        </button>
-                        <span className="text-sm font-bold w-4 text-center">{item.quantity}</span>
-                        <button 
-                            onClick={() => updateQuantity(item.id, 1)} 
-                            className="w-7 h-7 flex items-center justify-center bg-white rounded shadow-sm active:scale-95 transition-all"
-                        >
-                            <Plus className="w-3 h-3 text-gray-600" />
-                        </button>
-                    </div>
-                    
-                    {/* Nút xóa */}
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-red-400 hover:text-red-600 hover:bg-red-50 h-8 w-8" 
-                        onClick={() => removeFromCart(item.id)}
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </Button>
-                </div>
-            </div>
-          </div>
-        ))}
+    <div className="flex flex-col min-h-[calc(100vh-60px)]">
+      {/* Header Back */}
+      <div className="px-4 py-2">
+        <Link 
+          href={`/guest/t/${params.qrToken}`} 
+          className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          Thêm món khác
+        </Link>
       </div>
 
-      {/* Footer Checkout */}
-      <div className="bg-white p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sticky bottom-0 z-20">
-        <div className="flex justify-between mb-4 text-sm">
-            <span className="text-gray-500">Tạm tính ({cartItems.length} món):</span>
-            <span className="font-bold text-lg text-gray-800">{totalAmount.toLocaleString()}đ</span>
+      <div className="flex-1 px-4 space-y-4 pb-32">
+        <h1 className="text-2xl font-bold">Xác nhận đơn hàng</h1>
+        
+        {/* Cart List */}
+        <div className="space-y-4">
+          {cart.map((item) => (
+            <div key={item.cartId} className="flex gap-3 bg-card p-3 rounded-lg border shadow-sm">
+              {/* Ảnh nhỏ */}
+              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-muted">
+                {item.imageUrl ? (
+                  <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center text-[10px] text-muted-foreground">No img</div>
+                )}
+              </div>
+
+              {/* Info & Controls */}
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-semibold text-sm line-clamp-2">{item.name}</h3>
+                    <button 
+                      onClick={() => removeFromCart(item.cartId)}
+                      className="text-muted-foreground hover:text-red-500 p-1"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  {item.note && (
+                    <p className="text-xs text-muted-foreground mt-1 italic">Ghi chú: {item.note}</p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between mt-2">
+                  <span className="font-bold text-primary text-sm">{formatPrice(item.price * item.quantity)}</span>
+                  
+                  {/* Quantity Control */}
+                  <div className="flex items-center gap-3 bg-muted/50 rounded-md px-2 py-1">
+                    <button 
+                      onClick={() => updateQuantity(item.cartId, -1)}
+                      className="h-6 w-6 flex items-center justify-center bg-white rounded-sm shadow-sm hover:bg-gray-100 disabled:opacity-50"
+                      disabled={item.quantity <= 1}
+                    >
+                      <Minus className="h-3 w-3" />
+                    </button>
+                    <span className="text-sm font-medium min-w-6 text-center">{item.quantity}</span>
+                    <button 
+                      onClick={() => updateQuantity(item.cartId, 1)}
+                      className="h-6 w-6 flex items-center justify-center bg-white rounded-sm shadow-sm hover:bg-gray-100"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-        <Button 
-            className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-6 rounded-xl text-base flex gap-2 shadow-lg shadow-orange-200"
-            onClick={handlePlaceOrder}
-            disabled={isSubmitting}
-        >
-            {isSubmitting ? <Loader2 className="animate-spin w-5 h-5" /> : <Send className="w-5 h-5" />}
-            {isSubmitting ? 'Đang gửi...' : `Gửi gọi món • ${totalAmount.toLocaleString()}đ`}
-        </Button>
+
+        {/* Note chung (Optional - Nếu Backend hỗ trợ) */}
+        <div className="space-y-2">
+           <label className="text-sm font-medium">Ghi chú cho nhà bếp (nếu có)</label>
+           <Textarea 
+             placeholder="Ví dụ: Xin thêm bát con, mang món khai vị lên trước..." 
+             className="resize-none text-sm"
+             value={orderNote}
+             onChange={(e) => setOrderNote(e.target.value)}
+           />
+        </div>
+      </div>
+
+      {/* Footer Fixed */}
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 shadow-lg z-10 safe-area-bottom">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-muted-foreground">Tổng cộng ({cart.length} món)</span>
+          <span className="text-xl font-bold text-primary">{formatPrice(totalAmount)}</span>
+        </div>
+        
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button className="w-full h-12 text-lg font-bold shadow-md" disabled={isSubmitting}>
+              {isSubmitting ? "Đang gửi..." : "Gửi gọi món"}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent className="w-[90%] rounded-lg">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Xác nhận gọi món?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Các món ăn sẽ được gửi xuống bếp ngay lập tức. Bạn vui lòng kiểm tra kỹ số lượng.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-row gap-2 justify-end">
+              <AlertDialogCancel className="mt-0 flex-1">Hủy</AlertDialogCancel>
+              <AlertDialogAction onClick={handlePlaceOrder} className="flex-1">
+                Đồng ý
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
-  )
+  );
 }

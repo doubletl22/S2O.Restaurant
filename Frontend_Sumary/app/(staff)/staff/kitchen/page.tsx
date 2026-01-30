@@ -1,149 +1,135 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // 1. Import chuẩn từ next/navigation
-import { getCookie } from "cookies-next";    // 2. Import để kiểm tra đăng nhập
-import { OrderTicket } from "@/components/staff/order-ticket";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Flame, Utensils, CheckCircle, RefreshCcw } from "lucide-react";
+import { useEffect, useState } from "react";
+import { RefreshCw, Clock, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
-
-// --- Types ---
-export type OrderStatus = "Pending" | "Cooking" | "Ready" | "Served" | "Cancelled";
-
-export interface OrderItem {
-  id: number;
-  productId: number;
-  name: string;
-  quantity: number;
-  note?: string;
-  status: string;
-}
-
-export interface Order {
-  id: string;
-  tableNumber: string;
-  startTime: string;
-  status: OrderStatus;
-  items: OrderItem[];
-}
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { OrderStatus } from "@/lib/types";
+import { staffService, StaffOrderDto } from "@/services/staff.service";
 
 export default function KitchenPage() {
-  // 3. Khởi tạo router (viết thường)
-  const router = useRouter();
-  
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("all");
+  const [orders, setOrders] = useState<StaffOrderDto[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 4. Kiểm tra đăng nhập ngay khi vào trang
-  useEffect(() => {
-    const token = getCookie("access_token");
-    if (!token) {
-      // Nếu không có token, đá về trang login
-      router.push("/login"); // Dùng router viết thường
-    }
-  }, [router]);
-
+  // Auto-refresh logic
   const fetchOrders = async () => {
-    // Chỉ fetch nếu đã có token (tránh gọi API khi chưa login)
-    if (!getCookie("access_token")) return;
-
-    setIsLoading(true);
+    setLoading(true);
     try {
-      const response = await api.get<Order[]>('/orders/branch-orders', {
-        params: { statuses: ['Pending', 'Cooking', 'Ready'] }
-      });
-      setOrders(response.data);
+      // Bếp chỉ quan tâm món: Pending (Mới) hoặc Cooking (Đang nấu)
+      // Giả sử API trả về list orders có chứa các item này
+      const res = await staffService.getOrders(); 
+      if (res.isSuccess) {
+        // Lọc Client-side chỉ lấy đơn có món chưa xong (Tùy backend logic)
+        const activeOrders = res.value.filter(o => 
+          o.items.some(i => i.status === OrderStatus.Pending || i.status === OrderStatus.Cooking)
+        );
+        setOrders(activeOrders);
+      }
     } catch (error) {
-      console.error("Lỗi tải đơn:", error);
-      // Không cần toast lỗi 401 vì interceptor đã lo rồi
+      console.error(error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // Setup Polling (Gọi lại mỗi 30s)
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 30000);
+    const interval = setInterval(() => fetchOrders(), 15000); // 15s refresh
     return () => clearInterval(interval);
   }, []);
 
-  const handleStatusChange = async (orderId: string, newStatus: string) => {
-    const previousOrders = [...orders];
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus as OrderStatus } : o))
-    );
+  // Xử lý chuyển trạng thái: Pending -> Cooking -> Ready
+  const handleNextStatus = async (orderId: string, itemId: string, currentStatus: OrderStatus) => {
+    let nextStatus = OrderStatus.Cooking;
+    if (currentStatus === OrderStatus.Cooking) nextStatus = OrderStatus.Ready;
 
     try {
-      await api.put(`/orders/${orderId}/status`, { status: newStatus });
-      toast.success(`Cập nhật trạng thái: ${newStatus}`);
-      if (newStatus === 'Ready') setTimeout(fetchOrders, 500);
-    } catch (error) {
-      setOrders(previousOrders);
-      toast.error("Lỗi cập nhật. Thử lại sau.");
+      const res = await staffService.updateOrderItemStatus(orderId, itemId, nextStatus);
+      if (res.isSuccess) {
+        toast.success(nextStatus === OrderStatus.Ready ? "Món đã xong!" : "Đã nhận nấu");
+        fetchOrders(); // Refresh ngay
+      }
+    } catch (e) {
+      toast.error("Lỗi cập nhật");
     }
   };
 
-  const filteredOrders = orders.filter((order) => {
-    if (activeTab === "all") return order.status !== "Ready" && order.status !== "Served";
-    return order.status === activeTab;
-  });
-
   return (
-    <div className="h-full flex flex-col space-y-4 p-4 md:p-6 bg-(--bg) min-h-screen">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight flex items-center gap-2 text-(--text)">
-            <Flame className="text-orange-500 fill-orange-500" /> Bếp Trung Tâm
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Hiện có <span className="font-bold text-orange-600">{orders.filter(o => o.status !== "Ready").length}</span> đơn hàng chờ.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Button variant="outline" size="icon" onClick={fetchOrders}>
-             <RefreshCcw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          </Button>
-          <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3 sm:w-100">
-              <TabsTrigger value="all">Tất cả</TabsTrigger>
-              <TabsTrigger value="Pending" className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-700">
-                <Utensils className="w-4 h-4 mr-2" /> Chờ nấu
-              </TabsTrigger>
-              <TabsTrigger value="Cooking" className="data-[state=active]:bg-orange-100 data-[state=active]:text-orange-700">
-                <Flame className="w-4 h-4 mr-2" /> Đang nấu
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <Clock className="h-6 w-6 text-primary" />
+          Bếp / Bar (KDS)
+        </h1>
+        <Button variant="outline" size="sm" onClick={() => fetchOrders()}>
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+          Làm mới
+        </Button>
       </div>
 
-      {isLoading && orders.length === 0 ? (
-         <div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div></div>
-      ) : (
-        <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4 pb-20">
-          {filteredOrders.map((order) => (
-            <div key={order.id} className="break-inside-avoid mb-4">
-              <OrderTicket 
-                order={{ ...order, startTime: new Date(order.startTime) }} 
-                onStatusChange={handleStatusChange} 
-              />
-            </div>
-          ))}
-        </div>
-      )}
-      
-      {!isLoading && filteredOrders.length === 0 && (
-        <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
-          <CheckCircle className="w-12 h-12 mb-2 opacity-20" />
-          <p>Không có đơn hàng nào.</p>
-        </div>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {orders.length === 0 && !loading && (
+          <div className="col-span-full text-center py-20 text-muted-foreground">
+            Hiện không có món nào cần chế biến.
+          </div>
+        )}
+
+        {orders.map((order) => (
+          <Card key={order.id} className="border-l-4 border-l-primary shadow-sm flex flex-col">
+            <CardHeader className="pb-2 bg-muted/20">
+              <div className="flex justify-between items-start">
+                <CardTitle className="text-lg font-bold">{order.tableName}</CardTitle>
+                <span className="text-xs text-muted-foreground font-mono">
+                  {new Date(order.createdAt).toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-4 flex-1 flex flex-col gap-3">
+              {order.items
+                .filter(i => i.status === OrderStatus.Pending || i.status === OrderStatus.Cooking)
+                .map((item) => (
+                <div key={item.id} className="border-b pb-3 last:border-0 last:pb-0">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="font-medium text-base">
+                      <span className="font-bold text-primary mr-2">x{item.quantity}</span>
+                      {item.productName}
+                    </div>
+                  </div>
+                  
+                  {item.note && (
+                    <div className="text-sm text-red-600 italic mt-1 bg-red-50 p-1 rounded border border-red-100">
+                      Ghi chú: {item.note}
+                    </div>
+                  )}
+
+                  <div className="mt-3 flex justify-end">
+                    {item.status === OrderStatus.Pending ? (
+                      <Button 
+                        size="sm" 
+                        className="w-full bg-blue-600 hover:bg-blue-700"
+                        onClick={() => handleNextStatus(order.id, item.id, item.status)}
+                      >
+                        Bắt đầu nấu
+                      </Button>
+                    ) : (
+                      <Button 
+                        size="sm" 
+                        className="w-full bg-green-600 hover:bg-green-700"
+                        onClick={() => handleNextStatus(order.id, item.id, item.status)}
+                      >
+                        <CheckCircle2 className="h-4 w-4 mr-2" />
+                        Báo xong
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

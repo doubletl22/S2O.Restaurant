@@ -1,91 +1,112 @@
-// contexts/guest-cart-context.tsx
-'use client'
+"use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { ProductDto } from '@/lib/types';
-import { toast } from 'sonner';
-
-// Định nghĩa kiểu dữ liệu item trong giỏ (kèm số lượng & note)
-export interface CartItem extends ProductDto {
-  quantity: number;
-  note?: string;
-}
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Product, CartItem } from "@/lib/types";
 
 interface GuestCartContextType {
-  cartItems: CartItem[];
-  addToCart: (product: ProductDto) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, delta: number) => void;
+  cart: CartItem[];
+  addToCart: (product: Product, quantity?: number, note?: string) => void;
+  removeFromCart: (cartId: string) => void;
+  updateQuantity: (cartId: string, delta: number) => void;
   clearCart: () => void;
-  totalItems: number;
   totalAmount: number;
+  totalItems: number;
 }
 
 const GuestCartContext = createContext<GuestCartContextType | undefined>(undefined);
 
 export function GuestCartProvider({ children }: { children: React.ReactNode }) {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // 1. Load từ LocalStorage khi khởi động
+  // 1. Load cart từ LocalStorage khi mount
   useEffect(() => {
-    const saved = localStorage.getItem('s2o_guest_cart');
-    if (saved) {
+    const savedCart = localStorage.getItem("guest_cart");
+    if (savedCart) {
       try {
-        setCartItems(JSON.parse(saved));
+        setCart(JSON.parse(savedCart));
       } catch (e) {
-        console.error("Lỗi parse giỏ hàng:", e);
+        console.error("Lỗi đọc cart cũ", e);
       }
     }
+    setIsInitialized(true);
   }, []);
 
-  // 2. Lưu vào LocalStorage mỗi khi giỏ hàng thay đổi
+  // 2. Lưu cart mỗi khi thay đổi (chỉ sau khi đã init)
   useEffect(() => {
-    if (cartItems.length > 0) {
-        localStorage.setItem('s2o_guest_cart', JSON.stringify(cartItems));
+    if (isInitialized) {
+      localStorage.setItem("guest_cart", JSON.stringify(cart));
     }
-  }, [cartItems]);
+  }, [cart, isInitialized]);
 
-  const addToCart = (product: ProductDto) => {
-    setCartItems((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      if (existing) {
-        // Nếu món đã có, tăng số lượng
-        toast.success(`Đã tăng số lượng món ${product.name}`);
-        return prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
+  // Actions
+  const addToCart = (product: Product, quantity = 1, note = "") => {
+    setCart((prev) => {
+      // Tìm xem món này (cùng ID và cùng Note) đã có chưa
+      const existingIdx = prev.findIndex(
+        (item) => item.id === product.id && item.note === note
+      );
+
+      if (existingIdx >= 0) {
+        // Cộng dồn số lượng
+        const newCart = [...prev];
+        newCart[existingIdx].quantity += quantity;
+        toast.success(`Đã cập nhật số lượng: ${product.name}`);
+        return newCart;
+      } else {
+        // Thêm mới
+        const newItem: CartItem = {
+          ...product,
+          cartId: `${product.id}-${Date.now()}`, // Tạo ID tạm cho item trong giỏ
+          quantity,
+          note,
+        };
+        toast.success(`Đã thêm vào giỏ: ${product.name}`);
+        return [...prev, newItem];
       }
-      // Nếu chưa có, thêm mới
-      toast.success(`Đã thêm ${product.name} vào giỏ`);
-      return [...prev, { ...product, quantity: 1 }];
     });
   };
 
-  const removeFromCart = (productId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== productId));
+  const removeFromCart = (cartId: string) => {
+    setCart((prev) => prev.filter((item) => item.cartId !== cartId));
+    toast.info("Đã xóa món khỏi giỏ");
   };
 
-  const updateQuantity = (productId: string, delta: number) => {
-    setCartItems((prev) => prev.map((item) => {
-        if (item.id === productId) {
-            const newQty = Math.max(1, item.quantity + delta);
-            return { ...item, quantity: newQty };
+  const updateQuantity = (cartId: string, delta: number) => {
+    setCart((prev) => {
+      return prev.map((item) => {
+        if (item.cartId === cartId) {
+          const newQty = item.quantity + delta;
+          if (newQty <= 0) return item; // Không cho giảm dưới 1 (dùng remove để xóa)
+          return { ...item, quantity: newQty };
         }
         return item;
-    }));
+      });
+    });
   };
 
   const clearCart = () => {
-    setCartItems([]);
-    localStorage.removeItem('s2o_guest_cart');
+    setCart([]);
+    localStorage.removeItem("guest_cart");
   };
 
-  // Tính tổng số lượng (để hiện badge)
-  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const totalAmount = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  // Derived state
+  const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <GuestCartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalAmount }}>
+    <GuestCartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        totalAmount,
+        totalItems,
+      }}
+    >
       {children}
     </GuestCartContext.Provider>
   );
@@ -93,6 +114,8 @@ export function GuestCartProvider({ children }: { children: React.ReactNode }) {
 
 export const useGuestCart = () => {
   const context = useContext(GuestCartContext);
-  if (!context) throw new Error('useGuestCart must be used within a GuestCartProvider');
+  if (!context) {
+    throw new Error("useGuestCart must be used within a GuestCartProvider");
+  }
   return context;
 };

@@ -1,102 +1,70 @@
-'use client'
+"use client";
 
-import { Plus } from 'lucide-react'
-import Image from 'next/image'
-
-interface Product {
-  id: number
-  name: string
-  price: number
-  image: string
-  isAvailable: boolean
-}
+import { Plus } from "lucide-react";
+import { Product } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { useGuestCart } from "@/components/guest/guest-cart-context";
+import { cn } from "@/lib/utils";
 
 interface MenuItemCardProps {
-  product: Product
-  onAddToCart: (product: Product) => void
+  product: Product;
 }
 
-function formatPrice(price: number) {
-  return new Intl.NumberFormat('vi-VN').format(price) + 'đ'
-}
+export function MenuItemCard({ product }: MenuItemCardProps) {
+  const { addToCart } = useGuestCart();
 
-export function MenuItemCard({ product, onAddToCart }: MenuItemCardProps) {
-  const { name, price, image, isAvailable } = product
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
 
   return (
-    <div
-      className="flex flex-col overflow-hidden"
-      style={{
-        borderRadius: 'var(--r20)',
-        background: 'var(--card)',
-        boxShadow: '0 10px 24px rgba(17,24,39,0.06)',
-        border: '1px solid rgba(238,240,244,0.9)',
-        opacity: isAvailable ? 1 : 0.6,
-      }}
-    >
-      {/* Product Image */}
-      <div className="relative w-full aspect-square">
-        {image ? (
-          <Image
-            src={image || "/placeholder.svg"}
-            alt={name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 50vw, 33vw"
+    <div className="flex gap-3 p-3 bg-card rounded-xl shadow-sm border border-border/50">
+      {/* Ảnh món */}
+      <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-muted">
+        {product.imageUrl ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="h-full w-full object-cover"
+            loading="lazy"
           />
         ) : (
-          <div 
-            className="w-full h-full flex items-center justify-center"
-            style={{ background: '#e5e7eb' }}
-          >
-            <span className="text-3xl opacity-30">🍽️</span>
-          </div>
-        )}
-        
-        {/* Unavailable Overlay */}
-        {!isAvailable && (
-          <div 
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.5)' }}
-          >
-            <span className="text-white text-xs font-semibold px-2 py-1 rounded-full bg-black/60">
-              Hết món
-            </span>
+          <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+            No Image
           </div>
         )}
       </div>
 
-      {/* Content */}
-      <div className="flex flex-col p-3">
-        <h4 
-          className="font-bold text-sm line-clamp-2 leading-tight"
-          style={{ color: 'var(--text)' }}
-        >
-          {name}
-        </h4>
+      {/* Thông tin */}
+      <div className="flex flex-1 flex-col justify-between">
+        <div>
+          <h3 className="font-semibold line-clamp-1">{product.name}</h3>
+          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+            {product.description || "Không có mô tả"}
+          </p>
+        </div>
         
         <div className="flex items-center justify-between mt-2">
-          <p 
-            className="font-extrabold text-sm"
-            style={{ color: '#f97316' }}
-          >
-            {formatPrice(price)}
-          </p>
+          <span className="font-bold text-primary">{formatPrice(product.price)}</span>
           
-          <button
-            onClick={() => isAvailable && onAddToCart(product)}
-            disabled={!isAvailable}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-transform active:scale-95 disabled:cursor-not-allowed"
-            style={{
-              background: isAvailable ? 'rgba(249,115,22,0.12)' : 'rgba(107,114,128,0.12)',
-              color: isAvailable ? '#f97316' : '#6b7280',
-            }}
-            aria-label={`Add ${name} to cart`}
+          <Button
+            size="icon"
+            className="h-8 w-8 rounded-full shadow-md"
+            onClick={() => addToCart(product)}
+            disabled={!product.isActive || product.isSoldOut}
           >
-            <Plus className="w-5 h-5" strokeWidth={3} />
-          </button>
+            <Plus className="h-4 w-4" />
+          </Button>
         </div>
       </div>
+      
+      {/* Overlay nếu hết hàng */}
+      {(product.isSoldOut || !product.isActive) && (
+        <div className="absolute inset-0 bg-background/60 flex items-center justify-center rounded-xl z-10">
+          <span className="bg-black/70 text-white text-xs px-2 py-1 rounded font-bold uppercase">
+            Hết hàng
+          </span>
+        </div>
+      )}
     </div>
-  )
+  );
 }

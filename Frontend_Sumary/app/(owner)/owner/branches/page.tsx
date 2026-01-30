@@ -1,251 +1,256 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { 
-  Plus, Search, MoreHorizontal, MapPin, 
-  Phone, Building, Loader2, Edit, Trash 
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { useEffect, useState } from "react";
+import { Plus, MapPin, Phone, Store, QrCode, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import QRCode from "react-qr-code"; // Cần cài: npm install react-qr-code
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  Table, TableBody, TableCell, TableHead, 
-  TableHeader, TableRow
-} from '@/components/ui/table'
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, 
-  DropdownMenuLabel, DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import {
-  Dialog, DialogContent, DialogHeader, 
-  DialogTitle, DialogTrigger, DialogFooter
-} from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { toast } from 'sonner'
-import { branchService, BranchDto } from '@/services/branch.service'
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+
+import { branchService } from "@/services/branch.service";
+import { tableService } from "@/services/table.service";
+import { Branch, Table } from "@/lib/types";
 
 export default function BranchesPage() {
-  const [branches, setBranches] = useState<BranchDto[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  
-  // State Modal
-  const [isOpen, setIsOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    phoneNumber: ''
-  })
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 1. Load dữ liệu
-  const fetchBranches = async () => {
+  // States quản lý Bàn (trong Sheet)
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+  const [tables, setTables] = useState<Table[]>([]);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  
+  // State tạo bàn mới
+  const [newTableName, setNewTableName] = useState("");
+  const [newTableCapacity, setNewTableCapacity] = useState(4);
+
+  // --- 1. Load Data Chi Nhánh ---
+  const loadBranches = async () => {
     try {
-      setLoading(true)
-      const data = await branchService.getAll()
-      // Xử lý nếu backend trả về dạng { value: [] } hoặc []
-      const list = Array.isArray(data) ? data : (data as any).value || [];
-      setBranches(list)
+      setLoading(true);
+      const res = await branchService.getAll();
+      if (res.isSuccess) setBranches(res.value);
     } catch (error) {
-      console.error(error)
-      toast.error("Không thể tải danh sách chi nhánh")
+      console.error(error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchBranches()
-  }, [])
+    loadBranches();
+  }, []);
 
-  // 2. Xử lý Submit (Tạo mới hoặc Cập nhật)
-  const handleSubmit = async () => {
-    if (!formData.name || !formData.address) {
-      toast.error("Tên và địa chỉ là bắt buộc")
-      return
-    }
-
+  // --- 2. Xử lý logic Bàn (Tables) ---
+  const openTableManager = async (branch: Branch) => {
+    setSelectedBranch(branch);
+    setIsSheetOpen(true);
+    setTables([]); // Reset tạm
     try {
-      setIsSubmitting(true)
-      if (editingId) {
-        // Update
-        await branchService.update(editingId, formData)
-        toast.success("Cập nhật chi nhánh thành công")
-      } else {
-        // Create
-        await branchService.create(formData)
-        toast.success("Tạo chi nhánh thành công")
-      }
-      
-      setIsOpen(false)
-      fetchBranches() // Reload
-      resetForm()
-    } catch (error: any) {
-        const msg = error.response?.data?.detail || "Có lỗi xảy ra";
-        toast.error(msg)
-    } finally {
-      setIsSubmitting(false)
+      const res = await tableService.getByBranch(branch.id);
+      if (res.isSuccess) setTables(res.value);
+    } catch (e) {
+      toast.error("Lỗi tải danh sách bàn");
     }
-  }
+  };
 
-  const handleEdit = (branch: BranchDto) => {
-    setEditingId(branch.id)
-    setFormData({
-      name: branch.name,
-      address: branch.address,
-      phoneNumber: branch.phoneNumber
-    })
-    setIsOpen(true)
-  }
-  
-  const handleDelete = async (id: string) => {
-      if(!confirm("Bạn có chắc chắn muốn xóa chi nhánh này?")) return;
-      try {
-          await branchService.delete(id);
-          toast.success("Đã xóa chi nhánh");
-          fetchBranches();
-      } catch (e) {
-          toast.error("Không thể xóa chi nhánh đang hoạt động");
+  const handleCreateTable = async () => {
+    if (!selectedBranch || !newTableName) return;
+    try {
+      const res = await tableService.create({
+        name: newTableName,
+        capacity: newTableCapacity,
+        branchId: selectedBranch.id
+      });
+      
+      if (res.isSuccess) {
+        toast.success("Thêm bàn thành công");
+        setNewTableName("");
+        // Reload tables
+        const tablesRes = await tableService.getByBranch(selectedBranch.id);
+        if (tablesRes.isSuccess) setTables(tablesRes.value);
       }
-  }
+    } catch (e) {
+      toast.error("Không thể tạo bàn");
+    }
+  };
 
-  const resetForm = () => {
-    setEditingId(null)
-    setFormData({ name: '', address: '', phoneNumber: '' })
-  }
+  const handleDeleteTable = async (id: string) => {
+    if(!confirm("Bạn có chắc muốn xóa bàn này?")) return;
+    try {
+      await tableService.delete(id);
+      toast.success("Đã xóa bàn");
+      setTables(prev => prev.filter(t => t.id !== id));
+    } catch (e) {
+      toast.error("Lỗi khi xóa");
+    }
+  };
 
-  // Filter local
-  const filteredBranches = branches.filter(b => 
-    b.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    b.address.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  // --- 3. QR Print Dialog ---
+  const [qrTable, setQrTable] = useState<Table | null>(null);
+  
+  // Helper: Link Guest
+  // Giả sử domain deploy là https://s2o.app
+  // Khi dev: http://localhost:3000
+  const getGuestLink = (token: string) => {
+    if (typeof window !== "undefined") {
+        return `${window.location.origin}/guest/t/${token}`;
+    }
+    return "";
+  };
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Quản lý Chi nhánh</h1>
-          <p className="text-muted-foreground">Danh sách các cơ sở của nhà hàng</p>
+           <h1 className="text-2xl font-bold tracking-tight">Quản lý Chi nhánh</h1>
+           <p className="text-muted-foreground text-sm">Thiết lập các điểm bán và sơ đồ bàn ăn.</p>
         </div>
-        
-        <Dialog open={isOpen} onOpenChange={(val) => { setIsOpen(val); if(!val) resetForm(); }}>
-          <DialogTrigger asChild>
-            <Button className="bg-orange-600 hover:bg-orange-700">
-              <Plus className="mr-2 h-4 w-4" /> Thêm chi nhánh
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-125">
-            <DialogHeader>
-              <DialogTitle>{editingId ? 'Cập nhật chi nhánh' : 'Thêm chi nhánh mới'}</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label>Tên chi nhánh</Label>
-                <Input placeholder="Ví dụ: Cơ sở Quận 1" value={formData.name} 
-                  onChange={e => setFormData({...formData, name: e.target.value})} />
+        <Button>
+          <Plus className="mr-2 h-4 w-4" /> Thêm chi nhánh
+        </Button>
+      </div>
+
+      {/* Danh sách Chi nhánh */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {branches.map((branch) => (
+          <Card key={branch.id} className="hover:shadow-md transition-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Store className="h-5 w-5 text-primary" />
+                {branch.name}
+              </CardTitle>
+              <CardDescription>
+                 <span className="flex items-center gap-1 mt-1">
+                   <MapPin className="h-3 w-3" /> {branch.address}
+                 </span>
+                 <span className="flex items-center gap-1 mt-1">
+                   <Phone className="h-3 w-3" /> {branch.phone}
+                 </span>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-2">
+                <Button variant="outline" className="w-full" onClick={() => openTableManager(branch)}>
+                  <QrCode className="mr-2 h-4 w-4" /> Quản lý Bàn & QR
+                </Button>
+                <Button variant="ghost" size="icon" className="text-destructive">
+                   <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
-              <div className="grid gap-2">
-                <Label>Địa chỉ</Label>
-                <Input placeholder="123 Đường ABC..." value={formData.address} 
-                   onChange={e => setFormData({...formData, address: e.target.value})} />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* SHEET QUẢN LÝ BÀN (Trượt từ phải sang) */}
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetContent className="w-[100 sm:w-[540px]">
+          <SheetHeader>
+            <SheetTitle>Quản lý Bàn ăn - {selectedBranch?.name}</SheetTitle>
+            <SheetDescription>
+              Tạo bàn và lấy mã QR để dán lên bàn cho khách gọi món.
+            </SheetDescription>
+          </SheetHeader>
+          
+          <div className="mt-6 space-y-6">
+            {/* Form thêm bàn nhanh */}
+            <div className="flex gap-2 items-end bg-muted/50 p-3 rounded-lg border">
+              <div className="grid gap-1.5 flex-1">
+                <Label htmlFor="t-name">Tên bàn</Label>
+                <Input 
+                  id="t-name" 
+                  placeholder="Vd: Bàn 01" 
+                  value={newTableName}
+                  onChange={(e) => setNewTableName(e.target.value)}
+                />
               </div>
-              <div className="grid gap-2">
-                <Label>Số điện thoại</Label>
-                <Input placeholder="0909..." value={formData.phoneNumber} 
-                   onChange={e => setFormData({...formData, phoneNumber: e.target.value})} />
+              <div className="grid gap-1.5 w-20">
+                <Label htmlFor="t-cap">Ghế</Label>
+                <Input 
+                  id="t-cap" 
+                  type="number" 
+                  value={newTableCapacity}
+                  onChange={(e) => setNewTableCapacity(parseInt(e.target.value))}
+                />
               </div>
+              <Button onClick={handleCreateTable}><Plus className="h-4 w-4" /></Button>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsOpen(false)}>Hủy</Button>
-              <Button type="submit" onClick={handleSubmit} disabled={isSubmitting} className="bg-orange-600 hover:bg-orange-700">
-                {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : null} 
-                {editingId ? 'Lưu thay đổi' : 'Tạo mới'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
 
-      {/* Toolbar */}
-      <div className="flex items-center gap-2 bg-white p-2 rounded-lg border w-fit min-w-75">
-        <Search className="w-4 h-4 text-gray-500 ml-2" />
-        <Input 
-          placeholder="Tìm theo tên, địa chỉ..." 
-          className="border-0 focus-visible:ring-0"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+            <ScrollArea className="h-[60vh] pr-4">
+              <div className="grid grid-cols-1 gap-3">
+                {tables.map(table => (
+                  <div key={table.id} className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm">
+                     <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center font-bold text-primary">
+                          {table.name.replace(/[^0-9]/g, '') || "B"}
+                        </div>
+                        <div>
+                          <div className="font-medium">{table.name}</div>
+                          <div className="text-xs text-muted-foreground">{table.capacity} ghế • {table.status}</div>
+                        </div>
+                     </div>
+                     <div className="flex gap-2">
+                        {/* Nút xem QR */}
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" onClick={() => setQrTable(table)}>
+                              <QrCode className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-sm">
+                            <DialogHeader>
+                              <DialogTitle className="text-center">{table.name}</DialogTitle>
+                            </DialogHeader>
+                            <div className="flex flex-col items-center justify-center p-4 space-y-4">
+                               <div className="border-4 border-black p-2 rounded-lg">
+                                  {/* QR Code Generate */}
+                                  <QRCode 
+                                    value={getGuestLink(table.qrToken)} 
+                                    size={200} 
+                                  />
+                               </div>
+                               <p className="text-sm text-center text-muted-foreground break-all px-4">
+                                 {getGuestLink(table.qrToken)}
+                               </p>
+                               <Button className="w-full" onClick={() => window.print()}>
+                                 In mã QR
+                               </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
 
-      {/* Table */}
-      <div className="rounded-md border bg-white shadow-sm">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Tên chi nhánh</TableHead>
-              <TableHead>Liên hệ</TableHead>
-              <TableHead>Trạng thái</TableHead>
-              <TableHead className="text-right">Hành động</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-               <TableRow><TableCell colSpan={4} className="text-center py-8 text-gray-500">Đang tải dữ liệu...</TableCell></TableRow>
-            ) : filteredBranches.length === 0 ? (
-               <TableRow><TableCell colSpan={4} className="text-center py-8 text-gray-500">Chưa có chi nhánh nào</TableCell></TableRow>
-            ) : (
-              filteredBranches.map((branch) => (
-                <TableRow key={branch.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600">
-                        <Building className="w-5 h-5" />
-                      </div>
-                      <div className="font-medium text-gray-900">{branch.name}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-3.5 h-3.5" /> {branch.address}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Phone className="w-3.5 h-3.5" /> {branch.phoneNumber || '---'}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100">
-                        Hoạt động
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
+                        <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDeleteTable(table.id)}>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => handleEdit(branch)}>
-                          <Edit className="mr-2 h-4 w-4" /> Chỉnh sửa
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDelete(branch.id)} className="text-red-600">
-                          <Trash className="mr-2 h-4 w-4" /> Xóa chi nhánh
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                     </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
-  )
+  );
 }

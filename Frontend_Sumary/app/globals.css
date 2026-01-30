@@ -146,3 +146,16 @@
 .shadow-brand {
   box-shadow: 0 14px 28px rgba(239, 68, 68, 0.25);
 }
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Ẩn scrollbar ngang cho Category Chips */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

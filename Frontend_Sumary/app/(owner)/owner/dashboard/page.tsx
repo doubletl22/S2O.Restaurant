@@ -1,268 +1,158 @@
-'use client'
+"use client";
 
-import {
-  DollarSign,
-  ShoppingCart,
-  Users,
-  Flame,
-  TrendingUp,
-  ArrowUpRight,
-} from 'lucide-react'
-import { StatsCard } from '@/components/admin/stats-card'
-import { RevenueChart } from '@/components/admin/revenue-chart'
+import { useEffect, useState } from "react";
+import { 
+  DollarSign, 
+  ShoppingBag, 
+  Users, 
+  UtensilsCrossed, 
+  ArrowUpRight 
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
-// Mock revenue data for the last 7 days
-const revenueData = [
-  { day: 'T2', revenue: 4200000 },
-  { day: 'T3', revenue: 3800000 },
-  { day: 'T4', revenue: 5100000 },
-  { day: 'T5', revenue: 4700000 },
-  { day: 'T6', revenue: 6200000 },
-  { day: 'T7', revenue: 8500000 },
-  { day: 'CN', revenue: 7200000 },
-]
+import { ownerReportService, DashboardStats } from "@/services/owner-report.service";
 
-// Mock top dishes data
-const topDishes = [
-  { name: 'Phở Bò Tái', orders: 156, revenue: 10140000 },
-  { name: 'Bún Chả Hà Nội', orders: 134, revenue: 8040000 },
-  { name: 'Cơm Rang Dương Châu', orders: 98, revenue: 5390000 },
-  { name: 'Bánh Mì Thịt Nướng', orders: 87, revenue: 3045000 },
-]
+export default function DashboardPage() {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
-// Mock recent orders
-const recentOrders = [
-  { id: 'ORD-001', table: 'Bàn 5', items: 4, total: 285000, status: 'preparing' },
-  { id: 'ORD-002', table: 'Bàn 12', items: 2, total: 125000, status: 'completed' },
-  { id: 'ORD-003', table: 'Bàn 3', items: 6, total: 420000, status: 'pending' },
-  { id: 'ORD-004', table: 'Bàn 8', items: 3, total: 195000, status: 'preparing' },
-]
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const res = await ownerReportService.getDashboardStats();
+        if (res.isSuccess) {
+          setStats(res.value);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadStats();
+  }, []);
 
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(value)
-}
+  const formatMoney = (amount: number) => 
+    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
 
-const getStatusStyle = (status: string) => {
-  switch (status) {
-    case 'completed':
-      return { bg: '#dcfce7', color: '#16a34a', label: 'Hoàn thành' }
-    case 'preparing':
-      return { bg: '#fef3c7', color: '#d97706', label: 'Đang làm' }
-    case 'pending':
-      return { bg: '#f3f4f6', color: '#6b7280', label: 'Chờ xử lý' }
-    default:
-      return { bg: '#f3f4f6', color: '#6b7280', label: status }
+  if (loading) {
+    return <DashboardSkeleton />;
   }
-}
 
-export default function AdminDashboardPage() {
   return (
-    <div className="flex flex-col gap-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
-          Dashboard
-        </h1>
-        <p className="text-sm" style={{ color: 'var(--muted)' }}>
-          Tổng quan hoạt động kinh doanh
-        </p>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold tracking-tight">Tổng quan</h1>
+      
+      {/* 4 Cards Stats */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Doanh thu hôm nay</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatMoney(stats?.todayRevenue || 0)}</div>
+            <p className="text-xs text-muted-foreground">+20.1% so với hôm qua</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Đơn hàng mới</CardTitle>
+            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">+{stats?.todayOrders}</div>
+            <p className="text-xs text-muted-foreground">Trong 24h qua</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Tổng món ăn</CardTitle>
+            <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.totalProducts}</div>
+            <p className="text-xs text-muted-foreground">Đang kinh doanh</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Nhân sự</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.totalStaff}</div>
+            <p className="text-xs text-muted-foreground">Đang hoạt động</p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard
-          title="Tổng Doanh Thu"
-          value={formatCurrency(39700000)}
-          change="+12.5% so với tuần trước"
-          changeType="positive"
-          icon={DollarSign}
-          iconColor="#f97316"
-        />
-        <StatsCard
-          title="Đơn Đang Xử Lý"
-          value="24"
-          change="8 đơn mới trong 1h qua"
-          changeType="neutral"
-          icon={ShoppingCart}
-          iconColor="#3b82f6"
-        />
-        <StatsCard
-          title="Tổng Khách Hàng"
-          value="1,248"
-          change="+5.2% so với tháng trước"
-          changeType="positive"
-          icon={Users}
-          iconColor="#8b5cf6"
-        />
-        <StatsCard
-          title="Món Bán Chạy"
-          value="Phở Bò Tái"
-          change="156 phần hôm nay"
-          changeType="positive"
-          icon={Flame}
-          iconColor="#ef4444"
-        />
-      </div>
-
-      {/* Charts and Tables Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Revenue Chart - Takes 2 columns */}
-        <div className="lg:col-span-2">
-          <RevenueChart data={revenueData} />
-        </div>
-
-        {/* Top Dishes */}
-        <div
-          className="bg-white rounded-[20px] p-6 shadow-sm border"
-          style={{ borderColor: 'var(--line)' }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>
-              Món Bán Chạy
-            </h3>
-            <TrendingUp className="w-5 h-5" style={{ color: 'var(--muted)' }} />
-          </div>
-
-          <div className="flex flex-col gap-4">
-            {topDishes.map((dish, idx) => (
-              <div key={dish.name} className="flex items-center gap-3">
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
-                  style={{
-                    background: idx === 0 ? 'linear-gradient(135deg, #f97316, #ef4444)' : '#f3f4f6',
-                    color: idx === 0 ? '#fff' : '#6b7280',
-                  }}
-                >
-                  {idx + 1}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p
-                    className="font-medium text-sm truncate"
-                    style={{ color: 'var(--text)' }}
-                  >
-                    {dish.name}
-                  </p>
-                  <p className="text-xs" style={{ color: 'var(--muted)' }}>
-                    {dish.orders} đơn
-                  </p>
-                </div>
-                <span
-                  className="text-sm font-semibold"
-                  style={{ color: '#f97316' }}
-                >
-                  {formatCurrency(dish.revenue)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Orders Table */}
-      <div
-        className="bg-white rounded-[20px] p-6 shadow-sm border"
-        style={{ borderColor: 'var(--line)' }}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold" style={{ color: 'var(--text)' }}>
-            Đơn Hàng Gần Đây
-          </h3>
-          <button
-            className="flex items-center gap-1 text-sm font-medium"
-            style={{ color: '#f97316' }}
-          >
-            Xem tất cả
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--line)' }}>
-                <th
-                  className="text-left py-3 px-4 text-xs font-semibold uppercase"
-                  style={{ color: 'var(--muted)' }}
-                >
-                  Mã Đơn
-                </th>
-                <th
-                  className="text-left py-3 px-4 text-xs font-semibold uppercase"
-                  style={{ color: 'var(--muted)' }}
-                >
-                  Bàn
-                </th>
-                <th
-                  className="text-left py-3 px-4 text-xs font-semibold uppercase"
-                  style={{ color: 'var(--muted)' }}
-                >
-                  Số Món
-                </th>
-                <th
-                  className="text-left py-3 px-4 text-xs font-semibold uppercase"
-                  style={{ color: 'var(--muted)' }}
-                >
-                  Tổng Tiền
-                </th>
-                <th
-                  className="text-left py-3 px-4 text-xs font-semibold uppercase"
-                  style={{ color: 'var(--muted)' }}
-                >
-                  Trạng Thái
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentOrders.map((order) => {
-                const status = getStatusStyle(order.status)
-                return (
-                  <tr
-                    key={order.id}
-                    className="hover:bg-gray-50 transition-colors"
-                    style={{ borderBottom: '1px solid var(--line)' }}
-                  >
-                    <td
-                      className="py-3 px-4 text-sm font-medium"
-                      style={{ color: 'var(--text)' }}
-                    >
-                      {order.id}
-                    </td>
-                    <td
-                      className="py-3 px-4 text-sm"
-                      style={{ color: 'var(--text)' }}
-                    >
-                      {order.table}
-                    </td>
-                    <td
-                      className="py-3 px-4 text-sm"
-                      style={{ color: 'var(--muted)' }}
-                    >
-                      {order.items} món
-                    </td>
-                    <td
-                      className="py-3 px-4 text-sm font-semibold"
-                      style={{ color: '#f97316' }}
-                    >
-                      {formatCurrency(order.total)}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className="px-3 py-1 rounded-full text-xs font-medium"
-                        style={{ background: status.bg, color: status.color }}
-                      >
-                        {status.label}
-                      </span>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+      {/* Recent Orders List */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>Đơn hàng gần đây</CardTitle>
+          </CardHeader>
+          <CardContent>
+             <div className="space-y-4">
+                {stats?.recentOrders?.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">Chưa có đơn hàng nào.</p>
+                ) : (
+                  stats?.recentOrders.map((order) => (
+                    <div key={order.id} className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0">
+                       <div className="space-y-1">
+                          <p className="text-sm font-medium leading-none">{order.tableName}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleTimeString('vi-VN')}</p>
+                       </div>
+                       <div className="flex items-center gap-4">
+                          <Badge variant={order.status === 'Served' ? 'outline' : 'secondary'}>{order.status}</Badge>
+                          <div className="font-bold text-sm">{formatMoney(order.totalAmount)}</div>
+                       </div>
+                    </div>
+                  ))
+                )}
+             </div>
+          </CardContent>
+        </Card>
+        
+        {/* Quick Actions Card (Optional) */}
+        <Card className="col-span-3 bg-primary/5 border-primary/20">
+           <CardHeader>
+             <CardTitle className="text-primary">Thao tác nhanh</CardTitle>
+           </CardHeader>
+           <CardContent className="grid gap-2">
+              <a href="/owner/products" className="flex items-center justify-between p-3 bg-background rounded-lg hover:shadow-sm transition-all cursor-pointer">
+                 <span className="font-medium text-sm">Thêm món mới</span>
+                 <ArrowUpRight className="h-4 w-4 text-muted-foreground"/>
+              </a>
+              <a href="/owner/branches" className="flex items-center justify-between p-3 bg-background rounded-lg hover:shadow-sm transition-all cursor-pointer">
+                 <span className="font-medium text-sm">Tạo mã QR bàn</span>
+                 <ArrowUpRight className="h-4 w-4 text-muted-foreground"/>
+              </a>
+              <a href="/owner/staff" className="flex items-center justify-between p-3 bg-background rounded-lg hover:shadow-sm transition-all cursor-pointer">
+                 <span className="font-medium text-sm">Cấp tài khoản nhân viên</span>
+                 <ArrowUpRight className="h-4 w-4 text-muted-foreground"/>
+              </a>
+           </CardContent>
+        </Card>
       </div>
     </div>
-  )
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-6">
+       <Skeleton className="h-8 w-[200px]" />
+       <div className="grid gap-4 md:grid-cols-4">
+         {Array.from({length:4}).map((_, i) => <Skeleton key={i} className="h-[120px] rounded-xl" />)}
+       </div>
+       <Skeleton className="h-[300px] rounded-xl" />
+    </div>
+  );
 }

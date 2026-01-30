@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, Edit, Trash2, MoreHorizontal } from "lucide-react";
+import { Plus, Search, Edit, Trash2, MoreHorizontal, Layers } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -34,36 +34,27 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { ProductDialog } from "@/components/owner/product-dialog";
-import { productService } from "@/services/product.service";
+import { CategoryDialog } from "@/components/owner/category-dialog";
 import { categoryService } from "@/services/category.service";
-import { Product, Category } from "@/lib/types";
+import { Category } from "@/lib/types";
 
-export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
+export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Dialog States
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  
-  // Delete States
-  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
 
-  // 1. Fetch Data
   const loadData = async () => {
     try {
       setLoading(true);
-      // Gọi song song 2 API
-      const [prodRes, catRes] = await Promise.all([
-        productService.getProducts({ pageIndex: 1, pageSize: 100 }), 
-        categoryService.getAll()
-      ]);
-
-      if (prodRes.isSuccess) setProducts(prodRes.value.items);
-      if (catRes.isSuccess) setCategories(catRes.value);
+      const res = await categoryService.getAll();
+      if (res.isSuccess) {
+        setCategories(res.value);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -75,116 +66,101 @@ export default function ProductsPage() {
     loadData();
   }, []);
 
-  // 2. Handlers
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
+  const handleCreate = () => {
+    setEditingCategory(null);
     setIsDialogOpen(true);
   };
 
-  const handleCreate = () => {
-    setEditingProduct(null);
+  const handleEdit = (category: Category) => {
+    setEditingCategory(category);
     setIsDialogOpen(true);
   };
 
   const confirmDelete = async () => {
-    if (!productToDelete) return;
+    if (!categoryToDelete) return;
     try {
-      const res = await productService.delete(productToDelete);
+      const res = await categoryService.delete(categoryToDelete);
       if (res.isSuccess) {
-        toast.success("Đã xóa món ăn");
-        loadData(); // Reload list
+        toast.success("Đã xóa danh mục");
+        loadData();
       } else {
         toast.error("Không thể xóa", { description: res.error?.message });
       }
     } catch (error) {
       console.error(error);
     } finally {
-      setProductToDelete(null);
+      setCategoryToDelete(null);
     }
   };
 
-  // 3. Filter Client-side
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+  // Client-side Filter
+  const filteredCategories = categories.filter(c =>
+    c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="space-y-6">
-      {/* Header & Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-           <h1 className="text-2xl font-bold tracking-tight">Quản lý Thực đơn</h1>
-           <p className="text-muted-foreground text-sm">Quản lý danh sách món ăn và giá bán.</p>
+           <h1 className="text-2xl font-bold tracking-tight">Quản lý Danh mục</h1>
+           <p className="text-muted-foreground text-sm">Phân nhóm các món ăn trong thực đơn.</p>
         </div>
         <Button onClick={handleCreate} className="w-full sm:w-auto">
-          <Plus className="mr-2 h-4 w-4" /> Thêm món mới
+          <Plus className="mr-2 h-4 w-4" /> Tạo danh mục
         </Button>
       </div>
 
-      {/* Search Bar */}
       <div className="flex items-center gap-2 bg-card p-2 rounded-md border w-full sm:max-w-sm">
         <Search className="h-4 w-4 text-muted-foreground ml-2" />
         <Input 
-          placeholder="Tìm kiếm món ăn..." 
+          placeholder="Tìm danh mục..." 
           className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      {/* Main Table */}
       <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-20">Hình ảnh</TableHead>
-              <TableHead>Tên món</TableHead>
-              <TableHead>Danh mục</TableHead>
-              <TableHead>Giá bán</TableHead>
+              <TableHead className="w-12.5"></TableHead>
+              <TableHead>Tên danh mục</TableHead>
+              <TableHead>Mô tả</TableHead>
               <TableHead>Trạng thái</TableHead>
               <TableHead className="text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              // Loading Skeleton Rows
-              Array.from({ length: 5 }).map((_, i) => (
+              Array.from({ length: 4 }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell><Skeleton className="h-10 w-10 rounded-md" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-4" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-37.5" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-25" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-50" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-15" /></TableCell>
                   <TableCell><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
                 </TableRow>
               ))
-            ) : filteredProducts.length === 0 ? (
+            ) : filteredCategories.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center h-32 text-muted-foreground">
-                  Không tìm thấy món ăn nào.
+                <TableCell colSpan={5} className="text-center h-32 text-muted-foreground">
+                  Chưa có danh mục nào.
                 </TableCell>
               </TableRow>
             ) : (
-              // Data Rows
-              filteredProducts.map((product) => (
-                <TableRow key={product.id}>
+              filteredCategories.map((cat) => (
+                <TableRow key={cat.id}>
                   <TableCell>
-                    <div className="h-10 w-10 rounded-md bg-muted overflow-hidden">
-                       {product.imageUrl ? (
-                         <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
-                       ) : (
-                         <div className="h-full w-full flex items-center justify-center bg-gray-100 text-[10px] text-gray-400">NO IMG</div>
-                       )}
-                    </div>
+                    <Layers className="h-4 w-4 text-muted-foreground" />
                   </TableCell>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>
-                    {categories.find(c => c.id === product.categoryId)?.name || "---"}
+                  <TableCell className="font-medium">{cat.name}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm truncate max-w-75">
+                    {cat.description || "---"}
                   </TableCell>
-                  <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}</TableCell>
                   <TableCell>
-                    <Badge variant={product.isActive ? "outline" : "destructive"} className={product.isActive ? "bg-green-50 text-green-700 border-green-200" : ""}>
-                      {product.isActive ? "Đang bán" : "Ngừng bán"}
+                    <Badge variant={cat.isActive ? "outline" : "secondary"} className={cat.isActive ? "bg-green-50 text-green-700 border-green-200" : ""}>
+                      {cat.isActive ? "Hiển thị" : "Đã ẩn"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -196,14 +172,14 @@ export default function ProductsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Hành động</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => handleEdit(product)}>
-                          <Edit className="mr-2 h-4 w-4" /> Sửa thông tin
+                        <DropdownMenuItem onClick={() => handleEdit(cat)}>
+                          <Edit className="mr-2 h-4 w-4" /> Sửa danh mục
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           className="text-red-600 focus:text-red-600"
-                          onClick={() => setProductToDelete(product.id)}
+                          onClick={() => setCategoryToDelete(cat.id)}
                         >
-                          <Trash2 className="mr-2 h-4 w-4" /> Xóa món
+                          <Trash2 className="mr-2 h-4 w-4" /> Xóa danh mục
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -215,22 +191,20 @@ export default function ProductsPage() {
         </Table>
       </div>
 
-      {/* Component Dialog Form */}
-      <ProductDialog 
-        open={isDialogOpen} 
+      <CategoryDialog
+        open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        categories={categories}
-        productToEdit={editingProduct}
+        categoryToEdit={editingCategory}
         onSuccess={loadData}
       />
 
-      {/* Alert Confirm Delete */}
-      <AlertDialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
+      <AlertDialog open={!!categoryToDelete} onOpenChange={(open) => !open && setCategoryToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
+            <AlertDialogTitle>Xác nhận xóa?</AlertDialogTitle>
             <AlertDialogDescription>
-              Hành động này không thể hoàn tác. Món ăn sẽ bị xóa khỏi thực đơn vĩnh viễn.
+              Lưu ý: Nếu danh mục này đang chứa các món ăn, các món ăn đó có thể bị ẩn hoặc gặp lỗi. 
+              Bạn nên kiểm tra kỹ trước khi xóa.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -239,7 +213,7 @@ export default function ProductsPage() {
               onClick={confirmDelete} 
               className="bg-red-600 hover:bg-red-700"
             >
-              Xóa ngay
+              Vẫn xóa
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

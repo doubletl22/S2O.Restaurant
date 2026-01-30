@@ -1,48 +1,50 @@
-import api from '@/lib/api';
+import http from "@/lib/http";
+import { Result, SysAdminStats } from "@/lib/types";
 
-export interface TenantDto {
-  id: string;
-  name: string;
-  email: string; // Email admin của tenant
-  phoneNumber?: string;
-  address?: string;
-  subscriptionPlan: string;
-  isActive: boolean;
-  isLocked: boolean;
-  createdAt: string;
-  validUntil: string;
-}
-
-export interface CreateTenantPayload {
-  name: string;
-  email: string;
-  password?: string; // Optional nếu tự sinh
-  phone: string;
-  address: string;
-  subscriptionPlan: 'Basic' | 'Pro' | 'Enterprise';
-}
+// Endpoint giả định (chưa có thật)
+const REPORT_ENDPOINT = "/api/admin-reports"; 
 
 export const adminService = {
-  // 1. Lấy danh sách Tenant (Gọi qua Gateway -> Tenant Service)
-  getAllTenants: async () => {
-    // API: GET /api/admin/tenants
-    const response = await api.get<TenantDto[]>('/admin/tenants');
-    return response.data;
-  },
-
-  // 2. Tạo Tenant mới (Gọi qua Gateway -> Identity Service)
-  createTenant: async (payload: CreateTenantPayload) => {
-    // API: POST /api/sysadmin/tenants
-    // Backend Identity sẽ tạo User -> Publish Event -> Tenant Service tạo Tenant
-    const response = await api.post('/sysadmin/tenants', payload);
-    return response.data;
-  },
-
-  // 3. Khóa/Mở khóa Tenant
-  toggleLockTenant: async (tenantId: string, isLocked: boolean) => {
-    // API: POST /api/admin/tenants/{id}/lock hoặc unlock
-    const action = isLocked ? 'unlock' : 'lock'; 
-    const response = await api.post(`/admin/tenants/${tenantId}/${action}`);
-    return response.data;
+  // Lấy thống kê tổng quan (Dashboard)
+  getStats: async (): Promise<Result<SysAdminStats>> => {
+    try {
+      // Thử gọi API thật
+      return await http.get(`${REPORT_ENDPOINT}/dashboard`);
+    } catch (error) {
+      console.warn("API Dashboard chưa sẵn sàng, sử dụng dữ liệu giả lập (Mock Data).");
+      
+      // Trả về dữ liệu giả để UI không bị lỗi 404
+      return {
+        isSuccess: true,
+        isFailure: false,
+        error: null,
+        value: {
+          totalTenants: 12,
+          activeTenants: 10,
+          totalRevenue: 15000000,
+          totalUsers: 45,
+          recentTenants: [
+            {
+              id: "mock-1",
+              name: "Nhà hàng Biển Đông",
+              planType: "Premium",
+              isActive: true,
+              isLocked: false,
+              createdAt: new Date().toISOString(),
+              ownerEmail: "owner1@biendong.com"
+            },
+            {
+              id: "mock-2",
+              name: "Kichi Kichi Mock",
+              planType: "Enterprise",
+              isActive: true,
+              isLocked: false,
+              createdAt: new Date(Date.now() - 86400000).toISOString(), // Hôm qua
+              ownerEmail: "admin@kichi.com"
+            }
+          ]
+        }
+      };
+    }
   }
 };

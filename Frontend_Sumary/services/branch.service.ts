@@ -1,53 +1,23 @@
-import api from '@/lib/api';
+import http from "@/lib/http";
+import { Branch, Result } from "@/lib/types";
 
-export interface BranchDto {
-  id: string;
-  name: string;
-  address: string;
-  phoneNumber: string;
-  isActive: boolean;
-  isMainBranch?: boolean; // Nếu có logic chi nhánh chính
-}
-
-export interface CreateBranchPayload {
-  name: string;
-  address: string;
-  phoneNumber: string;
-}
-
-export interface UpdateBranchPayload {
-  name: string;
-  address: string;
-  phoneNumber: string;
-  isActive?: boolean;
-}
+const ENDPOINT = "/api/owner-branches"; // Endpoint dành cho Owner
 
 export const branchService = {
-  // Lấy danh sách chi nhánh
-  getAll: async () => {
-    // API: GET /api/branches
-    const response = await api.get<BranchDto[]>('/branches');
-    return response.data;
+  // Lấy danh sách chi nhánh của Owner hiện tại
+  getAll: async (): Promise<Result<Branch[]>> => {
+    return await http.get(ENDPOINT);
   },
 
-  // Tạo chi nhánh mới
-  create: async (payload: CreateBranchPayload) => {
-    // API: POST /api/branches
-    const response = await api.post('/branches', payload);
-    return response.data;
+  create: async (data: { name: string; address: string; phone: string }): Promise<Result<string>> => {
+    return await http.post(ENDPOINT, data);
   },
 
-  // Cập nhật chi nhánh
-  update: async (id: string, payload: UpdateBranchPayload) => {
-    // API: PUT /api/branches/{id}
-    const response = await api.put(`/branches/${id}`, payload);
-    return response.data;
+  update: async (id: string, data: Partial<Branch>): Promise<Result<void>> => {
+    return await http.put(`${ENDPOINT}/${id}`, data);
   },
 
-  // Xóa chi nhánh (nếu có)
-  delete: async (id: string) => {
-    // API: DELETE /api/branches/{id}
-    const response = await api.delete(`/branches/${id}`);
-    return response.data;
+  delete: async (id: string): Promise<Result<void>> => {
+    return await http.delete(`${ENDPOINT}/${id}`);
   }
 };
