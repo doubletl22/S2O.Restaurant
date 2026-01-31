@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { MenuItemCard } from '@/components/guest/menu-item-card'
+import { formatMoney, isSessionExpired, setSession } from '../_shared/guestStore';
 
 // Product interface as specified
 interface Product {
