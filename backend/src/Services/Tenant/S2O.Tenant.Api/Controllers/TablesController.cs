@@ -1,67 +1,56 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using S2O.Tenant.App.Features.Tables;
+using S2O.Tenant.App.Features.Tables; // Import namespace chứa Commands/Queries
 
 namespace S2O.Tenant.Api.Controllers;
 
+[Route("api/v1/tables")]
 [ApiController]
-[Route("api/[controller]")]
-//[Authorize]
 public class TablesController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly ISender _sender;
 
-    public TablesController(IMediator mediator)
+    public TablesController(ISender sender)
     {
-        _mediator = mediator;
+        _sender = sender;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateTable([FromBody] CreateTableCommand command)
-    {
-        var result = await _mediator.Send(command);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
-    }
-
- 
+    // GET: api/v1/tables
     [HttpGet]
+    [Authorize(Roles = "RestaurantOwner, Staff")]
     public async Task<IActionResult> GetTables([FromQuery] Guid? branchId)
     {
-        // Gửi Query sang Handler xử lý (GetTablesQuery.cs mà bạn đã có)
-        var query = new GetTablesQuery(branchId);
-        var result = await _mediator.Send(query);
-
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-
-        // Trả về đúng cấu trúc JSON mà Frontend đang đợi (có .value, .isSuccess)
-        return Ok(result);
+        // Nên thêm filter theo BranchId nếu quán có nhiều chi nhánh
+        var result = await _sender.Send(new GetTablesQuery(branchId));
+        return Ok(result.Value);
     }
 
-    [HttpDelete("{id}")]
-    [Authorize(Roles = "RestaurantOwner, SystemAdmin")]
-    public async Task<IActionResult> DeleteTable(Guid id)
+    // POST: api/v1/tables
+    [HttpPost]
+    [Authorize(Roles = "RestaurantOwner")]
+    public async Task<IActionResult> CreateTable([FromBody] CreateTableCommand command)
     {
-        var result = await _mediator.Send(new DeleteTableCommand(id));
-
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-
-        return Ok(new { Message = "Xóa bàn thành công." });
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateTable(Guid id, [FromBody] UpdateTableCommand command)
-    {
-        if (id != command.Id) return BadRequest();
-        var result = await _mediator.Send(command);
+        var result = await _sender.Send(command);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
-   
+    // PUT: api/v1/tables/{id}
+    [HttpPut("{id}")]
+    [Authorize(Roles = "RestaurantOwner")]
+    public async Task<IActionResult> UpdateTable(Guid id, [FromBody] UpdateTableCommand command)
+    {
+        if (id != command.Id) return BadRequest("ID không khớp");
+        var result = await _sender.Send(command);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
+    // DELETE: api/v1/tables/{id}
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "RestaurantOwner")]
+    public async Task<IActionResult> DeleteTable(Guid id)
+    {
+        var result = await _sender.Send(new DeleteTableCommand(id));
+        return result.IsSuccess ? NoContent() : BadRequest(result.Error);
+    }
 }

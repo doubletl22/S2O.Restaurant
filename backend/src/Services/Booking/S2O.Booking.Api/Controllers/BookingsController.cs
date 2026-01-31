@@ -16,14 +16,12 @@ public class BookingsController : ControllerBase
         _sender = sender;
     }
 
-    // Guest tạo yêu cầu đặt bàn (Public hoặc Guest Auth)
     [HttpPost]
-    [AllowAnonymous] // Cho phép khách vãng lai đặt
+    [AllowAnonymous] 
     public async Task<IActionResult> CreateBooking([FromBody] CreateBookingCommand command)
     {
         var result = await _sender.Send(command);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
-    // TODO: Thêm API GetBookings cho chủ quán sau
 }

@@ -59,7 +59,7 @@ public static class DependencyInjection
                 // === SỬA LỖI 2: Dùng tên Role chuẩn của .NET Identity ===
                 // Nếu Token của bạn dùng "role" ngắn, hãy sửa Identity Service để emit ra "role"
                 // Còn mặc định .NET Identity dùng URL dài này:
-                RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+                RoleClaimType = "role",
 
                 NameClaimType = "name"
             };

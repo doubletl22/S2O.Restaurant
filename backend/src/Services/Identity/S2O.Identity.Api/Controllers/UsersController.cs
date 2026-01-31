@@ -151,13 +151,7 @@ public class UsersController : ControllerBase
     }
     [HttpPut("{id}")]
     [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
-    public async Task<IActionResult> UpdateStaff(Guid id, [FromBody] UpdateStaffCommand command)
-    {
-        if (id != command.UserId) return BadRequest();
-        var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
-    }
-
+    
     [HttpGet]
     public async Task<IActionResult> GetUsers(
         [FromQuery] int page = 1,

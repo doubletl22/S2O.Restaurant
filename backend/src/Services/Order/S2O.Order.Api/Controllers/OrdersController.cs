@@ -4,12 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using S2O.Order.App.Features.Orders.Commands;
 using S2O.Order.App.Features.Orders.Queries;
 using S2O.Order.Domain.Enums;
-using System.Security.Claims;
 
 namespace S2O.Order.Api.Controllers;
 
+[Route("api/v1/orders")]
 [ApiController]
-[Route("api/[controller]")]
 public class OrdersController : ControllerBase
 {
     private readonly ISender _sender;
@@ -19,82 +18,58 @@ public class OrdersController : ControllerBase
         _sender = sender;
     }
 
-    // 1. Guest đặt món (Không cần Auth)
-    [HttpPost("guest")]
-    [AllowAnonymous]
-    public async Task<IActionResult> PlaceGuestOrder([FromBody] PlaceGuestOrderCommand command)
-    {
-        var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
-    }
+    // ==========================================
+    // 1. BACKOFFICE (Dành cho Staff/Owner)
+    // ==========================================
 
-    // 2. Chủ quán xem danh sách (Cần Auth Owner)
+    // GET: api/v1/orders?status=Cooking
     [HttpGet]
-    [Authorize] // Yêu cầu Token
-    public async Task<IActionResult> GetOrders()
+    [Authorize(Roles = "RestaurantOwner, Staff")]
+    public async Task<IActionResult> GetOrders([FromQuery] OrderStatus? status)
     {
-        var result = await _sender.Send(new GetOrdersQuery());
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
-    }
-    
-    [HttpPut("guest/{id}/cancel")]
-    [AllowAnonymous] // Khách tự hủy
-    public async Task<IActionResult> CancelOrder(Guid id, [FromBody] string reason)
-    {
-        var command = new CancelOrderCommand(id, reason);
-        var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        // Query Handler sẽ tự lấy BranchId từ Token (UserContext)
+        // Lưu ý: Đảm bảo GetBranchOrdersQuery không yêu cầu truyền BranchId từ ngoài vào 
+        // nếu bạn muốn bảo mật tuyệt đối, hoặc lấy từ Claim như code cũ.
+
+        // Giả sử Handler của bạn cần BranchId, ta lấy từ Token:
+        var branchId = GetBranchIdFromToken();
+        var result = await _sender.Send(new GetBranchOrdersQuery(branchId, status));
+
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
-    [HttpPut("guest/{id}")]
-    [AllowAnonymous] // Khách tự sửa
-    public async Task<IActionResult> UpdateOrder(Guid id, [FromBody] UpdateOrderCommand command)
+    // GET: api/v1/orders/{id}
+    [HttpGet("{id}")]
+    [Authorize(Roles = "RestaurantOwner, Staff")]
+    public async Task<IActionResult> GetOrderDetail(Guid id)
+    {
+        var branchId = GetBranchIdFromToken();
+        var result = await _sender.Send(new GetOrderDetailQuery(id, branchId));
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+    }
+
+    // PATCH: api/v1/orders/{id}/status
+    [HttpPatch("{id}/status")]
+    [Authorize(Roles = "RestaurantOwner, Staff")]
+    public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateOrderStatusCommand command)
     {
         if (id != command.OrderId) return BadRequest("ID không khớp");
 
+        // Gán thêm BranchId để đảm bảo an toàn (Staff quán này không sửa đơn quán khác)
+        // var safeCommand = command with { BranchId = GetBranchIdFromToken() }; // Nếu record hỗ trợ with
+
         var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok() : BadRequest(result.Error);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
-    [HttpGet("history")]
-    [Authorize] 
-    public async Task<IActionResult> GetMyHistory()
+    // ==========================================
+    // HELPER
+    // ==========================================
+    private Guid GetBranchIdFromToken()
     {
-        // 1. Lấy UserId từ Token (Claim "sub" hoặc "uid")
-        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                           ?? User.FindFirst("sub")?.Value;
-
-        if (string.IsNullOrEmpty(userIdString))
-        {
-            return Unauthorized("Không tìm thấy thông tin User trong Token");
-        }
-
-        var userId = Guid.Parse(userIdString);
-
-        // 2. Gọi Query
-        var query = new GetMyOrdersQuery(userId);
-        var result = await _sender.Send(query);
-
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
-    }
-
-    [HttpPost("customer")] 
-    [Authorize]
-    public async Task<IActionResult> PlaceCustomerOrder([FromBody] PlaceCustomerOrderCommand command)
-    {
-        // 1. Lấy UserId từ Token
-        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                           ?? User.FindFirst("sub")?.Value;
-        var userName = User.FindFirst(ClaimTypes.Name)?.Value ?? "Khách hàng";
-
-        if (string.IsNullOrEmpty(userIdString)) return Unauthorized();
-
-        // 2. Gán vào Command (Bảo mật: Client không thể fake ID của người khác)
-        command.UserId = Guid.Parse(userIdString);
-        command.UserName = userName;
-
-        // 3. Gửi đi
-        var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        var branchClaim = User.FindFirst("branch_id")?.Value;
+        if (string.IsNullOrEmpty(branchClaim))
+            throw new Exception("Không tìm thấy BranchId trong Token.");
+        return Guid.Parse(branchClaim);
     }
 }

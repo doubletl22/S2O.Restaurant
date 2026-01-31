@@ -2,14 +2,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using S2O.Identity.App.Abstractions;
+using S2O.Identity.App.DTOs; // Đảm bảo đã import namespace chứa LoginResponse và UserDto mới
 using S2O.Identity.App.Services;
 using S2O.Identity.Domain.Entities;
 using S2O.Shared.Kernel.Results;
-using S2O.Identity.App.DTOs; // Import namespace DTO
 
 namespace S2O.Identity.App.Features.Login;
 
-// 👇 1. Sửa interface trả về Result<LoginResponse>
 public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginResponse>>
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -26,36 +25,36 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
         _context = context;
     }
 
-    // 👇 2. Sửa kiểu trả về của hàm Handle
     public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
+        // 1. Tìm User
         var user = await _context.Users
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
-        // 👇 Sửa kiểu trả về Failure cho khớp
         if (user == null)
             return Result<LoginResponse>.Failure(new Error("Auth.UserNotFound", "Email không tồn tại"));
 
+        // 2. Check Password
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
 
         if (!isPasswordValid)
             return Result<LoginResponse>.Failure(new Error("Auth.InvalidPassword", "Mật khẩu không đúng"));
 
-        // Lấy Roles thật từ DB
+        // 3. Lấy Roles
         var roles = await _userManager.GetRolesAsync(user);
 
-        // Tạo JWT Token
+        // 4. Tạo Token
         var token = _tokenService.CreateToken(user, roles);
 
-        // 👇 3. Tạo object response đầy đủ (Token + User Info)
+        // 5. Trả về Result (Sử dụng LoginResponse mới)
         var response = new LoginResponse(
             AccessToken: token,
             User: new UserDto(
                 Id: user.Id.ToString(),
                 Email: user.Email ?? "",
                 FullName: user.FullName ?? "User",
-                Roles: roles.ToList()
+                Roles: roles.ToList() // Chuyển IList<string> sang List<string>
             )
         );
 

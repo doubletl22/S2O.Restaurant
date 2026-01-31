@@ -15,7 +15,8 @@ public class TokenProvider : ITokenProvider
 
     public TokenProvider(IConfiguration configuration) => _configuration = configuration;
 
-    public string Create(ApplicationUser user, IList<string> roles)
+    // Thêm tham số customClaims
+    public string Create(ApplicationUser user, IList<string> roles, IEnumerable<Claim>? customClaims = null)
     {
         var claims = new List<Claim>
         {
@@ -24,12 +25,27 @@ public class TokenProvider : ITokenProvider
              new Claim(ClaimConstants.TenantId, user.TenantId?.ToString() ?? string.Empty)
         };
 
+        // 1. Thêm Roles với tên ngắn gọn là "role"
         foreach (var role in roles)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            // QUAN TRỌNG: Dùng chuỗi "role" thay vì ClaimTypes.Role
+            claims.Add(new Claim("role", role));
         }
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]!));
+        // 2. Thêm Custom Claims (như branch_id)
+        if (customClaims != null)
+        {
+            foreach (var claim in customClaims)
+            {
+                // Tránh add trùng TenantId nếu đã có
+                if (claim.Type != ClaimConstants.TenantId)
+                {
+                    claims.Add(claim);
+                }
+            }
+        }
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"] ?? "S2O_Super_Secret_Key_For_Identity_Service_2026"));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
@@ -40,6 +56,6 @@ public class TokenProvider : ITokenProvider
             signingCredentials: creds
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token); 
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
