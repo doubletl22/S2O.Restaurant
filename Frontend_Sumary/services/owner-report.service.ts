@@ -1,37 +1,84 @@
 import http from "@/lib/http";
-import { Result } from "@/lib/types";
+import { Result, DashboardStats, OrderStatus } from "@/lib/types";
 
-const ENDPOINT = "/api/reports"; 
+const ENDPOINT = "/api/v1/reports"; 
 
-// DTO cho Dashboard
-export interface DashboardStats {
-  todayRevenue: number;
-  todayOrders: number;
-  totalProducts: number;
-  totalStaff: number;
-  recentOrders: {
-    id: string;
-    tableName: string;
-    totalAmount: number;
-    status: string;
-    createdAt: string;
-  }[];
-}
-
-// DTO cho biểu đồ doanh thu
 export interface RevenueChartData {
   date: string;
   revenue: number;
 }
 
 export const ownerReportService = {
-  // Lấy thống kê tổng quan (Dashboard)
+  // GET /api/v1/reports/dashboard
   getDashboardStats: async (): Promise<Result<DashboardStats>> => {
-    return await http.get(`${ENDPOINT}/dashboard`);
+    // [MOCK] Trả về dữ liệu giả để UI không bị trắng trang nếu API chưa sẵn sàng
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          isSuccess: true,
+          value: {
+            totalRevenue: 15400000,
+            todayRevenue: 2500000,
+            totalOrders: 150,
+            todayOrders: 24,
+            activeOrders: 5,
+            totalProducts: 45,
+            totalStaff: 8,
+            topSellingProducts: [
+              { name: "Phở Bò Đặc Biệt", quantity: 120 },
+              { name: "Cà Phê Sữa Đá", quantity: 95 }
+            ],
+            recentOrders: [
+              {
+                id: "ord-001",
+                orderNumber: "101",
+                tableName: "Bàn 01",
+                status: OrderStatus.Served,
+                totalAmount: 150000,
+                createdOn: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                items: []
+              },
+              {
+                id: "ord-002",
+                orderNumber: "102",
+                tableName: "Bàn 05",
+                status: OrderStatus.Cooking,
+                totalAmount: 320000,
+                createdOn: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                items: []
+              },
+              {
+                id: "ord-003",
+                orderNumber: "103",
+                tableName: "Bàn 02",
+                status: OrderStatus.Pending,
+                totalAmount: 85000,
+                createdOn: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                items: []
+              }
+            ]
+          }
+        });
+      }, 800); // Giả lập độ trễ mạng
+    });
+
+    // Khi có API thật, bỏ comment dòng dưới:
+    // return await http.get(`${ENDPOINT}/dashboard`);
   },
 
-  // Lấy doanh thu theo khoảng thời gian (7 ngày, 30 ngày...)
+  // GET /api/v1/reports/revenue
   getRevenueData: async (days: number = 7): Promise<Result<RevenueChartData[]>> => {
-    return await http.get(`${ENDPOINT}/revenue`, { params: { days } });
+    // [MOCK] Dữ liệu biểu đồ
+    return {
+      isSuccess: true,
+      value: Array.from({ length: days }).map((_, i) => ({
+        date: new Date(Date.now() - (days - 1 - i) * 86400000).toLocaleDateString('vi-VN'),
+        revenue: Math.floor(Math.random() * 2000000) + 1000000
+      }))
+    };
+    // API thật: return await http.get(`${ENDPOINT}/revenue`, { params: { days } });
   }
 };

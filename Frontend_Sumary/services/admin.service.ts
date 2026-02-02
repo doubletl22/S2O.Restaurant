@@ -1,50 +1,29 @@
 import http from "@/lib/http";
-import { Result, SysAdminStats } from "@/lib/types";
-
-// Endpoint giả định (chưa có thật)
-const REPORT_ENDPOINT = "/api/admin-reports"; 
+import { PagedResult, User, Result, SysAdminStats } from "@/lib/types";
 
 export const adminService = {
-  // Lấy thống kê tổng quan (Dashboard)
   getStats: async (): Promise<Result<SysAdminStats>> => {
-    try {
-      // Thử gọi API thật
-      return await http.get(`${REPORT_ENDPOINT}/dashboard`);
-    } catch (error) {
-      console.warn("API Dashboard chưa sẵn sàng, sử dụng dữ liệu giả lập (Mock Data).");
-      
-      // Trả về dữ liệu giả để UI không bị lỗi 404
-      return {
-        isSuccess: true,
-        isFailure: false,
-        error: null,
-        value: {
-          totalTenants: 12,
-          activeTenants: 10,
-          totalRevenue: 15000000,
-          totalUsers: 45,
-          recentTenants: [
-            {
-              id: "mock-1",
-              name: "Nhà hàng Biển Đông",
-              planType: "Premium",
-              isActive: true,
-              isLocked: false,
-              createdAt: new Date().toISOString(),
-              ownerEmail: "owner1@biendong.com"
-            },
-            {
-              id: "mock-2",
-              name: "Kichi Kichi Mock",
-              planType: "Enterprise",
-              isActive: true,
-              isLocked: false,
-              createdAt: new Date(Date.now() - 86400000).toISOString(), // Hôm qua
-              ownerEmail: "admin@kichi.com"
-            }
-          ]
-        }
-      };
-    }
-  }
+    const res = await http.get<Result<SysAdminStats>>("/api/v1/admin/stats");
+    return res as unknown as Result<SysAdminStats>;
+  },
+  
+  getSystemUsers: async (params?: any): Promise<PagedResult<User>> => {
+    const res = await http.get<PagedResult<User>>("/api/users", { params });
+    return res as unknown as PagedResult<User>;
+  },
+
+  createUser: async (data: any) => {
+    return (await http.post("/api/users", data)) as unknown;
+  },
+  
+  getUserById: async (id: string) => (await http.get<User>(`/api/users/${id}`)) as unknown as User,
+  
+  deleteUser: async (id: string) => (await http.delete(`/api/users/${id}`)) as unknown,
+  
+  lockUser: async (id: string) => (await http.post(`/api/users/${id}/lock`, {})) as unknown,
+  
+  unlockUser: async (id: string) => (await http.post(`/api/users/${id}/unlock`, {})) as unknown,
+  
+  resetPassword: async (userId: string, newPassword: string) => 
+    (await http.put(`/api/users/${userId}/reset-password`, { newPassword })) as unknown
 };

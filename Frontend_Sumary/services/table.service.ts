@@ -1,25 +1,30 @@
 import http from "@/lib/http";
-import { Table, Result, CreateTableRequest } from "@/lib/types";
-
-// Endpoint quản lý bàn (thường nằm trong Tenant Service)
-const ENDPOINT = "/api/tables";
+import { Table, Result } from "@/lib/types";
 
 export const tableService = {
-  // Lấy danh sách bàn theo BranchId
   getByBranch: async (branchId: string): Promise<Result<Table[]>> => {
-    return await http.get(`${ENDPOINT}/by-branch/${branchId}`);
+    const response = await http.get("/api/v1/tables", { params: { branchId } });
+    return response as any;
   },
 
-  create: async (data: CreateTableRequest): Promise<Result<string>> => {
-    return await http.post(ENDPOINT, data);
+  create: async (body: { name: string; capacity: number; branchId: string }): Promise<Result<string>> => {
+    const response = await http.post("/api/v1/tables", body);
+    return response as any;
   },
 
-  // Generate lại QR Token mới (nếu cần đổi mã bàn)
-  regenerateQr: async (tableId: string): Promise<Result<string>> => {
-    return await http.post(`${ENDPOINT}/${tableId}/regenerate-qr`);
+  update: async (id: string, body: any): Promise<Result<void>> => {
+    const response = await http.put(`/api/v1/tables/${id}`, body);
+    return response as any;
   },
 
   delete: async (id: string): Promise<Result<void>> => {
-    return await http.delete(`${ENDPOINT}/${id}`);
-  }
+    const response = await http.delete(`/api/v1/tables/${id}`);
+    return response as any;
+  },
+
+  // Alias
+  getTables: async (branchId: string) => tableService.getByBranch(branchId),
+  createTable: async (b: any) => tableService.create(b),
+  updateTable: async (id: string, b: any) => tableService.update(id, b),
+  deleteTable: async (id: string) => tableService.delete(id),
 };

@@ -1,20 +1,34 @@
 import http from "@/lib/http";
-import { PublicMenu, Result, GuestOrderRequest, TableInfo, GuestOrderHistory } from "@/lib/types";
-
-const CATALOG_PUBLIC = "/api/public-menu"; 
-const ORDER_PUBLIC = "/api/public-orders";
+import { PublicMenu, TableInfo, Result, Order } from "@/lib/types";
 
 export const guestService = {
-  getMenuByToken: async (qrToken: string): Promise<Result<{ menu: PublicMenu; table: TableInfo }>> => {
-    return await http.get(`${CATALOG_PUBLIC}/${qrToken}`);
+  resolveTable: async (tableId: string): Promise<TableInfo> => {
+    return await http.get(`/api/v1/storefront/tenants/resolve-table/${tableId}`) as any;
   },
 
-  placeOrder: async (data: GuestOrderRequest): Promise<Result<string>> => {
-    return await http.post(ORDER_PUBLIC, data);
+  getMenu: async (tenantId: string, categoryId?: string): Promise<PublicMenu> => {
+    return await http.get(`/api/v1/storefront/menus/${tenantId}`, { params: { categoryId } }) as any;
   },
 
-  // --- MỚI: Lấy danh sách món đã đặt ---
-  getOrders: async (qrToken: string): Promise<Result<GuestOrderHistory>> => {
-    return await http.get(`${ORDER_PUBLIC}/${qrToken}`);
+  getMenuByToken: async (qrToken: string): Promise<Result<{ table: TableInfo; menu: PublicMenu }>> => {
+    try {
+      const tableInfo = await guestService.resolveTable(qrToken);
+      if (!tableInfo || !tableInfo.tenantId) {
+        return { isSuccess: false, value: null as any, error: { code: "404", description: "Invalid Table" } };
+      }
+      const menu = await guestService.getMenu(tableInfo.tenantId);
+      return { isSuccess: true, value: { table: tableInfo, menu } };
+    } catch (error: any) {
+      return { isSuccess: false, value: null as any, error: error };
+    }
+  },
+
+  placeOrder: async (payload: any) => {
+    return await http.post("/api/v1/storefront/orders/guest", payload) as any;
+  },
+
+  getOrders: async (qrToken: string): Promise<Result<Order[]>> => {
+      // Mock hoặc gọi API thật
+      return { isSuccess: true, value: [] }; 
   }
 };

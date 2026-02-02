@@ -6,24 +6,30 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { OrderStatus } from "@/lib/types";
-import { staffService, StaffOrderDto } from "@/services/staff.service";
+// [FIX 1] Import Type từ @/lib/types thay vì service
+import { OrderStatus, StaffOrderDto, OrderItemDto } from "@/lib/types"; 
+import { staffService } from "@/services/staff.service";
 
 export default function OrderTicketPage() {
-  const [readyItems, setReadyItems] = useState<{order: StaffOrderDto, item: any}[]>([]);
+  // Định nghĩa state rõ ràng
+  const [readyItems, setReadyItems] = useState<{order: StaffOrderDto, item: OrderItemDto}[]>([]);
 
   const fetchReadyItems = async () => {
     try {
-      const res = await staffService.getOrders();
-      if (res.isSuccess) {
-        // Flatten list: Lấy tất cả item có status = Ready
-        const items: {order: StaffOrderDto, item: any}[] = [];
-        res.value.forEach(order => {
-          order.items.forEach(item => {
-            if (item.status === OrderStatus.Ready) {
-              items.push({ order, item });
-            }
-          });
+      const res: any = await staffService.getOrders();
+      if (res.isSuccess && Array.isArray(res.value)) {
+        const items: {order: StaffOrderDto, item: OrderItemDto}[] = [];
+        
+        res.value.forEach((order: StaffOrderDto) => {
+          if (order.items) {
+            // [FIX 2] Khai báo kiểu cho item
+            order.items.forEach((item: OrderItemDto) => {
+              // Lọc món đã xong (Ready) để phục vụ
+              if (item.status === OrderStatus.Ready) {
+                items.push({ order, item });
+              }
+            });
+          }
         });
         setReadyItems(items);
       }
@@ -40,10 +46,12 @@ export default function OrderTicketPage() {
 
   const handleServe = async (orderId: string, itemId: string) => {
     try {
-      const res = await staffService.updateOrderItemStatus(orderId, itemId, OrderStatus.Served);
+      const res: any = await staffService.updateOrderItemStatus(orderId, itemId, OrderStatus.Served);
       if (res.isSuccess) {
         toast.success("Đã phục vụ khách");
         fetchReadyItems();
+      } else {
+        toast.error("Lỗi: " + res.error?.message);
       }
     } catch (e) {
       toast.error("Có lỗi xảy ra");

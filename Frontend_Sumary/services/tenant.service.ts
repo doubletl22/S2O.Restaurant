@@ -1,35 +1,32 @@
-import http from "@/lib/http"; // Dùng cái mới, không dùng @/lib/api cũ
+import http from "@/lib/http";
 import { Result, Tenant, RegisterTenantRequest } from "@/lib/types";
 
-// Endpoint Admin quản lý (List/Delete/Lock)
-const ADMIN_ENDPOINT = "/api/admin/tenants"; 
-
-// Endpoint tạo mới (nằm ở Auth Controller như bạn yêu cầu)
-const AUTH_CREATE_ENDPOINT = "/api/auth/create-tenant";
+const ENDPOINT = "/api/v1/tenants";
 
 export const tenantService = {
-  // Lấy danh sách (Có hỗ trợ params phân trang nếu cần)
-  getAll: async (params?: { page?: number, size?: number, keyword?: string }): Promise<Result<Tenant[]>> => {
-    return await http.get(ADMIN_ENDPOINT, { params });
+  // GET All
+  getAll: async (): Promise<Result<Tenant[]>> => {
+    // Interceptor đã trả về data (Result object), ta chỉ cần ép kiểu về Result<Tenant[]>
+    const response = await http.get<Result<Tenant[]>>(ENDPOINT);
+    return response as unknown as Result<Tenant[]>;
   },
 
-  // Tạo mới (Dùng endpoint /auth/create-tenant)
+  // Create
   create: async (data: RegisterTenantRequest): Promise<Result<string>> => {
-    return await http.post(AUTH_CREATE_ENDPOINT, data);
+    const response = await http.post<Result<string>>(`${ENDPOINT}/registration`, data);
+    return response as unknown as Result<string>;
   },
 
-  // Cập nhật thông tin
-  update: async (id: string, data: any): Promise<Result<void>> => {
-    return await http.put(`${ADMIN_ENDPOINT}/${id}`, data);
-  },
-
-  // Khóa / Mở khóa (Backend cần API này)
+  // Lock/Unlock
   toggleLock: async (id: string, isLocked: boolean): Promise<Result<void>> => {
-    return await http.put(`${ADMIN_ENDPOINT}/${id}/lock`, { isLocked });
+    const action = isLocked ? "lock" : "unlock";
+    const response = await http.post<Result<void>>(`${ENDPOINT}/${id}/${action}`, {});
+    return response as unknown as Result<void>;
   },
 
-  // Xóa
+  // Delete
   delete: async (id: string): Promise<Result<void>> => {
-    return await http.delete(`${ADMIN_ENDPOINT}/${id}`);
+    const response = await http.delete<Result<void>>(`${ENDPOINT}/${id}`);
+    return response as unknown as Result<void>;
   }
 };

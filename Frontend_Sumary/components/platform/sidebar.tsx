@@ -18,7 +18,8 @@ import {
   Utensils,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { AUTH_COOKIE_NAME, ROLE_COOKIE_NAME } from '@/lib/auth'
+const AUTH_COOKIE_NAME = "auth_token";
+const ROLE_COOKIE_NAME = "user_role";
 
 interface NavItem {
   label: string

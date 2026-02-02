@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { QrCode, Copy, Printer } from 'lucide-react'
 import { toast } from 'sonner'
-import { branchService, BranchDto } from '@/services/branch.service'
-import { tableService, TableDto } from '@/services/table.service'
+import { branchService } from '@/services/branch.service'
+import { tableService } from '@/services/table.service'
+// [FIX] Import DTO từ types chung
+import { BranchDto, TableDto } from '@/lib/types'
 
 export default function QrCodesPage() {
   const [branches, setBranches] = useState<BranchDto[]>([])
@@ -15,22 +17,30 @@ export default function QrCodesPage() {
   const [tables, setTables] = useState<TableDto[]>([])
 
   useEffect(() => {
-    branchService.getAll().then(data => {
-        setBranches(data || [])
-        if(data && data.length > 0) setSelectedBranchId(data[0].id)
+    // [FIX] Handle Result<T> trả về từ service
+    branchService.getAll().then((res: any) => {
+        if (res.isSuccess) {
+            setBranches(res.value || [])
+            if(res.value && res.value.length > 0) setSelectedBranchId(res.value[0].id)
+        }
     })
   }, [])
 
   useEffect(() => {
     if(!selectedBranchId) return;
-    tableService.getByBranch(selectedBranchId).then(data => setTables(Array.isArray(data) ? data : []))
+    // [FIX] Handle Result<T>
+    tableService.getByBranch(selectedBranchId).then((res: any) => {
+        if (res.isSuccess) {
+            setTables(Array.isArray(res.value) ? res.value : [])
+        } else {
+            setTables([])
+        }
+    })
   }, [selectedBranchId])
 
-  // Hàm tạo link
   const getOrderLink = (tableId: string) => {
-      // Giả sử domain local hoặc production
       const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-      return `${baseUrl}/guest/t/${tableId}`; // Link khách truy cập
+      return `${baseUrl}/guest/t/${tableId}`;
   }
 
   const copyToClipboard = (text: string) => {
@@ -52,7 +62,9 @@ export default function QrCodesPage() {
            <div className="flex items-center gap-2">
                <Select value={selectedBranchId} onValueChange={setSelectedBranchId}>
                    <SelectTrigger className="w-50"><SelectValue placeholder="Chọn chi nhánh"/></SelectTrigger>
-                   <SelectContent>{branches.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                   <SelectContent>
+                       {branches.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+                   </SelectContent>
                </Select>
                <Button variant="outline" onClick={printQr}><Printer className="mr-2 h-4 w-4"/> In tất cả</Button>
            </div>
@@ -68,8 +80,8 @@ export default function QrCodesPage() {
                            <p className="text-xs text-gray-400 uppercase tracking-widest">Scan to Order</p>
                        </CardHeader>
                        <CardContent className="pb-2">
-                           {/* Placeholder QR Code. Nếu có thư viện thì dùng <QRCode value={link} /> */}
                            <div className="bg-white p-2 border rounded-lg inline-block">
+                               {/* Sử dụng API tạo QR miễn phí hoặc thư viện */}
                                <img 
                                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(link)}`} 
                                  alt="QR Code" 
@@ -78,7 +90,7 @@ export default function QrCodesPage() {
                            </div>
                        </CardContent>
                        <CardFooter className="flex flex-col gap-2 w-full pt-0 print:hidden">
-                           <div className="text-xs text-gray-400 truncate w-full px-2 bg-gray-50 py-1 rounded">
+                           <div className="text-xs text-gray-400 truncate w-full px-2 bg-gray-50 py-1 rounded border">
                                {link}
                            </div>
                            <Button variant="ghost" size="sm" className="w-full text-blue-600" onClick={() => copyToClipboard(link)}>

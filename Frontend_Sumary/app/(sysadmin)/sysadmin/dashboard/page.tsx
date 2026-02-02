@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Users, Building2, DollarSign, Activity, Server, TrendingUp } from "lucide-react";
-
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { adminService } from "@/services/admin.service";
@@ -16,7 +15,9 @@ export default function SysAdminDashboard() {
     const loadStats = async () => {
       try {
         const res = await adminService.getStats();
-        if (res.isSuccess) setStats(res.value);
+        if (res.isSuccess) {
+            setStats(res.value);
+        }
       } catch (e) {
         console.error("Lỗi tải dashboard stats:", e);
       } finally {
@@ -38,9 +39,7 @@ export default function SysAdminDashboard() {
         <p className="text-muted-foreground">Theo dõi hoạt động của nền tảng S2O Restaurant SaaS.</p>
       </div>
       
-      {/* 4 Cards Chỉ số chính */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {/* Tenant Stats */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Tổng Nhà hàng</CardTitle>
@@ -52,7 +51,6 @@ export default function SysAdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Active Stats */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Đang Hoạt động</CardTitle>
@@ -60,14 +58,13 @@ export default function SysAdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.activeTenants || 0}</div>
-            <div className="flex items-center text-xs text-green-600 mt-1">
+             <div className="flex items-center text-xs text-green-600 mt-1">
                <TrendingUp className="h-3 w-3 mr-1" /> 
                Tỉ lệ {(stats && stats.totalTenants > 0 ? (stats.activeTenants / stats.totalTenants * 100).toFixed(1) : 0)}%
             </div>
           </CardContent>
         </Card>
 
-        {/* Revenue Stats */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Doanh thu (Platform)</CardTitle>
@@ -79,7 +76,6 @@ export default function SysAdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* User Stats */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Tổng Users</CardTitle>
@@ -91,11 +87,8 @@ export default function SysAdminDashboard() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Phần mở rộng: Server Status & Quick Actions */}
+      {/* ... Phần server status giữ nguyên */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        
-        {/* Card Server Status */}
         <Card className="col-span-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -117,36 +110,6 @@ export default function SysAdminDashboard() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Card Recent Tenants */}
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Tenant mới nhất</CardTitle>
-            <CardDescription>Các nhà hàng vừa gia nhập hệ thống</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-               {stats?.recentTenants && stats.recentTenants.length > 0 ? (
-                 stats.recentTenants.map((tenant) => (
-                   <div key={tenant.id} className="flex items-center justify-between border-b last:border-0 pb-2">
-                      <div className="flex items-center gap-3">
-                         <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-xs shrink-0">
-                            {tenant.name ? tenant.name.substring(0,2).toUpperCase() : "NA"}
-                         </div>
-                         <div className="space-y-0.5">
-                            <p className="text-sm font-medium leading-none truncate max-w-30" title={tenant.name}>{tenant.name}</p>
-                            <p className="text-xs text-muted-foreground">{tenant.createdAt ? new Date(tenant.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</p>
-                         </div>
-                      </div>
-                      <div className="text-xs font-medium border px-2 py-1 rounded-md bg-muted">{tenant.subscriptionPlan}</div>
-                   </div>
-                 ))
-               ) : (
-                 <div className="text-center py-4 text-muted-foreground text-sm">Chưa có dữ liệu gần đây</div>
-               )}
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
@@ -157,11 +120,7 @@ function DashboardSkeleton() {
     <div className="space-y-6">
        <Skeleton className="h-10 w-75" />
        <div className="grid gap-4 md:grid-cols-4">
-         {Array.from({length:4}).map((_,i) => <Skeleton key={i} className="h-30 rounded-xl" />)}
-       </div>
-       <div className="grid gap-4 md:grid-cols-7">
-         <Skeleton className="col-span-4 h-75 rounded-xl" />
-         <Skeleton className="col-span-3 h-75 rounded-xl" />
+         {Array.from({length:4}).map((_,i) => <Skeleton key={i} className="h-32 rounded-xl" />)}
        </div>
     </div>
   );

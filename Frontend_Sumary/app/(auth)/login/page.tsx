@@ -10,7 +10,9 @@ import { jwtDecode } from "jwt-decode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authService, LoginRequest } from "@/services/auth.service";
+import { authService } from "@/services/auth.service";
+// [FIX 1] Import LoginRequest từ types
+import { LoginRequest } from "@/lib/types";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,27 +21,22 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginRequest) => {
     setIsLoading(true);
-    console.log("Đang gửi request login...", data); // DEBUG
 
     try {
       // 1. Gọi API
+      // [FIX 2] AuthController trả về trực tiếp LoginResponse, không có wrapper Result
       const res = await authService.login(data);
-      console.log("Kết quả trả về từ API:", res); // DEBUG
 
       // 2. Kiểm tra kết quả
-      if (res.isSuccess && res.value) {
-        const { accessToken, user } = res.value;
-
-        if (!accessToken) {
-          throw new Error("Không nhận được Access Token từ Server");
-        }
+      if (res && res.accessToken) {
+        const { accessToken, user } = res;
 
         // 3. Lưu LocalStorage
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("user", JSON.stringify(user));
 
-        // 4. Giải mã JWT để lấy thời gian hết hạn (exp)
-        let maxAge = 86400; // Mặc định 1 ngày
+        // 4. Cookie & Decode Token
+        let maxAge = 86400; // 1 ngày
         try {
           const decoded: any = jwtDecode(accessToken);
           const currentTime = Math.floor(Date.now() / 1000);
@@ -50,15 +47,12 @@ export default function LoginPage() {
           console.error("Lỗi decode token:", e);
         }
         
-        // 5. Lưu Cookie
         document.cookie = `token=${accessToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
 
         toast.success(`Xin chào, ${user.fullName}`);
 
-        // 6. Điều hướng
+        // 5. Điều hướng
         const roles = user.roles || [];
-        console.log("User Roles:", roles); // DEBUG
-
         if (roles.includes("SystemAdmin")) {
           router.push("/sysadmin/dashboard");
         } else if (roles.includes("RestaurantOwner")) {
@@ -68,23 +62,23 @@ export default function LoginPage() {
         } else {
           router.push("/");
         }
-      } else {
-        // Xử lý lỗi nghiệp vụ (Sai pass, user not found...)
-        console.error("Login thất bại:", res.error); // DEBUG
-        toast.error("Đăng nhập thất bại", {
-          description: res.error?.message || "Thông tin không chính xác.",
-        });
       }
     } catch (error: any) {
-      // Xử lý lỗi mạng / server crash
-      console.error("Lỗi hệ thống:", error); // DEBUG
+      // [FIX 3] Xử lý lỗi
+      // Nếu login sai, backend trả về 400 -> http interceptor ném lỗi vào đây
+      console.error("Login Error:", error);
       
-      let msg = "Không thể kết nối đến máy chủ.";
-      if (error?.message) msg = error.message;
-      // Nếu backend trả về validation error 400
-      if (error?.response?.data?.detail) msg = error.response.data.detail;
+      let msg = "Đăng nhập thất bại";
+      // Backend trả về lỗi dạng { code, description } hoặc { detail }
+      if (error?.description) {
+        msg = error.description;
+      } else if (error?.detail) {
+        msg = error.detail;
+      } else if (error?.message) {
+        msg = error.message;
+      }
 
-      toast.error("Lỗi đăng nhập", { description: msg });
+      toast.error("Lỗi", { description: msg });
     } finally {
       setIsLoading(false);
     }

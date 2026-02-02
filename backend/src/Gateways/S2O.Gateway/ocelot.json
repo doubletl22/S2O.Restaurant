@@ -6,6 +6,31 @@
     
     // Catalog: Lấy Menu
     {
+      // --- Cấu hình cho TENANT Service (Bao gồm cả Admin Stats và Delete) ---
+      "DownstreamPathTemplate": "/api/v1/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ {"Host": "s2o.tenant.api","Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/v1/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ] 
+    },
+    {
+      // --- Cấu hình cho IDENTITY Service (Users) ---
+      "DownstreamPathTemplate": "/api/users/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ {"Host": "s2o.identity.api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/users/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+    },
+     {
+      "DownstreamPathTemplate": "/api/users",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ {"Host": "s2o.identity.api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/users",
+      "UpstreamHttpMethod": [ "GET", "POST" ]
+    },
+
+
+    {
       "UpstreamPathTemplate": "/api/v1/storefront/menus/{everything}",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamPathTemplate": "/api/v1/storefront/menus/{everything}",

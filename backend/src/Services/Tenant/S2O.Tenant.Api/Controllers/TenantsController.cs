@@ -31,8 +31,6 @@ public class TenantsController : ControllerBase
     [Authorize(Roles = "SystemAdmin")]
     public async Task<IActionResult> ToggleLock(Guid id)
     {
-        // Gộp lock/unlock vào 1 logic hoặc tách ra tùy Command của bạn
-        // Giả sử bạn dùng ToggleTenantLockCommand(id, isLocked)
         var result = await _mediator.Send(new ToggleTenantLockCommand(id, true));
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
@@ -43,6 +41,14 @@ public class TenantsController : ControllerBase
     public async Task<IActionResult> Unlock(Guid id)
     {
         var result = await _mediator.Send(new ToggleTenantLockCommand(id, false));
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var result = await _mediator.Send(new S2O.Tenant.App.Features.Tenants.Commands.DeleteTenantCommand(id));
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 }

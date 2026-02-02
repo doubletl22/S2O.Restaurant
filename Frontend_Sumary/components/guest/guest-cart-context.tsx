@@ -2,10 +2,12 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Product, CartItem } from "@/lib/types";
+import { Product, CartItem, PublicTableInfo } from "@/lib/types";
 
 interface GuestCartContextType {
   cart: CartItem[];
+  tableInfo: PublicTableInfo | null;
+  setTableInfo: (info: PublicTableInfo) => void;
   addToCart: (product: Product, quantity?: number, note?: string) => void;
   removeFromCart: (cartId: string) => void;
   updateQuantity: (cartId: string, delta: number) => void;
@@ -18,72 +20,39 @@ const GuestCartContext = createContext<GuestCartContextType | undefined>(undefin
 
 export function GuestCartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [tableInfo, setTableInfo] = useState<PublicTableInfo | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // 1. Load cart từ LocalStorage khi mount
   useEffect(() => {
     const savedCart = localStorage.getItem("guest_cart");
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("Lỗi đọc cart cũ", e);
-      }
-    }
+    const savedTable = localStorage.getItem("guest_table_info");
+    if (savedCart) setCart(JSON.parse(savedCart));
+    if (savedTable) setTableInfo(JSON.parse(savedTable));
     setIsInitialized(true);
   }, []);
 
-  // 2. Lưu cart mỗi khi thay đổi (chỉ sau khi đã init)
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem("guest_cart", JSON.stringify(cart));
+      if (tableInfo) localStorage.setItem("guest_table_info", JSON.stringify(tableInfo));
     }
-  }, [cart, isInitialized]);
+  }, [cart, tableInfo, isInitialized]);
 
-  // Actions
   const addToCart = (product: Product, quantity = 1, note = "") => {
     setCart((prev) => {
-      // Tìm xem món này (cùng ID và cùng Note) đã có chưa
-      const existingIdx = prev.findIndex(
-        (item) => item.id === product.id && item.note === note
-      );
-
-      if (existingIdx >= 0) {
-        // Cộng dồn số lượng
-        const newCart = [...prev];
-        newCart[existingIdx].quantity += quantity;
-        toast.success(`Đã cập nhật số lượng: ${product.name}`);
-        return newCart;
-      } else {
-        // Thêm mới
-        const newItem: CartItem = {
-          ...product,
-          cartId: `${product.id}-${Date.now()}`, // Tạo ID tạm cho item trong giỏ
-          quantity,
-          note,
-        };
-        toast.success(`Đã thêm vào giỏ: ${product.name}`);
-        return [...prev, newItem];
+      const existing = prev.find(item => item.id === product.id && item.note === note);
+      if (existing) {
+        return prev.map(item => item === existing ? { ...item, quantity: item.quantity + quantity } : item);
       }
+      return [...prev, { ...product, cartId: `${product.id}-${Date.now()}`, quantity, note }];
     });
+    toast.success(`Đã thêm ${product.name}`);
   };
 
-  const removeFromCart = (cartId: string) => {
-    setCart((prev) => prev.filter((item) => item.cartId !== cartId));
-    toast.info("Đã xóa món khỏi giỏ");
-  };
-
+  const removeFromCart = (cartId: string) => setCart(p => p.filter(i => i.cartId !== cartId));
+  
   const updateQuantity = (cartId: string, delta: number) => {
-    setCart((prev) => {
-      return prev.map((item) => {
-        if (item.cartId === cartId) {
-          const newQty = item.quantity + delta;
-          if (newQty <= 0) return item; // Không cho giảm dưới 1 (dùng remove để xóa)
-          return { ...item, quantity: newQty };
-        }
-        return item;
-      });
-    });
+    setCart(p => p.map(i => (i.cartId === cartId && i.quantity + delta > 0) ? { ...i, quantity: i.quantity + delta } : i));
   };
 
   const clearCart = () => {
@@ -91,22 +60,11 @@ export function GuestCartProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("guest_cart");
   };
 
-  // Derived state
-  const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalAmount = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <GuestCartContext.Provider
-      value={{
-        cart,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        totalAmount,
-        totalItems,
-      }}
-    >
+    <GuestCartContext.Provider value={{ cart, tableInfo, setTableInfo, addToCart, removeFromCart, updateQuantity, clearCart, totalAmount, totalItems }}>
       {children}
     </GuestCartContext.Provider>
   );
@@ -114,8 +72,6 @@ export function GuestCartProvider({ children }: { children: React.ReactNode }) {
 
 export const useGuestCart = () => {
   const context = useContext(GuestCartContext);
-  if (!context) {
-    throw new Error("useGuestCart must be used within a GuestCartProvider");
-  }
+  if (!context) throw new Error("useGuestCart must be used within a GuestCartProvider");
   return context;
 };

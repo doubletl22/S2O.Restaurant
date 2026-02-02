@@ -1,13 +1,12 @@
 import http from "@/lib/http";
-import { Result, StaffProfile, CreateStaffRequest } from "@/lib/types";
+import { StaffProfile, CreateStaffRequest, Result } from "@/lib/types";
 
-// Endpoint trỏ về Identity Service -> OwnerStaffController
-const ENDPOINT = "/api/owner-staff"; 
+const ENDPOINT = "/api/v1/staffs"; // Hoặc /api/v1/owner/staffs tùy route backend
 
 export const ownerStaffService = {
-  // Lấy danh sách nhân viên của Owner
-  getAll: async (): Promise<Result<StaffProfile[]>> => {
-    return await http.get(ENDPOINT);
+  // Lấy danh sách nhân viên
+  getAll: async (keyword?: string): Promise<Result<StaffProfile[]>> => {
+    return await http.get(ENDPOINT, { params: { keyword } });
   },
 
   // Tạo nhân viên mới
@@ -15,13 +14,13 @@ export const ownerStaffService = {
     return await http.post(ENDPOINT, data);
   },
 
-  // Cập nhật thông tin (nếu cần)
-  update: async (id: string, data: Partial<CreateStaffRequest>): Promise<Result<void>> => {
-    return await http.put(`${ENDPOINT}/${id}`, data);
-  },
-
-  // Xóa nhân viên (hoặc khóa)
+  // Xóa nhân viên
   delete: async (id: string): Promise<Result<void>> => {
     return await http.delete(`${ENDPOINT}/${id}`);
+  },
+  
+  // Cập nhật (nếu cần)
+  update: async (id: string, data: any): Promise<Result<void>> => {
+    return await http.put(`${ENDPOINT}/${id}`, data);
   }
 };
