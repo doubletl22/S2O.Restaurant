@@ -1,156 +1,97 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Plus, Search, Edit, Trash2, MoreHorizontal } from "lucide-react";
-import { toast } from "sonner";
+import { useState } from "react";
+import { useProducts, useDeleteProduct } from "@/hooks/use-products";
+import { ProductDialog } from "@/components/owner/product-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-
-import { ProductDialog } from "@/components/owner/product-dialog";
-import { productService } from "@/services/product.service";
-import { categoryService } from "@/services/category.service";
-import { Product, Category } from "@/lib/types";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Plus, Search, Trash2, Utensils } from "lucide-react";
+import { formatCurrency } from "@/lib/utils"; // Hàm format tiền tệ (cần tạo thêm)
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [keyword, setKeyword] = useState("");
+  
+  // Fetch data (có thể thêm debounce cho keyword nếu muốn xịn hơn)
+  const { data: products, isLoading } = useProducts({ keyword });
+  const deleteMutation = useDeleteProduct();
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [productToDelete, setProductToDelete] = useState<string | null>(null);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [prodRes, catRes] = await Promise.all([
-        productService.getAll({ pageIndex: 1, pageSize: 100 }), // [FIX] dùng getAll
-        categoryService.getAll()
-      ]);
-
-      // [FIX] Xử lý Result<T>
-      if (prodRes.isSuccess) setProducts(prodRes.value.items || prodRes.value);
-      if (catRes.isSuccess) setCategories(catRes.value);
-    } catch (error) { console.error(error); } 
-    finally { setLoading(false); }
+  const handleDelete = (id: string) => {
+    if (confirm("Bạn có chắc muốn xóa món này?")) {
+      deleteMutation.mutate(id);
+    }
   };
 
-  useEffect(() => { loadData(); }, []);
-
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setIsDialogOpen(true);
-  };
-
-  const handleCreate = () => {
-    setEditingProduct(null);
-    setIsDialogOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!productToDelete) return;
-    try {
-      const res = await productService.delete(productToDelete); // [FIX] dùng delete
-      if (res.isSuccess) {
-        toast.success("Đã xóa món ăn");
-        loadData();
-      } else {
-        toast.error("Không thể xóa", { description: res.error?.message });
-      }
-    } catch (error) { console.error(error); } 
-    finally { setProductToDelete(null); }
-  };
-
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Helper xử lý data trả về (vì API có thể trả PagedResult hoặc List)
+  const items = Array.isArray(products) ? products : products?.items || [];
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold tracking-tight">Quản lý Thực đơn</h1>
-        <Button onClick={handleCreate}><Plus className="mr-2 h-4 w-4" /> Thêm món mới</Button>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold tracking-tight">Quản lý Món ăn</h1>
+        <Button onClick={() => setIsOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Thêm món mới
+        </Button>
       </div>
 
-      <div className="flex items-center gap-2 bg-card p-2 rounded-md border w-full sm:max-w-sm">
-        <Search className="h-4 w-4 text-muted-foreground ml-2" />
-        <Input 
-          placeholder="Tìm kiếm..." 
-          className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      {/* Thanh tìm kiếm */}
+      <div className="flex items-center gap-2 max-w-sm">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Tìm kiếm món ăn..."
+            className="pl-9"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
+        </div>
       </div>
 
+      {/* Bảng dữ liệu */}
       <div className="rounded-md border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-16">Ảnh</TableHead>
+              <TableHead className="w-[80px]">Ảnh</TableHead>
               <TableHead>Tên món</TableHead>
               <TableHead>Danh mục</TableHead>
               <TableHead>Giá bán</TableHead>
-              <TableHead>Trạng thái</TableHead>
-              <TableHead className="text-right">Thao tác</TableHead>
+              <TableHead className="text-right">Hành động</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loading ? Array.from({length:5}).map((_,i) => <TableRow key={i}><TableCell colSpan={6}><Skeleton className="h-10"/></TableCell></TableRow>) : 
-             filteredProducts.length === 0 ? <TableRow><TableCell colSpan={6} className="text-center h-24">Không có dữ liệu</TableCell></TableRow> :
-             filteredProducts.map((product) => (
+            {isLoading ? (
+              <TableRow><TableCell colSpan={5} className="text-center py-10">Đang tải dữ liệu...</TableCell></TableRow>
+            ) : items.length === 0 ? (
+              <TableRow><TableCell colSpan={5} className="text-center py-10 text-muted-foreground">Chưa có món ăn nào</TableCell></TableRow>
+            ) : (
+              items.map((product: any) => (
                 <TableRow key={product.id}>
                   <TableCell>
-                    <div className="h-10 w-10 rounded bg-muted overflow-hidden">
-                       {product.imageUrl ? <img src={product.imageUrl} className="h-full w-full object-cover"/> : null}
-                    </div>
+                    <Avatar className="h-10 w-10 rounded-md">
+                      <AvatarImage src={product.imageUrl} className="object-cover" />
+                      <AvatarFallback className="rounded-md"><Utensils className="h-4 w-4" /></AvatarFallback>
+                    </Avatar>
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{categories.find(c => c.id === product.categoryId)?.name || "---"}</TableCell>
-                  <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}</TableCell>
-                  <TableCell><Badge variant={product.isActive ? "outline" : "destructive"}>{product.isActive ? "Bán" : "Ẩn"}</Badge></TableCell>
+                  {/* Nếu API trả về tên category thì hiển thị, ko thì hiện ID tạm */}
+                  <TableCell>{product.categoryName || "---"}</TableCell> 
+                  <TableCell>{formatCurrency(product.price)}</TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4"/></Button></DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(product)}><Edit className="mr-2 h-4 w-4"/> Sửa</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setProductToDelete(product.id)} className="text-red-600"><Trash2 className="mr-2 h-4 w-4"/> Xóa</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(product.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
-            }
+            )}
           </TableBody>
         </Table>
       </div>
 
-      {/* [FIX] Props: setOpen thay vì onOpenChange, product thay vì productToEdit */}
-      <ProductDialog 
-        open={isDialogOpen} 
-        setOpen={setIsDialogOpen} // Component ProductDialog dùng setOpen
-        categories={categories}
-        product={editingProduct}  // Component ProductDialog dùng product
-        onSuccess={loadData}
-      />
-
-      <AlertDialog open={!!productToDelete} onOpenChange={(o) => !o && setProductToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader><AlertDialogTitle>Xóa món ăn?</AlertDialogTitle><AlertDialogDescription>Hành động này không thể hoàn tác.</AlertDialogDescription></AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel>Hủy</AlertDialogCancel><AlertDialogAction onClick={confirmDelete} className="bg-red-600">Xóa</AlertDialogAction></AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ProductDialog open={isOpen} onOpenChange={setIsOpen} />
     </div>
   );
 }

@@ -1,5 +1,14 @@
 import { OwnerSidebar } from "@/components/owner/owner-sidebar";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export default function OwnerLayout({
   children,
@@ -7,29 +16,40 @@ export default function OwnerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen w-full bg-muted/40">
-      {/* Sidebar cố định bên trái */}
-      <aside className="hidden md:block fixed inset-y-0 left-0 z-10 w-64 bg-background">
-        <OwnerSidebar />
-      </aside>
-
-      {/* Nội dung chính bên phải */}
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-64 w-full">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-           {/* Mobile Menu Trigger có thể đặt ở đây (Sheet) */}
-           <div className="flex-1">
-             <h1 className="text-lg font-semibold">Trang quản trị</h1>
-           </div>
-           <div className="flex items-center gap-2">
-             {/* User Avatar hoặc Info */}
-             <span className="text-sm text-muted-foreground">Admin</span>
-           </div>
+    // [FIX] Bọc toàn bộ layout trong SidebarProvider
+    <SidebarProvider>
+      <OwnerSidebar />
+      
+      {/* SidebarInset giúp nội dung tự động co giãn khi sidebar mở/đóng */}
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          {/* Nút đóng mở Sidebar */}
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
+          
+          {/* Breadcrumb đơn giản */}
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="/owner/dashboard">
+                  S2O Restaurant
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Owner Portal</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </header>
-        
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0">
-           {children}
-        </main>
-      </div>
-    </div>
+
+        {/* Nội dung chính */}
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <main className="flex-1 py-4">
+            {children}
+          </main>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

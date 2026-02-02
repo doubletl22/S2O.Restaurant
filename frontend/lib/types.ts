@@ -100,6 +100,7 @@ export interface CreateProductRequest {
   categoryId: string;
   isActive: boolean;
   imageUrl?: string;
+  imageFile?: File;
 }
 
 // --- STAFF ---

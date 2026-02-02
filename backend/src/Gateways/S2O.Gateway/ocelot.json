@@ -127,7 +127,6 @@
 
     // --- Products (Món ăn) ---
     {
-      // [FIX] Route lấy danh sách: GET /api/v1/products
       "DownstreamPathTemplate": "/api/v1/products",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [ { "Host": "catalog-api", "Port": 8080 } ],
