@@ -1,167 +1,73 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Search, SlidersHorizontal } from 'lucide-react'
-import { MenuItemCard } from '@/components/guest/menu-item-card'
-import { formatMoney, isSessionExpired, setSession } from '../_shared/guestStore';
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useGuestCart } from "@/components/guest/guest-cart-context";
+import { guestService } from "@/services/guest.service";
+import { Category, Product } from "@/lib/types";
+import { GuestHeader } from "@/components/guest/guest-header";
+import { CategoryChips } from "@/components/guest/category-chips";
+import { MenuItemCard } from "@/components/guest/menu-item-card";
+import { BottomNavV2 } from "@/components/guest/bottom-nav-v2";
 
-// Product interface as specified
-interface Product {
-  id: number
-  name: string
-  price: number
-  image: string
-  isAvailable: boolean
-}
+export default function GuestMenuPage({ params }: { params: { qrToken: string } }) {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  // [FIX] State selectedCategory cho phép null (đại diện cho "Tất cả")
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-// Mock data
-const categories = ['Tất cả', 'Món chính', 'Đồ uống', 'Tráng miệng', 'Khai vị']
+  const { setTableInfo } = useGuestCart();
 
-const products: Product[] = [
-  {
-    id: 1,
-    name: 'Phở Bò Tái',
-    price: 65000,
-    image: '/placeholder.svg?height=200&width=200',
-    isAvailable: true,
-  },
-  {
-    id: 2,
-    name: 'Cơm Rang Dương Châu',
-    price: 55000,
-    image: '/placeholder.svg?height=200&width=200',
-    isAvailable: true,
-  },
-  {
-    id: 3,
-    name: 'Bún Chả Hà Nội',
-    price: 60000,
-    image: '/placeholder.svg?height=200&width=200',
-    isAvailable: false,
-  },
-  {
-    id: 4,
-    name: 'Gỏi Cuốn Tôm Thịt',
-    price: 45000,
-    image: '/placeholder.svg?height=200&width=200',
-    isAvailable: true,
-  },
-  {
-    id: 5,
-    name: 'Bánh Mì Thịt Nướng',
-    price: 35000,
-    image: '/placeholder.svg?height=200&width=200',
-    isAvailable: true,
-  },
-  {
-    id: 6,
-    name: 'Trà Đào Cam Sả',
-    price: 28000,
-    image: '/placeholder.svg?height=200&width=200',
-    isAvailable: true,
-  },
-]
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        setLoading(true);
+        const res = await guestService.getMenuByToken(params.qrToken);
+        
+        if (res.isSuccess) {
+          const validCategories = res.value.menu.categories.map((c: any) => ({
+             ...c, isActive: true 
+          }));
+          setCategories(validCategories);
+          setProducts(res.value.menu.products || []);
+          setTableInfo(res.value.table); 
+        } else {
+          toast.error("Lỗi", { description: res.error?.description || "Không thể tải thực đơn" });
+        }
+      } catch (error) { console.error(error); } 
+      finally { setLoading(false); }
+    };
+    fetchMenu();
+  }, [params.qrToken, setTableInfo]);
 
-export default function GuestMenuPage() {
-  const [activeCategory, setActiveCategory] = useState(0)
-  const [cart, setCart] = useState<Product[]>([])
-
-  const handleAddToCart = (product: Product) => {
-    setCart((prev) => [...prev, product])
-  }
+  const filteredProducts = selectedCategory === null 
+    ? products 
+    : products.filter(p => p.categoryId === selectedCategory);
 
   return (
-    <div className="pb-24">
-      {/* Header with Search */}
-      <header 
-        className="bg-brand text-white px-4 py-5"
-        style={{
-          borderBottomLeftRadius: '22px',
-          borderBottomRightRadius: '22px',
-        }}
-      >
-        <div className="flex items-center gap-3 mb-3">
-          <div className="flex flex-col flex-1">
-            <span className="font-bold text-lg leading-tight">S2O Restaurant</span>
-            <span className="text-xs opacity-90">Bàn 5 - Chi nhánh Hoàn Kiếm</span>
-          </div>
-          {cart.length > 0 && (
-            <div 
-              className="px-3 py-1.5 rounded-full text-xs font-semibold"
-              style={{ background: 'rgba(255,255,255,0.2)' }}
-            >
-              {cart.length} món
-            </div>
-          )}
-        </div>
-        
-        {/* Search Bar */}
-        <div 
-          className="flex items-center gap-3 px-3 py-3 rounded-xl"
-          style={{
-            background: '#fff',
-            boxShadow: '0 10px 24px rgba(0,0,0,0.1)',
-          }}
-        >
-          <Search className="w-5 h-5 opacity-50" style={{ color: 'var(--muted)' }} />
-          <input
-            type="text"
-            placeholder="Tìm món ăn..."
-            className="flex-1 text-sm outline-none bg-transparent"
-            style={{ color: 'var(--text)' }}
-          />
-          <button 
-            className="w-9 h-9 rounded-xl flex items-center justify-center"
-            style={{ border: '1px solid var(--line)' }}
-          >
-            <SlidersHorizontal className="w-4 h-4" style={{ color: 'var(--muted)' }} />
-          </button>
-        </div>
-      </header>
-
-      {/* Category Chips */}
-      <div 
-        className="flex gap-3 px-4 pt-4 overflow-x-auto"
-        style={{ scrollbarWidth: 'none' }}
-      >
-        {categories.map((category, idx) => (
-          <button
-            key={category}
-            onClick={() => setActiveCategory(idx)}
-            className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
-              idx === activeCategory ? 'bg-brand text-white' : ''
-            }`}
-            style={
-              idx !== activeCategory
-                ? {
-                    background: 'var(--card)',
-                    color: 'var(--text)',
-                    boxShadow: '0 8px 18px rgba(17,24,39,0.06)',
-                  }
-                : undefined
-            }
-          >
-            {category}
-          </button>
-        ))}
+    <div className="min-h-screen bg-gray-50 pb-24">
+      <GuestHeader title="Thực đơn" />
+      
+      <div className="sticky top-16 z-10 bg-gray-50 pt-2 pb-2">
+         {/* [FIX] Truyền đúng hàm onSelect nhận (string | null) */}
+         <CategoryChips 
+            categories={categories} 
+            selectedId={selectedCategory}
+            onSelect={(id) => setSelectedCategory(id)}
+         />
       </div>
 
-      {/* Menu Section - Grid Layout */}
-      <section className="px-4 pt-5">
-        <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--text)' }}>
-          Món phổ biến
-        </h3>
-        
-        <div className="grid grid-cols-2 gap-3">
-          {products.map((product) => (
-            <MenuItemCard
-              key={product.id}
-              product={product}
-              onAddToCart={handleAddToCart}
-            />
-          ))}
-        </div>
-      </section>
+      <div className="p-4 space-y-4">
+        {loading ? <div className="text-center py-10 text-gray-400">Đang tải...</div> : 
+         filteredProducts.length === 0 ? <div className="text-center py-10 text-gray-400">Không có món ăn.</div> : 
+         filteredProducts.map((product) => (
+            <MenuItemCard key={product.id} product={product} />
+         ))
+        }
+      </div>
+
+      <BottomNavV2 qrToken={params.qrToken} />
     </div>
-  )
+  );
 }

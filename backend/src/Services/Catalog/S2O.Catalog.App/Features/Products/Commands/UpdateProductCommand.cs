@@ -10,7 +10,7 @@ public record UpdateProductCommand(
     string Name,
     string Description,
     decimal Price,
-    IFormFile? ImageFile, // <-- Nếu null nghĩa là giữ nguyên ảnh cũ, nếu có file thì thay ảnh mới
+    IFormFile? ImageFile, 
     bool IsActive
 ) : IRequest<Result>
 {

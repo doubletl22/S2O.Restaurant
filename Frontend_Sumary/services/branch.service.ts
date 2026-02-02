@@ -1,53 +1,32 @@
-import api from '@/lib/api';
-
-export interface BranchDto {
-  id: string;
-  name: string;
-  address: string;
-  phoneNumber: string;
-  isActive: boolean;
-  isMainBranch?: boolean; // Nếu có logic chi nhánh chính
-}
-
-export interface CreateBranchPayload {
-  name: string;
-  address: string;
-  phoneNumber: string;
-}
-
-export interface UpdateBranchPayload {
-  name: string;
-  address: string;
-  phoneNumber: string;
-  isActive?: boolean;
-}
+import http from "@/lib/http";
+import { Branch, Result } from "@/lib/types";
 
 export const branchService = {
-  // Lấy danh sách chi nhánh
-  getAll: async () => {
-    // API: GET /api/branches
-    const response = await api.get<BranchDto[]>('/owner/branches');
-    return response.data;
+  // GET: /api/v1/branches
+  getAll: async (): Promise<Result<Branch[]>> => {
+    // Ép kiểu 'as any' để bypass type check mặc định của axios
+    const response = await http.get("/api/v1/branches");
+    return response as any; 
   },
 
-  // Tạo chi nhánh mới
-  create: async (payload: CreateBranchPayload) => {
-    // API: POST /api/branches
-    const response = await api.post('/branches', payload);
-    return response.data;
+  create: async (body: { name: string; address: string; phone: string }): Promise<Result<string>> => {
+    const response = await http.post("/api/v1/branches", body);
+    return response as any;
   },
 
-  // Cập nhật chi nhánh
-  update: async (id: string, payload: UpdateBranchPayload) => {
-    // API: PUT /api/branches/{id}
-    const response = await api.put(`/branches/${id}`, payload);
-    return response.data;
+  update: async (id: string, body: any): Promise<Result<void>> => {
+    const response = await http.put(`/api/v1/branches/${id}`, body);
+    return response as any;
+  },
+  
+  delete: async (id: string): Promise<Result<void>> => {
+    const response = await http.delete(`/api/v1/branches/${id}`);
+    return response as any;
   },
 
-  // Xóa chi nhánh (nếu có)
-  delete: async (id: string) => {
-    // API: DELETE /api/branches/{id}
-    const response = await api.delete(`/branches/${id}`);
-    return response.data;
-  }
+  // Alias để tương thích code cũ (nếu có)
+  getBranches: async () => branchService.getAll(),
+  createBranch: async (b: any) => branchService.create(b),
+  updateBranch: async (id: string, b: any) => branchService.update(id, b),
+  deleteBranch: async (id: string) => branchService.delete(id),
 };

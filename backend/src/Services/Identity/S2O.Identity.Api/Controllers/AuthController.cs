@@ -1,13 +1,11 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using S2O.Identity.App.Features.Login;
-using S2O.Identity.App.Features.Register; // Nhớ using namespace chứa Command
-using S2O.Identity.App.Features.SaaS;
 
 namespace S2O.Identity.Api.Controllers;
 
-[Route("api/auth")]
+// 1. Đổi Route thành api/v1/auth
+[Route("api/v1/auth")]
 [ApiController]
 public class AuthController : ControllerBase
 {
@@ -18,48 +16,22 @@ public class AuthController : ControllerBase
         _sender = sender;
     }
 
-    // 1. Đăng nhập (Dùng chung cho tất cả)
+    // POST: api/v1/auth/login
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginCommand command)
     {
         var result = await _sender.Send(command);
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
-    // 2. Tạo Staff (Chỉ Owner mới được gọi)
-    // URL: POST /api/auth/staff
-    [HttpPost("staff")]
-    [Authorize(Roles = "RestaurantOwner")] 
-    public async Task<IActionResult> RegisterStaff([FromBody] RegisterStaffCommand command)
-    {
-        var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
-    }
 
-    // 3. Tạo Chủ quán mới (Chỉ SystemAdmin mới được gọi)
-    // URL: POST /api/auth/create-tenant
-    [HttpPost("create-tenant")]
-    [Authorize(Roles = "SystemAdmin")]
-    public async Task<IActionResult> CreateTenant([FromBody] RegisterTenantCommand command)
-    {
-        Console.WriteLine("=== ADMIN DEBUG CLAIMS ===");
-        foreach (var claim in User.Claims)
-        {
-            Console.WriteLine($"Key: {claim.Type} | Value: {claim.Value}");
-        }
-        var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
-    }
-
+    // POST: api/v1/auth/firebase-login
     [HttpPost("firebase-login")]
     public async Task<IActionResult> FirebaseLogin([FromBody] LoginWithFirebaseCommand command)
     {
         var result = await _sender.Send(command);
-
-        if (result.IsFailure)
-        {
-            return BadRequest(result.Error);
-        }
-
-        return Ok(new { Token = result.Value });
+        return result.IsSuccess ? Ok(new { Token = result.Value }) : BadRequest(result.Error);
     }
+
+    // Đã xóa: RegisterStaff (Chuyển sang StaffController)
+    // Đã xóa: CreateTenant (Chuyển sang TenantRegistrationController)
 }

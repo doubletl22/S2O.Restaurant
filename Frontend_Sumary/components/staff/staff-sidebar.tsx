@@ -45,12 +45,12 @@ export function StaffSidebar() {
     <div className="h-full w-64 bg-white border-r flex flex-col shadow-sm">
       {/* 1. Header Logo */}
       <div className="p-6 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--g1)] to-[var(--g2)] flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
+        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-(--g1) to-(--g2) flex items-center justify-center text-white shadow-lg shadow-orange-500/20">
           <ChefHat size={24} strokeWidth={2} />
         </div>
         <div>
-          <h1 className="font-black text-xl tracking-tighter text-[var(--text)]">
-            S2O<span className="text-[var(--g1)]">.Staff</span>
+          <h1 className="font-black text-xl tracking-tighter text-(--text)">
+            S2O<span className="text-(--g1)">.Staff</span>
           </h1>
           <p className="text-xs text-muted-foreground font-medium">Kitchen Display System</p>
         </div>

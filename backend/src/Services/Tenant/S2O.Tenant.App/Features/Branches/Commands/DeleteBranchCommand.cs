@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+using S2O.Shared.Kernel.Results;
 
 namespace S2O.Tenant.App.Features.Branches.Commands
 {
-    internal class DeleteBranchCommand
-    {
-    }
+    public record DeleteBranchCommand(Guid Id) : IRequest<Result>;
 }

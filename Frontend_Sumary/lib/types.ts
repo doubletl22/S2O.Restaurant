@@ -1,178 +1,213 @@
-// ==========================================
-// 1. COMMON / API RESPONSE
-// ==========================================
-
-// Cấu trúc trả về chuẩn của Backend (Result<T>)
-export interface ApiResponse<T> {
+export interface Result<T> {
   value: T;
   isSuccess: boolean;
-  isFailure: boolean;
-  error: ApiError | null;
+  error?: {
+    code: string;
+    description: string;
+    message?: string;
+  };
 }
 
-export interface ApiError {
-  code: string;
-  message: string;
+export interface PagedResult<T> {
+  items: T[];
+  pageIndex: number;
+  pageSize: number;
+  totalCount: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
-// ==========================================
-// 2. ENUMS (Các hằng số định danh)
-// ==========================================
-
-export enum UserRole {
-  SuperAdmin = 'SuperAdmin',
-  RestaurantOwner = 'RestaurantOwner',
-  Staff = 'Staff'
-}
-
-export enum BookingStatus {
-  Pending = 0,
-  Confirmed = 1,
-  Cancelled = 2,
-  Completed = 3
-}
-
-// ==========================================
-// 3. IDENTITY SERVICE (Auth & User)
-// ==========================================
-
+// --- AUTH & USER ---
 export interface User {
   id: string;
   email: string;
   fullName: string;
-  roles: string[]; // Mảng role từ JWT
+  roles: string[];
 }
+export interface LoginRequest { email: string; password: string; }
+export type LoginBody = LoginRequest;
+export interface LoginResponse { accessToken: string; user: User; }
 
-export interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
+export interface RegisterTenantRequest {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  password?: string;
+  subscriptionPlanId?: string;
 }
+export type RegisterTenantBody = RegisterTenantRequest;
 
-// ==========================================
-// 4. TENANT SERVICE (Nhà hàng & Chi nhánh)
-// ==========================================
-
-// Dành cho Super Admin xem danh sách
-export interface TenantDto {
+// --- TENANT & BRANCH ---
+export interface Tenant {
   id: string;
   name: string;
-  plan: string;       // "Free", "Premium", etc.
-  isLocked: boolean;  // Trạng thái khóa
-  createdAt: string;  // ISO Date string
+  email?: string; // Email liên hệ
+  phone?: string;
+  address?: string;
+  isActive: boolean;
+  isLocked: boolean;
+  createdOn?: string;
+  ownerEmail?: string;      
+  planType?: string;        
+  subscriptionPlan?: string; 
+  createdAt?: string;       
 }
 
-// Dành cho Chủ nhà hàng (Owner)
 export interface Branch {
   id: string;
-  tenantId: string;
   name: string;
   address: string;
-  phoneNumber: string;
+  phone: string;
   isActive: boolean;
 }
+export interface BranchDto extends Branch {}
 
 export interface Table {
   id: string;
-  branchId: string;
-  name: string;      // Vd: "Bàn VIP 1"
-  capacity: number;  // Số ghế
-  isAvailable: boolean;
-}
-
-// Payload để tạo bàn mới
-export interface CreateTablePayload {
-  branchId: string;
   name: string;
   capacity: number;
+  branchId: string;
+  isActive: boolean;
+  qrToken?: string;
+  status?: string;
 }
+export interface TableDto extends Table {}
 
-// ==========================================
-// 5. CATALOG SERVICE (Menu & Sản phẩm)
-// ==========================================
-
+// --- CATALOG ---
 export interface Category {
   id: string;
   name: string;
+  description?: string;
+  isActive: boolean;
 }
 
 export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string | null; // Đường dẫn ảnh (VD: /uploads/products/...)
-  isAvailable: boolean;
-  categoryId?: string;
-}
-
-// Thống kê Dashboard (Admin)
-export interface DashboardStats {
-  totalProducts: number;
-  totalCategories: number;
-  outOfStockProducts: number;
-}
-
-// Payload để tạo/sửa sản phẩm (Dùng cho Form)
-// Lưu ý: Khi gửi lên server sẽ dùng FormData, không dùng JSON thường
-export interface ProductFormPayload {
-  name: string;
-  description: string;
-  price: number;
-  isAvailable: boolean;
-  imageFile?: File; // File ảnh từ input type="file"
-}
-
-export interface CategoryDto {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-// Khớp với cấu trúc Product từ Backend
-export interface ProductDto {
   id: string;
   name: string;
   description?: string;
   price: number;
   imageUrl?: string;
   categoryId: string;
-  isAvailable: boolean;
+  isActive: boolean;
+  isSoldOut?: boolean;
 }
 
-// Khớp với response của GetPublicMenuQuery
-export interface PublicMenuResponse {
+export interface CreateProductRequest {
+  name: string;
+  description?: string;
+  price: number;
+  categoryId: string;
+  isActive: boolean;
+  imageUrl?: string;
+}
+
+// --- STAFF ---
+export interface Staff {
+  id: string;
+  fullName: string;
+  email: string;
+  phoneNumber?: string;
+  role: string;
+  isActive: boolean;
+  branchId?: string;
+}
+export interface StaffProfile extends Staff {}
+export interface CreateStaffRequest {
+  email: string;
+  fullName: string;
+  phoneNumber: string;
+  role: string;
+  branchId: string;
+  password?: string;
+}
+
+// --- GUEST ---
+export interface TableInfo {
+  tableId: string;
+  tableName: string;
   tenantId: string;
   tenantName: string;
-  categories: CategoryDto[];
-  products: ProductDto[];
+  branchId: string;
+  branchName?: string;
+}
+export type PublicTableInfo = TableInfo;
+
+export interface PublicMenu {
+  categories: { id: string; name: string; products: Product[] }[];
+  products?: Product[];
 }
 
-// ==========================================
-// 6. BOOKING SERVICE (Đặt bàn)
-// ==========================================
+export interface CartItem extends Product {
+  cartId: string;
+  quantity: number;
+  note?: string;
+}
 
-export interface Booking {
+export interface GuestOrderItem {
   id: string;
-  tenantId: string;
-  branchId: string;
-  tableId?: string; // Có thể null nếu chưa xếp bàn
-  
-  guestName: string;
-  phoneNumber: string;
-  bookingTime: string; // ISO Date String
-  partySize: number;
+  productId: string;
+  productName: string;
+  quantity: number;
   note?: string;
-  status: BookingStatus; // 0, 1, 2, 3
-  createdAtUtc: string;
+  unitPrice: number;   
+  totalPrice: number;
+  status: number;
+  imageUrl?: string;
+  price?: number; 
 }
 
-export interface CreateBookingPayload {
-  branchId: string;
-  tableId?: string;
-  guestName: string;
-  phoneNumber: string;
-  bookingTime: string; // "2026-01-25T18:30:00Z"
-  partySize: number;
+// --- ORDER ---
+export enum OrderStatus {
+  Pending = 0,
+  Confirmed = 1,
+  Cooking = 2,
+  Ready = 3,
+  Completed = 4,
+  Cancelled = 5,
+  Served = 6 
+}
+
+export interface OrderItemDto {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
   note?: string;
+  status: OrderStatus;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  tableId?: string;
+  tableName?: string;
+  status: OrderStatus;
+  totalAmount: number;
+  items: OrderItemDto[]; 
+  createdOn: string;
+  createdAt: string; 
+}
+
+export interface StaffOrderDto extends Order {}
+
+// --- DASHBOARD ---
+export interface DashboardStats {
+  totalRevenue: number;
+  totalOrders: number;
+  activeOrders: number;
+  totalProducts: number;
+  totalStaff: number;
+  todayRevenue?: number;
+  todayOrders?: number;
+  recentOrders?: Order[];
+  topSellingProducts: { name: string; quantity: number }[];
+}
+
+export interface SysAdminStats {
+  totalTenants: number;
+  activeTenants: number;
+  totalRevenue: number;
+  totalUsers: number;
+  recentTenants?: any[];
 }

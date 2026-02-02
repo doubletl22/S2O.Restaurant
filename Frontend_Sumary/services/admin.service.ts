@@ -1,61 +1,29 @@
-import api from '@/lib/api';
-
-export interface TenantDto {
-  id: string;
-  name: string;
-  email: string; // Email admin của tenant
-  phoneNumber?: string;
-  address?: string;
-  subscriptionPlan: string;
-  isActive: boolean;
-  isLocked: boolean;
-  createdAt: string;
-  validUntil: string;
-}
-
-/* ✅ ĐÃ BỔ SUNG ownerName */
-export interface CreateTenantPayload {
-  name: string;
-  ownerName: string; // 👈 thêm dòng này
-  email: string;
-  password?: string;
-  phone: string;
-  address: string;
-  subscriptionPlan: 'Basic' | 'Pro' | 'Enterprise';
-}
+import http from "@/lib/http";
+import { PagedResult, User, Result, SysAdminStats } from "@/lib/types";
 
 export const adminService = {
-
-  // 1. Lấy danh sách Tenant
-  getAllTenants: async () => {
-    const response = await api.get<TenantDto[]>('/admin/tenants');
-    return response.data;
+  getStats: async (): Promise<Result<SysAdminStats>> => {
+    const res = await http.get<Result<SysAdminStats>>("/api/v1/admin/stats");
+    return res as unknown as Result<SysAdminStats>;
+  },
+  
+  getSystemUsers: async (params?: any): Promise<PagedResult<User>> => {
+    const res = await http.get<PagedResult<User>>("/api/users", { params });
+    return res as unknown as PagedResult<User>;
   },
 
-  // 2. Tạo Tenant mới ✅ FIX FULL FLOW
-  createTenant: async (payload: CreateTenantPayload) => {
-
-    /* ✅ Build body đúng backend Identity cần */
-    const body = {
-      RestaurantName: payload.name,
-      OwnerName: payload.ownerName || payload.name, // nếu chưa nhập thì lấy tạm name
-      Email: payload.email,
-      Password: payload.password || "Password123!",
-      Address: payload.address,
-      PhoneNumber: payload.phone,
-      PlanType: payload.subscriptionPlan,
-    };
-
-    /* ✅ API đúng */
-    const response = await api.post('/auth/create-tenant', body);
-
-    return response.data;
+  createUser: async (data: any) => {
+    return (await http.post("/api/users", data)) as unknown;
   },
-
-  // 3. Khóa/Mở khóa Tenant
-  toggleLockTenant: async (tenantId: string, isLocked: boolean) => {
-    const action = isLocked ? 'unlock' : 'lock';
-    const response = await api.post(`/admin/tenants/${tenantId}/${action}`);
-    return response.data;
-  }
+  
+  getUserById: async (id: string) => (await http.get<User>(`/api/users/${id}`)) as unknown as User,
+  
+  deleteUser: async (id: string) => (await http.delete(`/api/users/${id}`)) as unknown,
+  
+  lockUser: async (id: string) => (await http.post(`/api/users/${id}/lock`, {})) as unknown,
+  
+  unlockUser: async (id: string) => (await http.post(`/api/users/${id}/unlock`, {})) as unknown,
+  
+  resetPassword: async (userId: string, newPassword: string) => 
+    (await http.put(`/api/users/${userId}/reset-password`, { newPassword })) as unknown
 };

@@ -6,7 +6,7 @@ using S2O.Shared.Kernel.Results;
 using S2O.Shared.Kernel.IntegrationEvents;
 using System.Security.Claims;
 
-namespace S2O.Identity.App.Features.SaaS;
+namespace S2O.Identity.App.Features.Register;
 
 public class RegisterTenantHandler : IRequestHandler<RegisterTenantCommand, Result<Guid>>
 {

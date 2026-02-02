@@ -1,133 +1,66 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
-import { UtensilsCrossed, ShoppingCart, ClipboardList } from "lucide-react";
-import { getSession, loadCart } from "@/app/(guest)/guest/t/_shared/guestStore";
+import { usePathname } from "next/navigation";
+import { Home, ShoppingCart, Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useGuestCart } from "@/components/guest/guest-cart-context";
 
-type TabKey = "menu" | "cart" | "tracking";
-
-function TabItem({
-  href,
-  active,
-  label,
-  icon,
-  badge,
-}: {
-  href: string;
-  active: boolean;
-  label: string;
-  icon: React.ReactNode;
-  badge?: number;
-}) {
-  return (
-    <Link
-      href={href}
-      className={[
-        "flex-1 py-2 flex flex-col items-center justify-center gap-1",
-        "active:scale-[0.99]",
-        active ? "text-orange-600" : "text-gray-600",
-      ].join(" ")}
-    >
-      <div className="relative">
-        {icon}
-        {!!badge && badge > 0 && (
-          <span
-            className={[
-              "absolute -top-2 -right-3",
-              "min-w-[18px] h-[18px] px-1",
-              "rounded-full bg-orange-500 text-white",
-              "text-[11px] leading-[18px] text-center font-semibold",
-            ].join(" ")}
-          >
-            {badge > 99 ? "99+" : badge}
-          </span>
-        )}
-      </div>
-      <div className={["text-[11px] font-medium", active ? "text-orange-600" : ""].join(" ")}>
-        {label}
-      </div>
-    </Link>
-  );
+// [FIX] Đổi tên prop từ tableId -> qrToken cho khớp với URL params
+interface BottomNavV2Props {
+  qrToken: string; 
 }
 
-export function BottomNavV2() {
-  const params = useParams();
+export function BottomNavV2({ qrToken }: BottomNavV2Props) {
   const pathname = usePathname();
-  const qrToken = String(params.qrToken || "");
+  const { totalItems } = useGuestCart();
 
-  const activeTab: TabKey = useMemo(() => {
-    if (pathname.includes("/cart")) return "cart";
-    if (pathname.includes("/tracking")) return "tracking";
-    return "menu";
-  }, [pathname]);
-
-  const [cartCount, setCartCount] = useState(0);
-
-  // ✅ Lấy số lượng món trong cart theo tableId trong session
-  useEffect(() => {
-    const tick = () => {
-      const s = getSession();
-      if (!s?.tableId) {
-        setCartCount(0);
-        return;
-      }
-      const items = loadCart(s.tableId);
-      const count = items.reduce((sum, it) => sum + (it.qty || 0), 0);
-      setCartCount(count);
-    };
-
-    tick();
-
-    // cập nhật khi thay đổi localStorage (tab khác) + polling nhẹ
-    const onStorage = (e: StorageEvent) => {
-      if (!e.key) return;
-      if (e.key.startsWith("S2O_GUEST_CART_") || e.key === "S2O_GUEST_SESSION") tick();
-    };
-    window.addEventListener("storage", onStorage);
-
-    const id = window.setInterval(tick, 800);
-
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.clearInterval(id);
-    };
-  }, []);
-
-  const base = `/guest/t/${qrToken}`;
+  // Helper check active link
+  const isActive = (path: string) => pathname === path;
+  
+  const baseUrl = `/guest/t/${qrToken}`;
 
   return (
-    <nav className="w-full">
-      <div className="px-3 py-2">
-        <div className="rounded-2xl border bg-white shadow-sm">
-          <div className="flex items-center">
-            <TabItem
-              href={`${base}/menu`}
-              active={activeTab === "menu"}
-              label="Thực đơn"
-              icon={<UtensilsCrossed className="h-5 w-5" />}
-            />
-            <div className="h-8 w-[1px] bg-gray-200" />
-            <TabItem
-              href={`${base}/cart`}
-              active={activeTab === "cart"}
-              label="Giỏ hàng"
-              icon={<ShoppingCart className="h-5 w-5" />}
-              badge={cartCount}
-            />
-            <div className="h-8 w-[1px] bg-gray-200" />
-            <TabItem
-              href={`${base}/tracking`}
-              active={activeTab === "tracking"}
-              label="Đơn của tôi"
-              icon={<ClipboardList className="h-5 w-5" />}
-            />
-          </div>
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t h-16 flex items-center justify-around z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+      <Link
+        href={baseUrl}
+        className={cn(
+          "flex flex-col items-center gap-1 text-xs font-medium w-full h-full justify-center active:scale-95 transition-transform",
+          isActive(baseUrl) ? "text-orange-600" : "text-gray-400"
+        )}
+      >
+        <Home className="h-6 w-6" />
+        <span>Menu</span>
+      </Link>
+
+      <Link
+        href={`${baseUrl}/cart`}
+        className={cn(
+          "flex flex-col items-center gap-1 text-xs font-medium w-full h-full justify-center active:scale-95 transition-transform relative",
+          isActive(`${baseUrl}/cart`) ? "text-orange-600" : "text-gray-400"
+        )}
+      >
+        <div className="relative">
+          <ShoppingCart className="h-6 w-6" />
+          {totalItems > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full animate-in zoom-in">
+              {totalItems}
+            </span>
+          )}
         </div>
-      </div>
-      {/* safe area cho iPhone */}
-      <div className="h-[env(safe-area-inset-bottom)]" />
-    </nav>
+        <span>Giỏ hàng</span>
+      </Link>
+
+      <Link
+        href={`${baseUrl}/tracking`}
+        className={cn(
+          "flex flex-col items-center gap-1 text-xs font-medium w-full h-full justify-center active:scale-95 transition-transform",
+          isActive(`${baseUrl}/tracking`) ? "text-orange-600" : "text-gray-400"
+        )}
+      >
+        <Clock className="h-6 w-6" />
+        <span>Đơn hàng</span>
+      </Link>
+    </div>
   );
 }

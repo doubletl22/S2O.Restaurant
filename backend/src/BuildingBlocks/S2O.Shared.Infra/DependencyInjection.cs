@@ -1,12 +1,12 @@
 ﻿using CloudinaryDotNet;
-using Microsoft.AspNetCore.Authentication.JwtBearer; 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens; 
+using Microsoft.IdentityModel.Tokens;
 using S2O.Shared.Infra.Interceptors;
 using S2O.Shared.Infra.Services;
 using S2O.Shared.Kernel.Interfaces;
-using System.Text; 
+using System.Text;
 
 namespace S2O.Shared.Infra;
 
@@ -14,6 +14,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddSharedInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        // 1. Cấu hình Cloudinary (Giữ nguyên)
         var cloudName = configuration["Cloudinary:CloudName"];
         if (!string.IsNullOrEmpty(cloudName))
         {
@@ -29,6 +30,7 @@ public static class DependencyInjection
 
         services.AddHttpContextAccessor();
 
+        // 2. Cấu hình Authentication (PHẦN QUAN TRỌNG NHẤT)
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -36,7 +38,10 @@ public static class DependencyInjection
         })
         .AddJwtBearer(options =>
         {
-            var secretKey = configuration["Jwt:Secret"] ?? "S2O_Super_Secret_Key_For_Identity_Service_2026";
+            // === SỬA LỖI 1: Đọc đúng key "Jwt:Key" thay vì "Jwt:Secret" ===
+            var secretKey = configuration["Jwt:Key"] ?? configuration["Jwt:Secret"] ?? "S2O_Super_Secret_Key_For_Identity_Service_2026";
+
+            // Giữ nguyên dòng này để claim không bị biến đổi
             options.MapInboundClaims = false;
 
             options.TokenValidationParameters = new TokenValidationParameters
@@ -45,16 +50,24 @@ public static class DependencyInjection
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
+
                 ValidIssuer = configuration["Jwt:Issuer"] ?? "S2O.Identity",
                 ValidAudience = configuration["Jwt:Audience"] ?? "S2O.Restaurant",
+
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+
+                // === SỬA LỖI 2: Dùng tên Role chuẩn của .NET Identity ===
+                // Nếu Token của bạn dùng "role" ngắn, hãy sửa Identity Service để emit ra "role"
+                // Còn mặc định .NET Identity dùng URL dài này:
                 RoleClaimType = "role",
+
                 NameClaimType = "name"
             };
         });
 
-        services.AddAuthorization(); 
+        services.AddAuthorization();
 
+        // 3. Dependency Injection
         services.AddScoped<ITenantContext, TenantContext>();
         services.AddScoped<IUserContext, UserContext>();
         services.AddScoped<UpdateAuditableEntitiesInterceptor>();

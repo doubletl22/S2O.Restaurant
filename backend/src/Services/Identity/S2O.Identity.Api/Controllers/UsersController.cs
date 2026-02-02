@@ -2,33 +2,36 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using S2O.Identity.App.Features.Users.Commands;
 using S2O.Identity.Domain.Entities;
-using System.Security.Claims;
+using S2O.Identity.Infra.Persistence;
+using System.Security.Claims; 
 
 namespace S2O.Identity.Api.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/users")]
 [ApiController]
 [Authorize] 
 public class UsersController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ISender _sender;
+    private readonly AuthDbContext _context;
 
-    public UsersController(UserManager<ApplicationUser> userManager, ISender sender)
+    public UsersController(UserManager<ApplicationUser> userManager, ISender sender, AuthDbContext context)
     {
         _userManager = userManager;
         _sender = sender;
+        _context = context;
     }
 
-    // DTO: Khuôn mẫu dữ liệu gửi lên
     public record CreateUserRequest(
         string Email,
         string Password,
         string FullName,
         string Role,
-        Guid? TenantId // Chỉ SystemAdmin mới cần điền cái này
+        Guid? TenantId 
     );
 
     [HttpPost]
@@ -85,7 +88,7 @@ public class UsersController : ControllerBase
             UserName = request.Email,
             Email = request.Email,
             FullName = request.FullName,
-            TenantId = targetTenantId, // Gán TenantId đã tính toán ở trên
+            TenantId = targetTenantId, 
             EmailConfirmed = true,
             IsActive = true
         };
@@ -110,11 +113,9 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}/reset-password")]
-    // [Authorize(Roles = "SysAdmin")] // Bật lại khi chạy thật
+    // [Authorize(Roles = "SysAdmin")] 
     public async Task<IActionResult> ResetPassword(Guid id, [FromBody] string newPassword)
     {
-        // Lưu ý: Frontend gửi chuỗi string raw hoặc object { newPassword: "..." }
-        // Để đơn giản nên wrap vào DTO, ở đây tôi demo nhận object
         var command = new AdminResetPasswordCommand(id, newPassword);
         var result = await _sender.Send(command);
 
@@ -135,7 +136,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}/role")]
-    [Authorize(Roles = "SystemAdmin,RestaurantOwner")] // Chỉ Admin hoặc Chủ quán mới được sửa quyền
+    [Authorize(Roles = "SystemAdmin,RestaurantOwner")] 
     public async Task<IActionResult> UpdateUserRole(Guid id, [FromBody] UpdateUserRoleCommand command)
     {
         if (id != command.UserId) return BadRequest("ID không khớp");
@@ -147,12 +148,95 @@ public class UsersController : ControllerBase
     }
     [HttpPut("{id}")]
     [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
-    public async Task<IActionResult> UpdateStaff(Guid id, [FromBody] UpdateStaffCommand command)
+
+
+    [HttpPost("{id}/lock")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> LockUser(Guid id)
     {
-        if (id != command.UserId) return BadRequest();
-        var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user == null) return NotFound("Không tìm thấy user");
+
+        // Khóa đến năm 9999
+        await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+        return Ok(new { Message = "Đã khóa tài khoản" });
     }
 
+    [HttpPost("{id}/unlock")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> UnlockUser(Guid id)
+    {
+        var user = await _userManager.FindByIdAsync(id.ToString());
+        if (user == null) return NotFound("Không tìm thấy user");
+
+        await _userManager.SetLockoutEndDateAsync(user, null);
+        return Ok(new { Message = "Đã mở khóa tài khoản" });
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "SystemAdmin")] // Chỉ SysAdmin mới xem được tất cả
+    public async Task<IActionResult> GetUsers(
+    [FromQuery] int page = 1,
+    [FromQuery] int size = 20,
+    [FromQuery] string? keyword = null)
+    {
+        var query = _context.Users.AsQueryable();
+
+        if (!string.IsNullOrEmpty(keyword))
+        {
+            keyword = keyword.ToLower();
+            query = query.Where(u =>
+                (u.FullName != null && u.FullName.ToLower().Contains(keyword)) ||
+                (u.Email != null && u.Email.ToLower().Contains(keyword)));
+        }
+
+        var totalCount = await query.CountAsync();
+        var users = await query
+            .OrderByDescending(u => u.CreatedOn)
+            .Skip((page - 1) * size)
+            .Take(size)
+            .Select(u => new
+            {
+                u.Id,
+                u.FullName,
+                u.Email,
+                u.PhoneNumber,
+                u.IsActive,
+                TenantId = u.TenantId,
+                // Check xem user có đang bị lock không
+                IsLocked = u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.UtcNow
+            })
+            .ToListAsync();
+
+        // Lấy Roles cho từng user (Cần thiết để hiển thị SysAdmin/Owner/Staff)
+        var userDtos = new List<object>();
+        foreach (var u in users)
+        {
+            var appUser = await _userManager.FindByIdAsync(u.Id.ToString());
+            if (appUser == null) continue;
+            var roles = await _userManager.GetRolesAsync(appUser);
+
+            userDtos.Add(new
+            {
+                u.Id,
+                u.FullName,
+                u.Email,
+                u.PhoneNumber,
+                u.IsActive,
+                u.TenantId,
+                u.IsLocked,
+                Roles = roles // Trả về mảng roles
+            });
+        }
+
+        return Ok(new
+        {
+            Items = userDtos,
+            TotalCount = totalCount,
+            Page = page,
+            Size = size,
+            TotalPages = (int)Math.Ceiling(totalCount / (double)size)
+        });
+    }
 
 }

@@ -27,7 +27,7 @@ export default function RootPage() {
 
       switch (role) {
         case 'SysAdmin':
-          router.push('/sysadmin/restaurants')
+          router.push('/SystemAdmin/restaurants')
           break
         case 'RestaurantOwner':
           router.push('/owner/dashboard')

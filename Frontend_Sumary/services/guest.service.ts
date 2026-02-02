@@ -1,56 +1,34 @@
-import api from '@/lib/api';
-import { PublicMenuResponse } from '@/lib/types';
-
-interface TableInfoResponse {
-  tableId: string;
-  tableName: string;
-  tenantId: string;
-  tenantName: string;
-  branchId: string;
-  guestPhone: string;
-}
-
-export interface PlaceOrderPayload {
-  tableId: string;
-  tenantId: string;
-  branchId: string;
-  guestName: string;
-  guestPhone: string;
-  items: {
-    productId: string;
-    quantity: number;
-    note?: string;
-  }[];
-}
+import http from "@/lib/http";
+import { PublicMenu, TableInfo, Result, Order } from "@/lib/types";
 
 export const guestService = {
-  getTableInfo: async (tableId: string) => {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    
-    if (!tableId || !uuidRegex.test(tableId)) {
-        console.warn("Table ID không hợp lệ (không phải UUID):", tableId);
-        return null; // Trả về null luôn, không gọi API
-    }
+  resolveTable: async (tableId: string): Promise<TableInfo> => {
+    return await http.get(`/api/v1/storefront/tenants/resolve-table/${tableId}`) as any;
+  },
 
+  getMenu: async (tenantId: string, categoryId?: string): Promise<PublicMenu> => {
+    return await http.get(`/api/v1/storefront/menus/${tenantId}`, { params: { categoryId } }) as any;
+  },
+
+  getMenuByToken: async (qrToken: string): Promise<Result<{ table: TableInfo; menu: PublicMenu }>> => {
     try {
-        const response = await api.get<TableInfoResponse>(`/public/tenant/resolve-table/${tableId}`);
-        return response.data;
-    } catch (error) {
-        console.error("Lỗi resolve table:", error);
-        return null;
+      const tableInfo = await guestService.resolveTable(qrToken);
+      if (!tableInfo || !tableInfo.tenantId) {
+        return { isSuccess: false, value: null as any, error: { code: "404", description: "Invalid Table" } };
+      }
+      const menu = await guestService.getMenu(tableInfo.tenantId);
+      return { isSuccess: true, value: { table: tableInfo, menu } };
+    } catch (error: any) {
+      return { isSuccess: false, value: null as any, error: error };
     }
   },
 
-  getPublicMenu: async (tenantId: string) => {
-    const response = await api.get<any>(`/public/menu/${tenantId}`);
-    if (response.data.isSuccess) {
-       return response.data.value;
-    }
-    return null;
+  placeOrder: async (payload: any) => {
+    return await http.post("/api/v1/storefront/orders/guest", payload) as any;
   },
-  placeGuestOrder: async (payload: PlaceOrderPayload) => {
-    const response = await api.post('/orders/guest', payload);
-    return response.data;
+
+  getOrders: async (qrToken: string): Promise<Result<Order[]>> => {
+      // Mock hoặc gọi API thật
+      return { isSuccess: true, value: [] }; 
   }
 };
-

@@ -10,6 +10,6 @@ public class ApplicationUser : IdentityUser<Guid>, ITenantEntity
     public Guid? TenantId { get; set; }
     public Guid? BranchId { get; set; } 
     public bool IsActive { get; set; } = true;
-
+    public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 }

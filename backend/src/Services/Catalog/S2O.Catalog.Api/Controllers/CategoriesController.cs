@@ -2,60 +2,45 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using S2O.Catalog.App.Features.Categories.Commands;
-using S2O.Catalog.App.Features.Categories.Queries; // (Bạn tự làm thêm phần Get List nhé)
-using S2O.Shared.Kernel.Interfaces;
+using S2O.Catalog.App.Features.Categories.Queries;
 
 namespace S2O.Catalog.Api.Controllers;
 
-[Route("api/categories")]
+[Route("api/v1/categories")]
 [ApiController]
 public class CategoriesController : ControllerBase
 {
     private readonly ISender _sender;
-    private readonly ITenantContext _tenantContext;
 
-    public CategoriesController(ISender sender, ITenantContext tenantContext)
+    public CategoriesController(ISender sender)
     {
         _sender = sender;
-        _tenantContext = tenantContext;
     }
 
-    [HttpPost]
-// Sau khi debug xong thì mở lại dòng này
-[Authorize(Roles = "RestaurantOwner, SystemAdmin")] 
-public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryCommand command)
-{
-    // Inject ITenantContext vào Constructor trước nhé
-    var tenantId = _tenantContext.TenantId; 
-
-    if (tenantId == null || tenantId == Guid.Empty)
-    {
-        return BadRequest("Thiếu thông tin TenantId trong Token.");
-    }
-
-    // Gán TenantId vào command
-    var commandWithTenant = command with { TenantId = tenantId.Value };
-
-    var result = await _sender.Send(commandWithTenant);
-    
-    return result.IsSuccess 
-        ? Ok(new { CategoryId = result.Value }) 
-        : BadRequest(result.Error);
-}
-
+    // GET: api/v1/categories
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [Authorize(Roles = "RestaurantOwner, Staff")]
+    public async Task<IActionResult> GetCategories()
     {
         var result = await _sender.Send(new GetCategoriesQuery());
         return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
+    // POST: api/v1/categories
+    [HttpPost]
+    [Authorize(Roles = "RestaurantOwner")]
+    public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryCommand command)
+    {
+        var result = await _sender.Send(command);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
+    // DELETE: api/v1/categories/{id}
     [HttpDelete("{id}")]
+    [Authorize(Roles = "RestaurantOwner")]
     public async Task<IActionResult> DeleteCategory(Guid id)
     {
         var result = await _sender.Send(new DeleteCategoryCommand(id));
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
 }
-
-public record CreateCategoryRequest(string Name, string? Description);
