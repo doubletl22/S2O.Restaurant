@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using S2O.Catalog.App.Abstractions;
-using S2O.Catalog.App.DTOs; // Đảm bảo bạn đã có ProductResponse hoặc ProductDto
+using S2O.Catalog.App.DTOs; 
 using S2O.Shared.Kernel.Results;
 
 namespace S2O.Catalog.App.Features.Products.Queries;
@@ -12,7 +12,6 @@ public record GetOwnerProductsQuery(int PageIndex = 1, int PageSize = 10, string
 public class GetOwnerProductsHandler : IRequestHandler<GetOwnerProductsQuery, Result<PagedResult<ProductResponse>>>
 {
     private readonly ICatalogDbContext _context;
-    // Inject thêm CurrentUserService nếu bạn cần lấy TenantId thủ công
     // private readonly ICurrentUserService _currentUser; 
 
     public GetOwnerProductsHandler(ICatalogDbContext context)
@@ -22,7 +21,6 @@ public class GetOwnerProductsHandler : IRequestHandler<GetOwnerProductsQuery, Re
 
     public async Task<Result<PagedResult<ProductResponse>>> Handle(GetOwnerProductsQuery request, CancellationToken ct)
     {
-        // Global Query Filter (IMustHaveTenant) sẽ tự động lọc TenantId
         var query = _context.Products.AsNoTracking();
 
         if (!string.IsNullOrEmpty(request.Keyword))
@@ -38,7 +36,7 @@ public class GetOwnerProductsHandler : IRequestHandler<GetOwnerProductsQuery, Re
         var totalCount = await query.CountAsync(ct);
 
         var items = await query
-            .OrderByDescending(p => p.CreatedAt)
+            .OrderByDescending(p => p.CreatedAtUtc)
             .Skip((request.PageIndex - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(p => new ProductResponse

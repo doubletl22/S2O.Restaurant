@@ -8,7 +8,7 @@ public class Product : IAuditableEntity, IMustHaveTenant
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public string? ImageUrl { get; set; }
-    public bool IsAvailable { get; set; } = true; // Trạng thái còn/hết món
+    public bool IsAvailable { get; set; } = true;   
 
     public Guid CategoryId { get; set; }
     public Category Category { get; set; } = null!;
@@ -18,5 +18,4 @@ public class Product : IAuditableEntity, IMustHaveTenant
     public string? CreatedBy { get; set; }
     public DateTime? LastModifiedAtUtc { get; set; }
     public string? LastModifiedBy { get; set; }
-    public DateTime CreatedAt { get; set; }
 }

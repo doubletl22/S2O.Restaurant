@@ -16,6 +16,7 @@ services:
       context: .
       dockerfile: src/Services/Identity/S2O.Identity.Api/Dockerfile
     environment:
+      - DOTNET_SYSTEM_NET_DISABLEIPV6=1
       - ASPNETCORE_ENVIRONMENT=Development
       - MessageBroker__Host=rabbitmq
       - ConnectionStrings__DefaultConnection=${IDENTITY_DB_CONN}
@@ -35,6 +36,7 @@ services:
       context: .
       dockerfile: src/Services/Catalog/S2O.Catalog.Api/Dockerfile
     environment:
+      - DOTNET_SYSTEM_NET_DISABLEIPV6=1
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=${CATALOG_DB_CONN}
       - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
@@ -51,6 +53,7 @@ services:
       context: .
       dockerfile: src/Services/Order/S2O.Order.Api/Dockerfile
     environment:
+      - DOTNET_SYSTEM_NET_DISABLEIPV6=1
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=${ORDER_DB_CONN}
       - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
@@ -70,6 +73,7 @@ services:
       context: .
       dockerfile: src/Services/Tenant/S2O.Tenant.Api/Dockerfile
     environment:
+      - DOTNET_SYSTEM_NET_DISABLEIPV6=1
       - ASPNETCORE_ENVIRONMENT=Development
       - MessageBroker__Host=rabbitmq
       - ConnectionStrings__DefaultConnection=${TENANT_DB_CONN}
@@ -86,6 +90,7 @@ services:
       context: .
       dockerfile: src/Services/Booking/S2O.Booking.Api/Dockerfile
     environment:
+      - DOTNET_SYSTEM_NET_DISABLEIPV6=1
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=${BOOKING_DB_CONN}
       - ConnectionStrings__TenantConnection=${TENANT_DB_CONN}
@@ -100,8 +105,9 @@ services:
       context: .
       dockerfile: src/Services/Payment/S2O.Payment.Api/Dockerfile
     environment:
+      - DOTNET_SYSTEM_NET_DISABLEIPV6=1
       - ASPNETCORE_ENVIRONMENT=Development
-        - ConnectionStrings__DefaultConnection=${PAYMENT_DB_CONN}
+      - ConnectionStrings__DefaultConnection=${PAYMENT_DB_CONN}
       - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
       - Jwt__Issuer=S2O.Identity
       - Jwt__Audience=S2O.Restaurant
@@ -113,6 +119,7 @@ services:
       context: .
       dockerfile: src/Gateways/S2O.GateWay/Dockerfile
     environment:
+      - DOTNET_SYSTEM_NET_DISABLEIPV6=1
       - ASPNETCORE_ENVIRONMENT=Development
       - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
       - Jwt__Issuer=S2O.Identity

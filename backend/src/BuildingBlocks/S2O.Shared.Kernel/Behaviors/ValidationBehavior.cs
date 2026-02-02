@@ -20,7 +20,6 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
         if (errors.Any())
         {
-            // Logic trả về lỗi chuẩn hóa
             return (TResponse)Result.Failure(new Error("Validation.Error", errors.First().ErrorMessage));
         }
 

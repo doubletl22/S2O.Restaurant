@@ -22,17 +22,14 @@ public class TenantInterceptor : SaveChangesInterceptor
 
         var tracker = eventData.Context.ChangeTracker;
 
-        // 1. Xử lý TenantId (Cho IMustHaveTenant)
         foreach (var entry in tracker.Entries<IMustHaveTenant>())
         {
             if (entry.State == EntityState.Added && _tenantContext.TenantId.HasValue)
             {
-                // Chỉ gán nếu chưa có giá trị (hoặc ghi đè tùy logic, ở đây mình ghi đè cho chắc)
                 entry.Entity.TenantId = _tenantContext.TenantId.Value;
             }
         }
 
-        // 2. Xử lý BranchId (Cho IMustHaveBranch - MỚI)
         foreach (var entry in tracker.Entries<IMustHaveBranch>())
         {
             if (entry.State == EntityState.Added && _tenantContext.BranchId.HasValue)
@@ -41,7 +38,6 @@ public class TenantInterceptor : SaveChangesInterceptor
             }
         }
 
-        // 3. Xử lý Audit (CreatedAt, ModifiedAt)
         foreach (var entry in tracker.Entries<Entity>())
         {
             if (entry.State == EntityState.Added)

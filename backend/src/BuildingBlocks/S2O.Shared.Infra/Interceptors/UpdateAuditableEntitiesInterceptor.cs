@@ -7,11 +7,11 @@ namespace S2O.Shared.Infra.Interceptors;
 
 public class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
 {
-    private readonly IUserContext _userContext; // 1. Thêm biến này
+    private readonly IUserContext _userContext; 
 
     public UpdateAuditableEntitiesInterceptor(IUserContext userContext)
     {
-        _userContext = userContext; // 2. Inject vào Constructor
+        _userContext = userContext; 
     }
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
@@ -30,7 +30,6 @@ public class UpdateAuditableEntitiesInterceptor : SaveChangesInterceptor
     {
         if (context == null) return;
 
-        // 3. Quan trọng: Kiểm tra thực thể có phải là IAuditableEntity không (chứ không phải IMustHaveTenant)
         foreach (var entry in context.ChangeTracker.Entries<IAuditableEntity>())
         {
             if (entry.State == EntityState.Added)

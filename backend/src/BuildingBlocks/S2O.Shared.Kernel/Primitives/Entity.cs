@@ -12,5 +12,4 @@ public abstract class Entity
 
 public abstract class AggregateRoot : Entity
 {
-    // Dùng cho mô hình CQRS và Domain Events sau này
 }

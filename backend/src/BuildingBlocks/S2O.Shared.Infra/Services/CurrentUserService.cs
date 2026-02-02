@@ -13,7 +13,6 @@ public class CurrentUserService : ICurrentUserService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    // Lấy UserId và chuyển sang Guid
     public Guid? UserId
     {
         get
@@ -23,7 +22,6 @@ public class CurrentUserService : ICurrentUserService
         }
     }
 
-    // Lấy TenantId và chuyển sang Guid
     public Guid? TenantId
     {
         get

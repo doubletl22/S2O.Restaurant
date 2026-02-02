@@ -1,19 +1,20 @@
-// Frontend_Sumary/components/owner/product-dialog.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { toast } from "sonner";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { productService } from "@/services/product.service";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -25,115 +26,95 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner"; // Hoặc hook use-toast của bạn
+import { Loader2, Plus, Upload } from "lucide-react";
 
-import { Product, CreateProductRequest } from "@/lib/types";
-import { productService } from "@/services/product.service";
-
-// Schema khớp với CreateProductRequest
-const formSchema = z.object({
+// Schema validate
+const productSchema = z.object({
   name: z.string().min(1, "Tên món không được để trống"),
-  price: z.coerce.number().min(0, "Giá phải lớn hơn 0"),
   description: z.string().optional(),
-  categoryId: z.string().min(1, "Vui lòng chọn danh mục"),
-  isActive: z.boolean().default(true),
-  imageUrl: z.string().optional(), // Đổi từ 'image' sang 'imageUrl'
+  price: z.coerce.number().min(0, "Giá phải lớn hơn hoặc bằng 0"),
+  categoryId: z.string().min(1, "Vui lòng chọn danh mục"), // Giả sử đã có select box category
+  // Image validation xử lý riêng vì input file khó validate qua zod trực tiếp với react-hook-form native
 });
 
-interface ProductDialogProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  product?: Product | null;
-  onSuccess?: () => void;
-  categories: { id: string; name: string }[];
-}
+type ProductFormValues = z.infer<typeof productSchema>;
 
-export function ProductDialog({
-  open,
-  setOpen,
-  product,
-  onSuccess,
-  categories,
-}: ProductDialogProps) {
-  const [loading, setLoading] = useState(false);
+export function ProductDialog() {
+  const [open, setOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const queryClient = useQueryClient();
 
-  // Khai báo form với đúng Type
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
-      price: 0,
       description: "",
-      categoryId: "",
-      isActive: true,
-      imageUrl: "",
+      price: 0,
+      categoryId: "", // Bạn cần truyền ID danh mục thực tế vào đây hoặc dùng Select
     },
   });
 
-  useEffect(() => {
-    if (product) {
-      form.reset({
-        name: product.name,
-        price: product.price,
-        description: product.description || "",
-        categoryId: product.categoryId,
-        isActive: product.isActive,
-        imageUrl: product.imageUrl || "",
-      });
-    } else {
-      form.reset({
-        name: "",
-        price: 0,
-        description: "",
-        categoryId: "",
-        isActive: true,
-        imageUrl: "",
-      });
-    }
-  }, [product, form, open]);
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      setLoading(true);
-      
-      const payload: CreateProductRequest = {
-        name: values.name,
-        price: values.price,
-        description: values.description,
-        categoryId: values.categoryId,
-        isActive: values.isActive,
-        imageUrl: values.imageUrl,
+  // Mutation gọi API
+  const createProductMutation = useMutation({
+    mutationFn: async (values: ProductFormValues) => {
+      // Build payload khớp với CreateProductRequest
+      const payload: any = {
+        ...values,
+        imageFile: selectedFile, // Truyền file vào đây
       };
-
-      if (product) {
-        // Gọi updateProduct
-        await productService.updateProduct(product.id, payload);
-        toast.success("Cập nhật thành công");
-      } else {
-        // Gọi createProduct
-        await productService.createProduct(payload);
-        toast.success("Thêm món mới thành công");
-      }
-
+      
+      // Nếu categoryId chưa có (ví dụ demo), hãy gán cứng hoặc xử lý logic Select
+      // payload.categoryId = "GUID_CUA_CATEGORY"; 
+      
+      return await productService.create(payload);
+    },
+    onSuccess: () => {
+      toast.success("Tạo món thành công!");
+      queryClient.invalidateQueries({ queryKey: ["products"] }); // Refresh list
       setOpen(false);
-      onSuccess?.();
-    } catch (error: any) {
-      toast.error(error?.description || "Có lỗi xảy ra");
-    } finally {
-      setLoading(false);
+      form.reset();
+      setSelectedFile(null);
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Có lỗi xảy ra khi tạo món");
+    },
+  });
+
+  const onSubmit = (values: ProductFormValues) => {
+    // Validate file thủ công nếu cần
+    // if (!selectedFile) { toast.error("Vui lòng chọn ảnh"); return; }
+    
+    // Giả sử categoryId lấy từ form hoặc context. 
+    // Demo này yêu cầu user nhập ID hoặc bạn tích hợp Select Component
+    createProductMutation.mutate(values);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" /> Thêm món mới
+        </Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{product ? "Sửa món ăn" : "Thêm món ăn"}</DialogTitle>
+          <DialogTitle>Thêm món mới</DialogTitle>
+          <DialogDescription>
+            Điền thông tin chi tiết món ăn và tải lên hình ảnh.
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             
+            {/* Tên món */}
             <FormField
               control={form.control}
               name="name"
@@ -141,20 +122,21 @@ export function ProductDialog({
                 <FormItem>
                   <FormLabel>Tên món</FormLabel>
                   <FormControl>
-                    <Input placeholder="Phở bò..." {...field} />
+                    <Input placeholder="Phở bò tái..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Giá & Danh mục (Demo input text cho categoryId) */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Giá bán</FormLabel>
+                    <FormLabel>Giá bán (VNĐ)</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
@@ -168,17 +150,9 @@ export function ProductDialog({
                 name="categoryId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Danh mục</FormLabel>
+                    <FormLabel>Danh mục (ID)</FormLabel>
                     <FormControl>
-                      <select 
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                        {...field}
-                      >
-                        <option value="">-- Chọn danh mục --</option>
-                        {categories.map((c) => (
-                          <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                      </select>
+                      <Input placeholder="Guid Category..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -186,20 +160,7 @@ export function ProductDialog({
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="imageUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Link Hình ảnh</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
+            {/* Mô tả */}
             <FormField
               control={form.control}
               name="description"
@@ -207,34 +168,41 @@ export function ProductDialog({
                 <FormItem>
                   <FormLabel>Mô tả</FormLabel>
                   <FormControl>
-                    <Textarea {...field} />
+                    <Textarea placeholder="Thơm ngon..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="isActive"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                  <div className="space-y-0.5">
-                    <FormLabel>Kích hoạt</FormLabel>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
+            {/* Upload File Input */}
+            <FormItem>
+                <FormLabel>Hình ảnh</FormLabel>
+                <div className="flex items-center gap-4">
+                    <Input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleFileChange} 
+                        className="cursor-pointer"
                     />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+                    {selectedFile && (
+                        <div className="text-sm text-muted-foreground truncate max-w-[150px]">
+                            {selectedFile.name}
+                        </div>
+                    )}
+                </div>
+            </FormItem>
 
             <DialogFooter>
-               <Button type="button" variant="outline" onClick={() => setOpen(false)}>Hủy</Button>
-               <Button type="submit" disabled={loading}>{loading ? "Đang lưu..." : "Lưu"}</Button>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Hủy
+              </Button>
+              <Button type="submit" disabled={createProductMutation.isPending}>
+                {createProductMutation.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Lưu món
+              </Button>
             </DialogFooter>
           </form>
         </Form>

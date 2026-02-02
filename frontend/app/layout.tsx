@@ -1,9 +1,10 @@
-import React from "react"
-import type { Metadata } from 'next'
-import { Toaster } from "@/components/ui/sonner"
-import { Geist, Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import './globals.css'
+import React from "react";
+import type { Metadata } from 'next';
+import { Toaster } from "@/components/ui/sonner";
+import { Geist, Geist_Mono } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
+import './globals.css';
+import Providers from "@/components/providers"; // <--- [1] Import Providers
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -29,17 +30,18 @@ export const metadata: Metadata = {
     ],
     apple: '/apple-icon.png',
   },
-}
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi">
       <body>
-        {children}
+        {/* [2] Bọc Providers quanh children */}
+        <Providers>
+          {children}
+        </Providers>
         <Toaster position="top-right" richColors />
       </body>
     </html>
   );
 }
-
-

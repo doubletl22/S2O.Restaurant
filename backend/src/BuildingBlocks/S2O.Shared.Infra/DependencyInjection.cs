@@ -14,7 +14,6 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddSharedInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        // 1. Cấu hình Cloudinary (Giữ nguyên)
         var cloudName = configuration["Cloudinary:CloudName"];
         if (!string.IsNullOrEmpty(cloudName))
         {
@@ -30,7 +29,6 @@ public static class DependencyInjection
 
         services.AddHttpContextAccessor();
 
-        // 2. Cấu hình Authentication (PHẦN QUAN TRỌNG NHẤT)
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -38,10 +36,8 @@ public static class DependencyInjection
         })
         .AddJwtBearer(options =>
         {
-            // === SỬA LỖI 1: Đọc đúng key "Jwt:Key" thay vì "Jwt:Secret" ===
             var secretKey = configuration["Jwt:Key"] ?? configuration["Jwt:Secret"] ?? "S2O_Super_Secret_Key_For_Identity_Service_2026";
 
-            // Giữ nguyên dòng này để claim không bị biến đổi
             options.MapInboundClaims = false;
 
             options.TokenValidationParameters = new TokenValidationParameters
@@ -55,10 +51,6 @@ public static class DependencyInjection
                 ValidAudience = configuration["Jwt:Audience"] ?? "S2O.Restaurant",
 
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-
-                // === SỬA LỖI 2: Dùng tên Role chuẩn của .NET Identity ===
-                // Nếu Token của bạn dùng "role" ngắn, hãy sửa Identity Service để emit ra "role"
-                // Còn mặc định .NET Identity dùng URL dài này:
                 RoleClaimType = "role",
 
                 NameClaimType = "name"
@@ -67,7 +59,6 @@ public static class DependencyInjection
 
         services.AddAuthorization();
 
-        // 3. Dependency Injection
         services.AddScoped<ITenantContext, TenantContext>();
         services.AddScoped<IUserContext, UserContext>();
         services.AddScoped<UpdateAuditableEntitiesInterceptor>();
