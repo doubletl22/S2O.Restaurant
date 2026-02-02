@@ -191,4 +191,5 @@ export default function TrackingPage({ params }: { params: { qrToken: string } }
       </ScrollArea>
     </div>
   );
+  );
 }

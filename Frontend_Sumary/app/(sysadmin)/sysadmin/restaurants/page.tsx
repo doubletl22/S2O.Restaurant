@@ -127,6 +127,7 @@ export default function RestaurantsPage() {
               <TableHead className="text-right">Hành động</TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
             {loading ? (
                <TableRow><TableCell colSpan={5} className="text-center h-24">Đang tải...</TableCell></TableRow>
@@ -146,11 +147,13 @@ export default function RestaurantsPage() {
                       </div>
                     </div>
                   </TableCell>
+
                   <TableCell>
                     <Badge variant="outline" className="uppercase text-xs">
                       {tenant.planType || tenant.subscriptionPlan || "Standard"}
                     </Badge>
                   </TableCell>
+
                   <TableCell>
                     {tenant.isLocked ? (
                       <Badge variant="destructive" className="gap-1"><Lock className="h-3 w-3" /> Đã khóa</Badge>
@@ -169,6 +172,7 @@ export default function RestaurantsPage() {
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
                       </DropdownMenuTrigger>
+
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Quản trị</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleToggleLock(tenant)}>
