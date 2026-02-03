@@ -137,5 +137,5 @@ export default function CartPage({ params }: { params: { qrToken: string } }) {
       <BottomNavV2 qrToken={params.qrToken} />
     </div>
   );
-  );
+
 }

@@ -54,7 +54,7 @@ export default function ProductsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[80px]">Ảnh</TableHead>
+              <TableHead className="w-20">Ảnh</TableHead>
               <TableHead>Tên món</TableHead>
               <TableHead>Danh mục</TableHead>
               <TableHead>Giá bán</TableHead>

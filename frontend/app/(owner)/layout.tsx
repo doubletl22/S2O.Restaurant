@@ -22,7 +22,7 @@ export default function OwnerLayout({
       
       {/* SidebarInset giúp nội dung tự động co giãn khi sidebar mở/đóng */}
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 transition-[width,height] ease-linear group-has-[-collapsible=icon]/sidebar-wrapper:h-12">
           {/* Nút đóng mở Sidebar */}
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />

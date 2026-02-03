@@ -1,107 +1,162 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { QrCode, Copy, Printer } from 'lucide-react'
-import { toast } from 'sonner'
-import { branchService } from '@/services/branch.service'
-import { tableService } from '@/services/table.service'
-// [FIX] Import DTO từ types chung
-import { BranchDto, TableDto } from '@/lib/types'
+import { useState, useRef, useMemo } from "react";
+import { useReactToPrint } from "react-to-print";
+import { useBranches, useTables } from "@/hooks/use-branches"; // Tận dụng hook cũ
+import { QRCodeTemplate } from "@/components/owner/qr-code-template";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Printer, CheckSquare, Square, Loader2, QrCode } from "lucide-react";
+
+// [CẤU HÌNH] Thay đổi URL này thành domain thật của Customer App
+const CUSTOMER_APP_URL = "http://localhost:3000"; 
 
 export default function QrCodesPage() {
-  const [branches, setBranches] = useState<BranchDto[]>([])
-  const [selectedBranchId, setSelectedBranchId] = useState<string>('')
-  const [tables, setTables] = useState<TableDto[]>([])
+  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
+  const [selectedTableIds, setSelectedTableIds] = useState<string[]>([]);
+  const { data: branches, isLoading: isLoadingBranches } = useBranches();
+  const { data: tables, isLoading: isLoadingTables } = useTables(selectedBranchId);
+  const printComponentRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    contentRef: printComponentRef, 
+    documentTitle: `QR_Codes_${selectedBranchId || "All"}`,
+  });
 
-  useEffect(() => {
-    // [FIX] Handle Result<T> trả về từ service
-    branchService.getAll().then((res: any) => {
-        if (res.isSuccess) {
-            setBranches(res.value || [])
-            if(res.value && res.value.length > 0) setSelectedBranchId(res.value[0].id)
-        }
-    })
-  }, [])
+  const handleSelectAll = (checked: boolean) => {
+    if (checked && tables) {
+      setSelectedTableIds(tables.map((t: any) => t.id));
+    } else {
+      setSelectedTableIds([]);
+    }
+  };
 
-  useEffect(() => {
-    if(!selectedBranchId) return;
-    // [FIX] Handle Result<T>
-    tableService.getByBranch(selectedBranchId).then((res: any) => {
-        if (res.isSuccess) {
-            setTables(Array.isArray(res.value) ? res.value : [])
-        } else {
-            setTables([])
-        }
-    })
-  }, [selectedBranchId])
+  const handleSelectTable = (tableId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedTableIds(prev => [...prev, tableId]);
+    } else {
+      setSelectedTableIds(prev => prev.filter(id => id !== tableId));
+    }
+  };
 
-  const getOrderLink = (tableId: string) => {
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-      return `${baseUrl}/guest/t/${tableId}`;
-  }
+  const tablesToPrint = useMemo(() => {
+    if (!tables) return [];
+    return tables.filter((t: any) => selectedTableIds.includes(t.id));
+  }, [tables, selectedTableIds]);
 
-  const copyToClipboard = (text: string) => {
-      navigator.clipboard.writeText(text);
-      toast.success("Đã sao chép link")
-  }
-
-  const printQr = () => {
-      window.print();
-  }
+  const currentBranchName = branches?.find((b: any) => b.id === selectedBranchId)?.name || "Nhà hàng";
 
   return (
-    <div className="p-6 space-y-6 print:p-0">
-       <div className="flex justify-between items-center print:hidden">
-           <div>
-               <h1 className="text-2xl font-bold text-gray-800">Mã QR Gọi Món</h1>
-               <p className="text-sm text-gray-500">In mã này dán lên bàn để khách quét</p>
-           </div>
-           <div className="flex items-center gap-2">
-               <Select value={selectedBranchId} onValueChange={setSelectedBranchId}>
-                   <SelectTrigger className="w-50"><SelectValue placeholder="Chọn chi nhánh"/></SelectTrigger>
-                   <SelectContent>
-                       {branches.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
-                   </SelectContent>
-               </Select>
-               <Button variant="outline" onClick={printQr}><Printer className="mr-2 h-4 w-4"/> In tất cả</Button>
-           </div>
-       </div>
+    <div className="flex h-[calc(100vh-6rem)] flex-col md:flex-row gap-6 p-4">
+      
+      {/* --- CỘT TRÁI: CẤU HÌNH --- */}
+      <Card className="w-full md:w-1/3 flex flex-col h-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <QrCode className="h-5 w-5"/> Tạo mã QR
+          </CardTitle>
+          <CardDescription>Chọn chi nhánh và bàn để in</CardDescription>
+        </CardHeader>
+        
+        <CardContent className="flex flex-col gap-4 flex-1 overflow-hidden">
+          {/* Chọn Chi Nhánh */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Chi nhánh</label>
+            <Select 
+                onValueChange={(val) => {
+                    setSelectedBranchId(val);
+                    setSelectedTableIds([]); // Reset chọn bàn khi đổi chi nhánh
+                }} 
+                value={selectedBranchId || ""}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn chi nhánh..." />
+              </SelectTrigger>
+              <SelectContent>
+                {branches?.map((b: any) => (
+                  <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-           {tables.map(table => {
-               const link = getOrderLink(table.id);
-               return (
-                   <Card key={table.id} className="flex flex-col items-center text-center shadow-sm hover:shadow-md transition-shadow break-inside-avoid">
-                       <CardHeader className="pb-2">
-                           <CardTitle className="text-xl font-bold text-orange-600">{table.name}</CardTitle>
-                           <p className="text-xs text-gray-400 uppercase tracking-widest">Scan to Order</p>
-                       </CardHeader>
-                       <CardContent className="pb-2">
-                           <div className="bg-white p-2 border rounded-lg inline-block">
-                               {/* Sử dụng API tạo QR miễn phí hoặc thư viện */}
-                               <img 
-                                 src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(link)}`} 
-                                 alt="QR Code" 
-                                 className="w-32 h-32"
-                               />
-                           </div>
-                       </CardContent>
-                       <CardFooter className="flex flex-col gap-2 w-full pt-0 print:hidden">
-                           <div className="text-xs text-gray-400 truncate w-full px-2 bg-gray-50 py-1 rounded border">
-                               {link}
-                           </div>
-                           <Button variant="ghost" size="sm" className="w-full text-blue-600" onClick={() => copyToClipboard(link)}>
-                               <Copy className="mr-2 h-3 w-3"/> Copy Link
-                           </Button>
-                       </CardFooter>
-                   </Card>
-               )
-           })}
-           {tables.length === 0 && <div className="col-span-full text-center py-10 text-gray-400">Không có bàn nào để tạo QR.</div>}
-       </div>
+          {/* Chọn Bàn */}
+          {selectedBranchId && (
+            <div className="flex flex-col flex-1 overflow-hidden border rounded-md">
+              <div className="p-3 border-b bg-muted/30 flex items-center gap-2">
+                <Checkbox 
+                  id="select-all"
+                  checked={tables?.length > 0 && selectedTableIds.length === tables?.length}
+                  onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+                />
+                <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                  Chọn tất cả ({tables?.length || 0})
+                </label>
+              </div>
+              
+              <ScrollArea className="flex-1 p-3">
+                {isLoadingTables ? (
+                   <div className="flex justify-center p-4"><Loader2 className="animate-spin h-4 w-4"/></div>
+                ) : tables?.length === 0 ? (
+                    <div className="text-center text-sm text-muted-foreground">Chưa có bàn nào.</div>
+                ) : (
+                  <div className="space-y-3">
+                    {tables?.map((table: any) => (
+                      <div key={table.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={table.id} 
+                          checked={selectedTableIds.includes(table.id)}
+                          onCheckedChange={(checked) => handleSelectTable(table.id, checked as boolean)}
+                        />
+                        <label
+                          htmlFor={table.id}
+                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {table.name} <span className="text-muted-foreground text-xs">({table.capacity} ghế)</span>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+          )}
+
+          <Button 
+            className="w-full mt-auto" 
+            size="lg" 
+            disabled={tablesToPrint.length === 0}
+            onClick={handlePrint}
+          >
+            <Printer className="mr-2 h-4 w-4" /> 
+            In {tablesToPrint.length} mã QR
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* --- CỘT PHẢI: PREVIEW --- */}
+      <div className="flex-1 bg-muted/20 border rounded-lg overflow-auto flex flex-col items-center p-8">
+        {tablesToPrint.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground opacity-50">
+                <QrCode className="h-20 w-20 mb-4" />
+                <p>Vui lòng chọn bàn để xem trước</p>
+            </div>
+        ) : (
+            <div className="shadow-lg">
+                {/* Component này sẽ được in, nhưng ta cũng hiển thị nó để Preview */}
+                <QRCodeTemplate 
+                    ref={printComponentRef} 
+                    tables={tablesToPrint}
+                    branchName={currentBranchName}
+                    baseUrl={CUSTOMER_APP_URL}
+                />
+            </div>
+        )}
+      </div>
+
     </div>
-  )
+  );
 }

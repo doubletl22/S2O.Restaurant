@@ -25,7 +25,6 @@ public class GetOwnerBranchesHandler : IRequestHandler<GetOwnerBranchesQuery, Re
 
     public async Task<Result<List<BranchDto>>> Handle(GetOwnerBranchesQuery request, CancellationToken ct)
     {
-        // Tự động lọc theo TenantId nhờ Global Filter
         var branches = await _context.Branches
             .AsNoTracking()
             .OrderBy(b => b.Name)
@@ -33,8 +32,8 @@ public class GetOwnerBranchesHandler : IRequestHandler<GetOwnerBranchesQuery, Re
             {
                 Id = b.Id,
                 Name = b.Name,
-                Address = b.Address,
-                PhoneNumber = b.PhoneNumber,
+                Address = b.Address ?? "",
+                PhoneNumber = b.PhoneNumber ?? "",
                 IsActive = b.IsActive
             })
             .ToListAsync(ct);

@@ -49,6 +49,6 @@ export default function GuestLayout({
           {children}
         </main>
       </div>
-    </div>
+    </GuestCartProvider>
   );
 }
