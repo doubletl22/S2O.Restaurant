@@ -26,7 +26,7 @@ public class KitchenController : ControllerBase
             .Where(o => o.BranchId == branchId
                         && o.Status != OrderStatus.Paid
                         && o.Status != OrderStatus.Cancelled)
-            .OrderBy(o => o.OrderDate) // [ĐÃ SỬA] Dùng OrderDate để sắp xếp
+            .OrderBy(o => o.OrderDate) 
             .ToListAsync();
 
         var tickets = activeOrders
@@ -36,7 +36,6 @@ public class KitchenController : ControllerBase
                 OrderId = o.Id,
                 TableName = o.TableName ?? "Unknown",
 
-                // [FIX LỖI TẠI ĐÂY] Đổi CreatedOn thành OrderDate
                 Time = o.OrderDate.ToString("HH:mm"),
 
                 Status = o.Items.Any(i => i.Status == OrderStatus.Pending) ? "Pending" : "Cooking",
