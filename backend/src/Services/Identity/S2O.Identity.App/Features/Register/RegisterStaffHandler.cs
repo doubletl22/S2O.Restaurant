@@ -1,9 +1,7 @@
 ﻿using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using S2O.Identity.App.Abstractions;
 using S2O.Identity.Domain.Entities;
-using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Results;
 
 namespace S2O.Identity.App.Features.Register;
@@ -11,26 +9,21 @@ namespace S2O.Identity.App.Features.Register;
 public class RegisterStaffHandler : IRequestHandler<RegisterStaffCommand, Result<Guid>>
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly ITenantContext _tenantContext;
-    private readonly IAuthDbContext _context;
-
+    private readonly RoleManager<ApplicationRole> _roleManager;
     public RegisterStaffHandler(
         UserManager<ApplicationUser> userManager,
-        ITenantContext tenantContext,
-        IAuthDbContext context
-    )
+        RoleManager<ApplicationRole> roleManager)
     {
         _userManager = userManager;
-        _tenantContext = tenantContext;
-        _context = context;
+        _roleManager = roleManager;
     }
 
     public async Task<Result<Guid>> Handle(RegisterStaffCommand request, CancellationToken cancellationToken)
     {
-        var currentTenantId = _tenantContext.TenantId;
-        if (currentTenantId is null)
+        if (!await _roleManager.RoleExistsAsync(request.Role))
         {
-            return Result<Guid>.Failure(new Error("Identity.TenantNotFound", "TenantId is missing in tenant context."));
+            var newRole = new ApplicationRole { Name = request.Role };
+            await _roleManager.CreateAsync(newRole);
         }
 
         var user = new ApplicationUser
@@ -38,30 +31,31 @@ public class RegisterStaffHandler : IRequestHandler<RegisterStaffCommand, Result
             UserName = request.Email,
             Email = request.Email,
             FullName = request.FullName,
+            BranchId = request.BranchId,
+            TenantId = request.TenantId,
             PhoneNumber = request.PhoneNumber,
-
-            TenantId = currentTenantId.Value,
-            IsActive = true
+            IsActive = true,
+            EmailConfirmed = true
         };
 
-        var createResult = await _userManager.CreateAsync(user, request.Password);
-        if (!createResult.Succeeded)
+        var result = await _userManager.CreateAsync(user, request.Password);
+
+        if (!result.Succeeded)
         {
-            return Result<Guid>.Failure(
-                new Error("Identity.RegisterFailed", createResult.Errors.First().Description)
-            );
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return Result<Guid>.Failure(new Error("Identity.RegisterFailed", errors));
         }
 
-        await _userManager.AddToRoleAsync(user, "Staff");
+        await _userManager.AddToRoleAsync(user, request.Role);
 
-        _context.UserBranches.Add(new UserBranch
+        var claims = new List<Claim>
         {
-            UserId = user.Id,
-            BranchId = request.BranchId
-        });
-        await _context.SaveChangesAsync(cancellationToken);
-
-        await _userManager.AddClaimAsync(user, new Claim("branch_id", request.BranchId.ToString()));
+            new Claim("tenant_id", request.TenantId.ToString()),
+            new Claim("branch_id", request.BranchId.ToString()),
+            new Claim("full_name", request.FullName),
+            new Claim("role", request.Role)
+        };
+        await _userManager.AddClaimsAsync(user, claims);
 
         return Result<Guid>.Success(user.Id);
     }

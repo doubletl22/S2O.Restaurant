@@ -1,35 +1,26 @@
 import http from "@/lib/http";
 import { StaffProfile, CreateStaffRequest, Result } from "@/lib/types";
 
-const ENDPOINT = "/api/v1/staff";
+const ENDPOINT = "/api/v1/staffs"; // Hoặc /api/v1/owner/staffs tùy route backend
 
 export const ownerStaffService = {
-  // GET /api/v1/staff?keyword=...
+  // Lấy danh sách nhân viên
   getAll: async (keyword?: string): Promise<Result<StaffProfile[]>> => {
     return await http.get(ENDPOINT, { params: { keyword } });
   },
 
-  // POST /api/v1/staff
+  // Tạo nhân viên mới
   create: async (data: CreateStaffRequest): Promise<Result<string>> => {
-    // Map đúng payload theo RegisterStaffCommand:
-    // Username, FullName, Email, Password, BranchId
-    const payload = {
-      username: data.email, // dùng email làm username
-      fullName: data.fullName,
-      email: data.email,
-      password: data.password || "",
-      branchId: data.branchId,
-    };
-
-    return await http.post(ENDPOINT, payload);
+    return await http.post(ENDPOINT, data);
   },
 
-  // Nếu bạn muốn xoá/disable staff, cần thêm endpoint backend.
+  // Xóa nhân viên
   delete: async (id: string): Promise<Result<void>> => {
     return await http.delete(`${ENDPOINT}/${id}`);
   },
-
+  
+  // Cập nhật (nếu cần)
   update: async (id: string, data: any): Promise<Result<void>> => {
     return await http.put(`${ENDPOINT}/${id}`, data);
-  },
+  }
 };

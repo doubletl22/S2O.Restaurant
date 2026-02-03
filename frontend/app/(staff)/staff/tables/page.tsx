@@ -1,65 +1,94 @@
-"use client";
+'use client'
 
-import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Users, Armchair } from "lucide-react";
+import { Users } from 'lucide-react'
 
-// Dữ liệu giả lập (Sau này gọi API GetTables)
-const MOCK_TABLES = [
-  { id: "1", name: "Bàn 01", status: "Free", capacity: 4 },
-  { id: "2", name: "Bàn 02", status: "Occupied", capacity: 4, activeOrderId: "O-123" },
-  { id: "3", name: "Bàn 03", status: "Free", capacity: 2 },
-  { id: "4", name: "VIP 01", status: "Free", capacity: 10 },
-  { id: "5", name: "Bàn 04", status: "Serving", capacity: 6 },
-];
+const tables = [
+  { id: 1, status: 'occupied', guests: 4 },
+  { id: 2, status: 'occupied', guests: 2 },
+  { id: 3, status: 'available', guests: 0 },
+  { id: 4, status: 'reserved', guests: 0 },
+  { id: 5, status: 'occupied', guests: 3 },
+  { id: 6, status: 'available', guests: 0 },
+  { id: 7, status: 'occupied', guests: 2 },
+  { id: 8, status: 'available', guests: 0 },
+  { id: 9, status: 'reserved', guests: 0 },
+  { id: 10, status: 'available', guests: 0 },
+  { id: 11, status: 'occupied', guests: 5 },
+  { id: 12, status: 'occupied', guests: 2 },
+]
+
+const statusColors: Record<string, { bg: string; text: string; label: string }> = {
+  available: { bg: 'rgba(34, 197, 94, 0.12)', text: '#22c55e', label: 'Trống' },
+  occupied: { bg: 'rgba(249, 115, 22, 0.12)', text: '#f97316', label: 'Đang dùng' },
+  reserved: { bg: 'rgba(99, 102, 241, 0.12)', text: '#6366f1', label: 'Đã đặt' },
+}
 
 export default function TablesPage() {
-  const router = useRouter();
-
-  const handleSelectTable = (tableId: string) => {
-    // Chuyển sang trang POS của bàn đó
-    router.push(`/staff/pos/${tableId}`);
-  };
-
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Sơ đồ bàn</h1>
+    <div className="p-4 lg:p-6">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
+          Tables
+        </h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>
+          Quản lý trạng thái bàn
+        </p>
+      </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-        {MOCK_TABLES.map((table) => {
-          const isOccupied = table.status !== "Free";
-          
+      {/* Legend */}
+      <div className="flex flex-wrap gap-4 mb-6">
+        {Object.entries(statusColors).map(([key, value]) => (
+          <div key={key} className="flex items-center gap-2">
+            <div 
+              className="w-3 h-3 rounded-full"
+              style={{ background: value.text }}
+            />
+            <span className="text-sm" style={{ color: 'var(--muted)' }}>
+              {value.label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Tables Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {tables.map((table) => {
+          const status = statusColors[table.status]
           return (
-            <Card 
-                key={table.id} 
-                className={`cursor-pointer hover:shadow-lg transition-all border-2 
-                    ${isOccupied 
-                        ? "border-red-200 bg-red-50 hover:border-red-400" 
-                        : "border-green-200 bg-green-50 hover:border-green-400"
-                    }`}
-                onClick={() => handleSelectTable(table.id)}
+            <div
+              key={table.id}
+              className="flex flex-col items-center justify-center p-6 rounded-2xl cursor-pointer transition-all hover:scale-105"
+              style={{ 
+                background: status.bg,
+                border: `2px solid ${status.text}20`
+              }}
             >
-              <CardContent className="p-4 flex flex-col items-center justify-center h-32 relative">
-                <div className="absolute top-2 right-2">
-                    <Badge variant={isOccupied ? "destructive" : "outline"} className={!isOccupied ? "bg-white text-green-700 border-green-200" : ""}>
-                        {isOccupied ? "Có khách" : "Trống"}
-                    </Badge>
+              <span 
+                className="text-3xl font-bold"
+                style={{ color: status.text }}
+              >
+                {table.id}
+              </span>
+              <span 
+                className="text-xs font-medium mt-2"
+                style={{ color: status.text }}
+              >
+                {status.label}
+              </span>
+              {table.guests > 0 && (
+                <div 
+                  className="flex items-center gap-1 mt-2 text-xs"
+                  style={{ color: 'var(--muted)' }}
+                >
+                  <Users className="w-3 h-3" />
+                  {table.guests}
                 </div>
-                
-                <div className={`p-3 rounded-full mb-2 ${isOccupied ? "bg-red-200 text-red-700" : "bg-green-200 text-green-700"}`}>
-                    <Armchair className="h-6 w-6" />
-                </div>
-                
-                <h3 className="font-bold text-lg">{table.name}</h3>
-                <div className="flex items-center text-xs text-muted-foreground mt-1">
-                    <Users className="h-3 w-3 mr-1" /> {table.capacity} chỗ
-                </div>
-              </CardContent>
-            </Card>
-          );
+              )}
+            </div>
+          )
         })}
       </div>
     </div>
-  );
+  )
 }

@@ -48,7 +48,7 @@ export function AdminHeader() {
       {/* Welcome Text */}
       <div className="text-sm text-gray-600">
         {greeting}!{' '}
-        <span className="text-[#f97316] font-bold">User</span>
+        <span className="text-[#f97316] font-bold">Admin</span>
       </div>
 
       {/* User Profile */}
