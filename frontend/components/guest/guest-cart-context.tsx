@@ -32,11 +32,17 @@ type GuestCartContextType = {
   tableInfo: PublicTableInfo | null;
   setTableInfo: (info: PublicTableInfo) => void;
 
-  addToCart: (p: { id: string; name: string; price: number; imageUrl?: string }, note?: string) => void;
+  addToCart: (
+    p: { id: string; name: string; price: number; imageUrl?: string },
+    note?: string
+  ) => void;
   removeFromCart: (cartId: string) => void;
   updateQuantity: (cartId: string, delta: number) => void;
   updateNote: (cartId: string, note: string) => void;
   clearCart: () => void;
+
+  // ✅ thêm dòng này để layout badge dùng được
+  totalItems: number;
 
   totalAmount: number;
 };
@@ -102,16 +108,21 @@ export function GuestCartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addToCart = useCallback(
-    (p: { id: string; name: string; price: number; imageUrl?: string }, note?: string) => {
+    (
+      p: { id: string; name: string; price: number; imageUrl?: string },
+      note?: string
+    ) => {
       const n = normalizeNote(note);
 
       setCart((prev) => {
         // gộp theo productId + note (note khác => item khác)
-        const idx = prev.findIndex((x) => x.id === p.id && normalizeNote(x.note) === n);
+        const idx = prev.findIndex(
+          (x) => x.id === p.id && normalizeNote(x.note) === n
+        );
 
         if (idx >= 0) {
           const next = [...prev];
-          next[idx] = { ...next[idx], quantity: next[idx].quantity + 1 };
+          next[idx] = { ...next[idx], quantity: Number(next[idx].quantity || 0) + 1 };
           return next;
         }
 
@@ -121,7 +132,7 @@ export function GuestCartProvider({ children }: { children: React.ReactNode }) {
             cartId: uid(),
             id: p.id,
             name: p.name,
-            price: p.price,
+            price: Number(p.price || 0),
             quantity: 1,
             note: n,
             imageUrl: p.imageUrl || "",
@@ -139,9 +150,11 @@ export function GuestCartProvider({ children }: { children: React.ReactNode }) {
   const updateQuantity = useCallback((cartId: string, delta: number) => {
     setCart((prev) => {
       const next = prev.map((x) =>
-        x.cartId === cartId ? { ...x, quantity: x.quantity + delta } : x
+        x.cartId === cartId
+          ? { ...x, quantity: Number(x.quantity || 0) + Number(delta || 0) }
+          : x
       );
-      return next.filter((x) => x.quantity > 0);
+      return next.filter((x) => Number(x.quantity || 0) > 0);
     });
   }, []);
 
@@ -158,7 +171,10 @@ export function GuestCartProvider({ children }: { children: React.ReactNode }) {
 
       // Tìm item khác có cùng productId + note mới để merge
       const dupIdx = prev.findIndex(
-        (x) => x.cartId !== cartId && x.id === current.id && normalizeNote(x.note) === n
+        (x) =>
+          x.cartId !== cartId &&
+          x.id === current.id &&
+          normalizeNote(x.note) === n
       );
 
       // Không có trùng => chỉ update note
@@ -170,7 +186,8 @@ export function GuestCartProvider({ children }: { children: React.ReactNode }) {
       const merged = [...prev];
       merged[dupIdx] = {
         ...merged[dupIdx],
-        quantity: merged[dupIdx].quantity + current.quantity,
+        quantity:
+          Number(merged[dupIdx].quantity || 0) + Number(current.quantity || 0),
       };
 
       return merged.filter((x) => x.cartId !== cartId);
@@ -184,8 +201,19 @@ export function GuestCartProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, []);
 
+  // ✅ tổng số lượng item (badge 1–2–3…)
+  const totalItems = useMemo(
+    () => cart.reduce((sum, i) => sum + (Number(i.quantity) || 0), 0),
+    [cart]
+  );
+
+  // ✅ tổng tiền an toàn
   const totalAmount = useMemo(
-    () => cart.reduce((sum, i) => sum + i.price * i.quantity, 0),
+    () =>
+      cart.reduce(
+        (sum, i) => sum + (Number(i.price) || 0) * (Number(i.quantity) || 0),
+        0
+      ),
     [cart]
   );
 
@@ -199,12 +227,31 @@ export function GuestCartProvider({ children }: { children: React.ReactNode }) {
       updateQuantity,
       updateNote,
       clearCart,
+
+      // ✅ trả về cho context để layout dùng được
+      totalItems,
+
       totalAmount,
     }),
-    [cart, tableInfo, setTableInfo, addToCart, removeFromCart, updateQuantity, updateNote, clearCart, totalAmount]
+    [
+      cart,
+      tableInfo,
+      setTableInfo,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      updateNote,
+      clearCart,
+      totalItems,
+      totalAmount,
+    ]
   );
 
-  return <GuestCartContext.Provider value={value}>{children}</GuestCartContext.Provider>;
+  return (
+    <GuestCartContext.Provider value={value}>
+      {children}
+    </GuestCartContext.Provider>
+  );
 }
 
 export function useGuestCart() {

@@ -12,7 +12,9 @@ import { BottomNavV2 } from "@/components/guest/bottom-nav-v2";
 
 export default function CartPage() {
   const params = useParams<{ qrToken: string }>();
-  const qrToken = Array.isArray(params?.qrToken) ? params.qrToken[0] : params?.qrToken;
+  const qrToken = Array.isArray(params?.qrToken)
+    ? params.qrToken[0]
+    : params?.qrToken;
 
   const router = useRouter();
 
@@ -52,7 +54,9 @@ export default function CartPage() {
   }, [qrToken, tableInfo?.tableId, setTableInfo]);
 
   const formatMoney = (v: number) =>
-    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(v);
+    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+      v
+    );
 
   const placeOrder = async () => {
     if (!tableInfo?.tenantId || !tableInfo?.tableId) {
@@ -63,7 +67,9 @@ export default function CartPage() {
 
     // ✅ chặn trường hợp qty <= 0
     if (safeCart.some((i) => i.__qty <= 0)) {
-      toast.error("Số lượng không hợp lệ", { description: "Vui lòng tăng số lượng sản phẩm." });
+      toast.error("Số lượng không hợp lệ", {
+        description: "Vui lòng tăng số lượng sản phẩm.",
+      });
       return;
     }
 
@@ -74,9 +80,9 @@ export default function CartPage() {
         tenantId: tableInfo.tenantId,
         tableId: tableInfo.tableId,
         items: safeCart.map((i) => ({
-          productId: i.id,           // menuItemId
+          productId: i.id, // menuItemId
           name: i.name,
-          quantity: i.__qty,         // ✅ luôn có số
+          quantity: i.__qty, // ✅ luôn có số
           note: i.note || "",
         })),
       };
@@ -116,13 +122,30 @@ export default function CartPage() {
         clearCart();
         router.push(`/guest/t/${qrToken}/tracking`);
       } else {
+        // ✅ bắt rộng message trong response fail (tùy backend)
         toast.error("Đặt món thất bại", {
-          description: res?.error?.description || res?.error?.message || "Vui lòng thử lại",
+          description:
+            res?.error?.description ||
+            res?.error?.message ||
+            res?.message ||
+            res?.title ||
+            "Vui lòng thử lại",
         });
       }
     } catch (e: any) {
-      console.error(e);
-      toast.error("Lỗi kết nối máy chủ");
+      // ✅ FIX: Hiện đúng lỗi backend thay vì báo chung chung
+      console.error("PLACE_ORDER_ERROR:", e);
+
+      const desc =
+        e?.response?.data?.error?.description ||
+        e?.response?.data?.error?.message ||
+        e?.response?.data?.message ||
+        e?.response?.data?.title ||
+        e?.message ||
+        (typeof e === "string" ? e : null) ||
+        "Vui lòng thử lại";
+
+      toast.error("Đặt món thất bại", { description: desc });
     } finally {
       setSubmitting(false);
     }
@@ -155,7 +178,9 @@ export default function CartPage() {
             >
               <div className="flex-1">
                 <h4 className="font-medium text-gray-900">{item.name}</h4>
-                {item.note && <p className="text-xs text-gray-500 mt-1">Ghi chú: {item.note}</p>}
+                {item.note && (
+                  <p className="text-xs text-gray-500 mt-1">Ghi chú: {item.note}</p>
+                )}
                 <div className="text-sm font-semibold text-orange-600 mt-1">
                   {formatMoney(item.price)}
                 </div>
@@ -198,7 +223,9 @@ export default function CartPage() {
         <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[420px] p-4 bg-white border-t shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
           <div className="flex justify-between items-center mb-4">
             <span className="text-gray-600">Tổng cộng</span>
-            <span className="text-xl font-bold text-orange-600">{formatMoney(totalAmount)}</span>
+            <span className="text-xl font-bold text-orange-600">
+              {formatMoney(totalAmount)}
+            </span>
           </div>
 
           <Button
