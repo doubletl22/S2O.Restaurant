@@ -183,6 +183,20 @@
       "UpstreamPathTemplate": "/api/v1/payments/{everything}",
       "UpstreamHttpMethod": [ "POST", "GET" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] }
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/tables/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ], 
+      "UpstreamPathTemplate": "/api/v1/tables/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/kitchen/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/v1/kitchen/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
     }
   ],
   "GlobalConfiguration": {

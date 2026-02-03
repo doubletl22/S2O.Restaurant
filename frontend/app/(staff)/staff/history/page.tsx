@@ -1,83 +1,112 @@
-'use client'
+"use client";
 
-import { CheckCircle2 } from 'lucide-react'
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Calendar as CalendarIcon, Search, Eye } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const completedOrders = [
-  { id: '1', tableNumber: 8, completedAt: new Date(Date.now() - 5 * 60000), itemCount: 3, total: 185000 },
-  { id: '2', tableNumber: 4, completedAt: new Date(Date.now() - 15 * 60000), itemCount: 2, total: 120000 },
-  { id: '3', tableNumber: 11, completedAt: new Date(Date.now() - 25 * 60000), itemCount: 5, total: 295000 },
-  { id: '4', tableNumber: 1, completedAt: new Date(Date.now() - 45 * 60000), itemCount: 4, total: 220000 },
-  { id: '5', tableNumber: 9, completedAt: new Date(Date.now() - 60 * 60000), itemCount: 2, total: 95000 },
-]
+// Mock Data: Lịch sử đơn hàng
+const MOCK_HISTORY = [
+  { id: "ORD-009", date: "03/02/2026 12:30", table: "Bàn 01", items: "Lẩu Thái, Pepsi...", total: 450000, payment: "Tiền mặt", staff: "Nguyễn Văn A" },
+  { id: "ORD-008", date: "03/02/2026 12:15", table: "Bàn 03", items: "Cà phê đen, Bạc xỉu", total: 65000, payment: "Chuyển khoản", staff: "Nguyễn Văn A" },
+  { id: "ORD-007", date: "03/02/2026 11:45", table: "VIP 01", items: "Combo Sashimi VIP...", total: 2500000, payment: "Thẻ tín dụng", staff: "Trần Thị B" },
+  { id: "ORD-006", date: "02/02/2026 19:30", table: "Bàn 02", items: "Cơm chiên, Canh chua", total: 120000, payment: "Tiền mặt", staff: "Nguyễn Văn A" },
+];
 
-function formatTime(date: Date) {
-  return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-}
+export default function HistoryPage() {
+  const [searchTerm, setSearchTerm] = useState("");
 
-function formatPrice(price: number) {
-  return new Intl.NumberFormat('vi-VN').format(price) + 'đ'
-}
+  // Filter đơn giản
+  const filteredData = MOCK_HISTORY.filter(
+    (item) =>
+      item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.table.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-export default function OrderHistoryPage() {
+  // Tính tổng doanh thu hiển thị
+  const totalRevenue = filteredData.reduce((sum, item) => sum + item.total, 0);
+
   return (
-    <div className="p-4 lg:p-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>
-          Order History
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+           <CalendarIcon className="h-6 w-6 text-primary" /> Lịch sử đơn hàng
         </h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>
-          Các đơn đã hoàn thành hôm nay
-        </p>
+        
+        {/* Thanh tìm kiếm */}
+        <div className="relative w-full md:w-75">
+             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+             <Input 
+                placeholder="Tìm mã đơn, tên bàn..." 
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+             />
+        </div>
       </div>
 
-      {/* Orders List */}
-      <div className="flex flex-col gap-3">
-        {completedOrders.map((order) => (
-          <div
-            key={order.id}
-            className="flex items-center gap-4 p-4 rounded-2xl"
-            style={{ 
-              background: 'var(--card)',
-              boxShadow: 'var(--shadow)'
-            }}
-          >
-            {/* Icon */}
-            <div 
-              className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: 'rgba(34, 197, 94, 0.12)' }}
-            >
-              <CheckCircle2 className="w-6 h-6" style={{ color: '#22c55e' }} />
-            </div>
+      {/* Thống kê nhanh */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+              <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Tổng đơn hàng</CardTitle></CardHeader>
+              <CardContent><div className="text-2xl font-bold">{filteredData.length}</div></CardContent>
+          </Card>
+          <Card>
+              <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">Doanh thu (Hiển thị)</CardTitle></CardHeader>
+              <CardContent><div className="text-2xl font-bold text-green-600">{totalRevenue.toLocaleString()}đ</div></CardContent>
+          </Card>
+      </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-bold" style={{ color: 'var(--text)' }}>
-                  Bàn #{order.tableNumber}
-                </span>
-                <span 
-                  className="px-2 py-0.5 rounded-full text-xs font-medium"
-                  style={{ background: 'rgba(34, 197, 94, 0.12)', color: '#22c55e' }}
-                >
-                  Hoàn thành
-                </span>
-              </div>
-              <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>
-                {order.itemCount} món • {formatTime(order.completedAt)}
-              </p>
-            </div>
-
-            {/* Total */}
-            <span 
-              className="font-bold text-lg shrink-0"
-              style={{ color: 'var(--text)' }}
-            >
-              {formatPrice(order.total)}
-            </span>
-          </div>
-        ))}
+      {/* Bảng dữ liệu */}
+      <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader className="bg-muted/50">
+            <TableRow>
+              <TableHead className="w-25">Mã đơn</TableHead>
+              <TableHead>Thời gian</TableHead>
+              <TableHead>Bàn</TableHead>
+              <TableHead className="hidden md:table-cell">Tóm tắt món</TableHead>
+              <TableHead>Nhân viên</TableHead>
+              <TableHead>Thanh toán</TableHead>
+              <TableHead className="text-right">Tổng tiền</TableHead>
+              <TableHead className="w-12.5"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredData.length === 0 ? (
+                <TableRow>
+                    <TableCell colSpan={8} className="text-center h-24 text-muted-foreground">
+                        Không tìm thấy đơn hàng nào.
+                    </TableCell>
+                </TableRow>
+            ) : (
+                filteredData.map((order) => (
+                <TableRow key={order.id} className="hover:bg-muted/20">
+                    <TableCell className="font-mono font-medium">{order.id}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{order.date}</TableCell>
+                    <TableCell><Badge variant="outline">{order.table}</Badge></TableCell>
+                    <TableCell className="hidden md:table-cell text-sm truncate max-w-50" title={order.items}>
+                        {order.items}
+                    </TableCell>
+                    <TableCell className="text-sm">{order.staff}</TableCell>
+                    <TableCell className="text-sm">{order.payment}</TableCell>
+                    <TableCell className="text-right font-bold text-green-700">
+                        {order.total.toLocaleString()}đ
+                    </TableCell>
+                    <TableCell>
+                        <Button variant="ghost" size="icon" title="Xem chi tiết">
+                            <Eye className="h-4 w-4 text-gray-500" />
+                        </Button>
+                    </TableCell>
+                </TableRow>
+                ))
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
-  )
+  );
 }

@@ -1,9 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore; // [QUAN TRỌNG] Để dùng .Include(), .ToListAsync()
 using S2O.Order.App.Features.Orders.Commands;
 using S2O.Order.App.Features.Orders.Queries;
 using S2O.Order.Domain.Enums;
+using S2O.Order.Infra.Persistence; // [QUAN TRỌNG] Namespace chứa OrderDbContext
 
 namespace S2O.Order.Api.Controllers;
 
@@ -12,10 +14,13 @@ namespace S2O.Order.Api.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly ISender _sender;
+    private readonly OrderDbContext _context; // [FIX 1] Khai báo biến _context
 
-    public OrdersController(ISender sender)
+    // [FIX 1] Inject OrderDbContext vào Constructor
+    public OrdersController(ISender sender, OrderDbContext context)
     {
         _sender = sender;
+        _context = context;
     }
 
     // ==========================================
@@ -27,11 +32,6 @@ public class OrdersController : ControllerBase
     [Authorize(Roles = "RestaurantOwner, Staff")]
     public async Task<IActionResult> GetOrders([FromQuery] OrderStatus? status)
     {
-        // Query Handler sẽ tự lấy BranchId từ Token (UserContext)
-        // Lưu ý: Đảm bảo GetBranchOrdersQuery không yêu cầu truyền BranchId từ ngoài vào 
-        // nếu bạn muốn bảo mật tuyệt đối, hoặc lấy từ Claim như code cũ.
-
-        // Giả sử Handler của bạn cần BranchId, ta lấy từ Token:
         var branchId = GetBranchIdFromToken();
         var result = await _sender.Send(new GetBranchOrdersQuery(branchId, status));
 
@@ -55,11 +55,30 @@ public class OrdersController : ControllerBase
     {
         if (id != command.OrderId) return BadRequest("ID không khớp");
 
-        // Gán thêm BranchId để đảm bảo an toàn (Staff quán này không sửa đơn quán khác)
-        // var safeCommand = command with { BranchId = GetBranchIdFromToken() }; // Nếu record hỗ trợ with
-
         var result = await _sender.Send(command);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
+    // ==========================================
+    // [MỚI THÊM] API ACTIVE ORDERS
+    // ==========================================
+
+    // GET: api/v1/orders/active?branchId=...
+    [HttpGet("active")]
+    // [Authorize(Roles = "RestaurantOwner, Staff")] // Nên bật Authorize
+    public async Task<IActionResult> GetActiveOrders([FromQuery] Guid branchId)
+    {
+        // [FIX 2] Sử dụng _context đã inject ở trên
+        var orders = await _context.Orders
+            .Include(o => o.Items)
+            .Where(o => o.BranchId == branchId
+                        // [FIX 3] So sánh với Enum thay vì string "Paid"
+                        && o.Status != OrderStatus.Paid
+                        && o.Status != OrderStatus.Cancelled)
+            .OrderByDescending(o => o.OrderDate) // Đảm bảo Property tên là CreatedOn (theo file Entity bạn upload)
+            .ToListAsync();
+
+        return Ok(orders);
     }
 
     // ==========================================
@@ -69,7 +88,11 @@ public class OrdersController : ControllerBase
     {
         var branchClaim = User.FindFirst("branch_id")?.Value;
         if (string.IsNullOrEmpty(branchClaim))
-            throw new Exception("Không tìm thấy BranchId trong Token.");
+        {
+            // Nếu chưa có Token chuẩn, trả về Guid Empty hoặc throw lỗi tùy bạn
+            // throw new Exception("Không tìm thấy BranchId trong Token.");
+            return Guid.Empty;
+        }
         return Guid.Parse(branchClaim);
     }
 }

@@ -83,7 +83,7 @@ export default function StaffPage() {
         <div className="flex items-center gap-2 w-full md:w-auto">
           {/* Dropdown lọc chi nhánh */}
           <Select value={filterBranchId} onValueChange={setFilterBranchId}>
-            <SelectTrigger className="w-[200px] bg-background">
+            <SelectTrigger className="w-50 bg-background">
               <SelectValue placeholder="Lọc theo chi nhánh" />
             </SelectTrigger>
             <SelectContent>
@@ -143,7 +143,7 @@ export default function StaffPage() {
                       
                       <div className="flex justify-between items-center p-2 bg-muted/50 rounded-md">
                           <span className="text-muted-foreground text-xs font-medium uppercase">Chi nhánh</span>
-                          <div className="flex items-center gap-1 font-medium truncate max-w-[120px]">
+                          <div className="flex items-center gap-1 font-medium truncate max-w-30">
                               <MapPin className="h-3 w-3 text-muted-foreground" /> 
                               {branches?.find((b:any) => b.id === staff.branchId)?.name || "Unknown"}
                           </div>

@@ -21,5 +21,6 @@ public class Order : Entity, IAuditableEntity, IMustHaveTenant
     public DateTime? LastModifiedAtUtc { get; set; }
     public string? LastModifiedBy { get; set; }
     public DateTime OrderDate { get; set; }
-}
+    public DateTime CreatedON { get; set; }
+    }
 
