@@ -1,110 +1,175 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 export type GuestSession = {
-  qrToken: string;       // ✅ thêm để biết session đang thuộc QR nào
+  qrToken: string;
   tableId: string;
   tenantId: string;
-  tableName: string;
-  tenantName: string;
+  tableName?: string;
+  tenantName?: string;
   branchId?: string;
   expiresAt: number;
 };
 
 export type CartItem = {
-  id: string; // menuItemId
+  id: string; // productId/menuItemId
   name: string;
   price: number;
   qty: number;
   note?: string;
+  imageUrl?: string;
 };
 
-export type GuestOrderLocal = {
-  orderId: string;
-  createdAt: number;
-  total: number;
-  status: "Pending" | "Preparing" | "Ready" | "Served" | "Cancelled" | "Paid";
+type State = {
+  session: GuestSession | null;
+  cart: CartItem[];
 };
 
-const SESSION_KEY = "S2O_GUEST_SESSION";
-const CART_KEY_PREFIX = "S2O_GUEST_CART_";
-const ORDERS_KEY_PREFIX = "S2O_GUEST_ORDERS_";
+const STORAGE_KEY = (qrToken: string) => `guest_store_${qrToken}`;
 
-export function formatMoney(v: number) {
+let _qrToken = "";
+let _state: State = { session: null, cart: [] };
+const _subs = new Set<() => void>();
+
+function notify() {
+  _subs.forEach((fn) => fn());
+}
+
+function load(qrToken: string) {
   try {
-    return new Intl.NumberFormat("vi-VN").format(v);
+    const raw = localStorage.getItem(STORAGE_KEY(qrToken));
+    if (!raw) return { session: null, cart: [] } as State;
+    const data = JSON.parse(raw) as State;
+
+    // hết hạn thì reset
+    if (data?.session?.expiresAt && Date.now() > data.session.expiresAt) {
+      return { session: null, cart: [] };
+    }
+
+    return {
+      session: data?.session ?? null,
+      cart: Array.isArray(data?.cart) ? data.cart : [],
+    };
   } catch {
-    return String(v);
+    return { session: null, cart: [] };
   }
 }
 
-/**
- * ✅ setSession: thêm qrToken + TTL
- */
-export function setSession(
-  session: Omit<GuestSession, "expiresAt"> & { ttlMinutes?: number }
-) {
-  const ttl = session.ttlMinutes ?? 180;
-  const expiresAt = Date.now() + ttl * 60 * 1000;
-  const payload: GuestSession = { ...session, expiresAt };
-  localStorage.setItem(SESSION_KEY, JSON.stringify(payload));
-  return payload;
+function persist() {
+  if (!_qrToken) return;
+  try {
+    localStorage.setItem(STORAGE_KEY(_qrToken), JSON.stringify(_state));
+  } catch {}
 }
 
-export function getSession(): GuestSession | null {
-  const raw = localStorage.getItem(SESSION_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as GuestSession;
-  } catch {
-    return null;
-  }
+export function initGuestStore(qrToken: string) {
+  if (!qrToken) return;
+  if (_qrToken === qrToken) return;
+  _qrToken = qrToken;
+  _state = load(qrToken);
+  notify();
+}
+
+export function subscribeGuestStore(cb: () => void) {
+  _subs.add(cb);
+  return () => _subs.delete(cb);
+}
+
+export function getSession() {
+  return _state.session;
+}
+
+export function saveSession(session: GuestSession) {
+  _state.session = session;
+  persist();
+  notify();
 }
 
 export function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
+  _state.session = null;
+  _state.cart = [];
+  persist();
+  notify();
 }
 
-export function isSessionExpired() {
-  const s = getSession();
-  if (!s) return true;
-  return Date.now() > s.expiresAt;
+export function getCart() {
+  return _state.cart;
 }
 
-const cartKey = (tableId: string) => `${CART_KEY_PREFIX}${tableId}`;
-const ordersKey = (tableId: string) => `${ORDERS_KEY_PREFIX}${tableId}`;
+export function cartCount() {
+  return _state.cart.reduce((sum, x) => sum + (x.qty || 0), 0);
+}
 
-export function loadCart(tableId: string): CartItem[] {
-  const raw = localStorage.getItem(cartKey(tableId));
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw) as CartItem[];
-  } catch {
-    return [];
+export function cartTotal() {
+  return _state.cart.reduce(
+    (sum, x) => sum + (Number(x.price) || 0) * (x.qty || 0),
+    0
+  );
+}
+
+export function addToCart(
+  item: { id: string; name: string; price: number; imageUrl?: string },
+  qty = 1
+) {
+  const i = _state.cart.find((x) => x.id === item.id);
+  if (i) {
+    i.qty += qty;
+  } else {
+    _state.cart.push({
+      id: item.id,
+      name: item.name,
+      price: Number(item.price) || 0,
+      qty: qty,
+      note: "",
+      imageUrl: item.imageUrl,
+    });
   }
+  persist();
+  notify();
 }
 
-export function saveCart(tableId: string, items: CartItem[]) {
-  localStorage.setItem(cartKey(tableId), JSON.stringify(items));
-}
+export function setQty(id: string, qty: number) {
+  const i = _state.cart.find((x) => x.id === id);
+  if (!i) return;
 
-export function clearCart(tableId: string) {
-  localStorage.removeItem(cartKey(tableId));
-}
-
-export function loadOrders(tableId: string): GuestOrderLocal[] {
-  const raw = localStorage.getItem(ordersKey(tableId));
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw) as GuestOrderLocal[];
-  } catch {
-    return [];
+  if (qty <= 0) {
+    _state.cart = _state.cart.filter((x) => x.id !== id);
+  } else {
+    i.qty = qty;
   }
+  persist();
+  notify();
 }
 
-export function addOrder(tableId: string, order: GuestOrderLocal) {
-  const list = loadOrders(tableId);
-  list.unshift(order);
-  localStorage.setItem(ordersKey(tableId), JSON.stringify(list));
+export function setNote(id: string, note: string) {
+  const i = _state.cart.find((x) => x.id === id);
+  if (!i) return;
+  i.note = note;
+  persist();
+  notify();
 }
 
-export function clearOrders(tableId: string) {
-  localStorage.removeItem(ordersKey(tableId));
+export function removeItem(id: string) {
+  _state.cart = _state.cart.filter((x) => x.id !== id);
+  persist();
+  notify();
+}
+
+export function clearCart() {
+  _state.cart = [];
+  persist();
+  notify();
+}
+
+/** Hook: component nào gọi hook này sẽ re-render khi cart/session đổi */
+export function useGuestStoreVersion() {
+  const [v, setV] = useState(0);
+
+  useEffect(() => {
+    const unsub = subscribeGuestStore(() => setV((x) => x + 1));
+    return () => unsub();
+  }, []);
+
+  return v;
 }
