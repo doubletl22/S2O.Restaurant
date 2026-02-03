@@ -2,8 +2,10 @@
 using S2O.Catalog.App.Abstractions;
 using S2O.Catalog.App.Features.Products.Commands;
 using S2O.Catalog.Infra.Persistence;
+using S2O.Infra.Services;
 using S2O.Shared.Infra; // Import Shared Infra
 using S2O.Shared.Infra.Interceptors;
+using S2O.Shared.Kernel.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,9 @@ builder.Services.AddDbContext<CatalogDbContext>((sp, options) => {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
            .AddInterceptors(auditableInterceptor, tenantInterceptor);
 });
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<ICatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateProductCommand).Assembly));
 builder.Services.AddControllers();
@@ -68,8 +73,6 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        // Lưu ý: Thay 'TenantsDbContext' bằng tên DbContext tương ứng của Service đó
-        // Ví dụ: CatalogDbContext, OrderDbContext...
         var context = services.GetRequiredService<S2O.Catalog.Infra.Persistence.CatalogDbContext>();
 
         if (context.Database.GetPendingMigrations().Any())

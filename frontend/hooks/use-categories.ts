@@ -9,9 +9,14 @@ export const useCategories = () => {
   return useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const res = await categoryService.getAll();
-      if (!res.isSuccess) throw new Error(res.error?.description || "Lỗi lấy danh mục");
-      return res.value; 
+      const res: any = await categoryService.getAll();
+      
+      // [FIX] Kiểm tra linh hoạt các trường hợp trả về
+      if (Array.isArray(res)) return res; // Trường hợp API trả về []
+      if (res.value) return res.value;    // Trường hợp API trả về { value: [] }
+      if (res.items) return res.items;    // Trường hợp API trả về { items: [] }
+      
+      return []; 
     },
   });
 };

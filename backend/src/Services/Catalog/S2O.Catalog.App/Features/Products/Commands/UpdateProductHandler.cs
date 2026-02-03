@@ -1,55 +1,99 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using S2O.Catalog.App.Abstractions;
-using S2O.Shared.Kernel.Interfaces; // <-- Inject Service
+using S2O.Shared.Kernel.Interfaces; // [1] Namespace chứa Interface của bạn
 using S2O.Shared.Kernel.Results;
 
 namespace S2O.Catalog.App.Features.Products.Commands;
 
-public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result>
+public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result<Guid>>
 {
     private readonly ICatalogDbContext _context;
-    private readonly IFileStorageService _fileStorage; // <-- Inject
+    private readonly IFileStorageService _fileService; // [2] Inject Service
 
-    public UpdateProductHandler(ICatalogDbContext context, IFileStorageService fileStorage)
+    public UpdateProductHandler(ICatalogDbContext context, IFileStorageService fileService)
     {
         _context = context;
-        _fileStorage = fileStorage;
+        _fileService = fileService;
     }
 
-    public async Task<Result> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        // 1. Tìm sản phẩm (Thêm check TenantId nếu cần bảo mật kỹ)
-        var product = await _context.Products
-            .FirstOrDefaultAsync(p => p.Id == request.ProductId, cancellationToken);
-
+        // 1. Tìm món ăn
+        var product = await _context.Products.FindAsync(new object[] { request.Id }, cancellationToken);
         if (product == null)
         {
-            return Result.Failure(new Error("Catalog.NotFound", "Không tìm thấy món ăn này."));
+            return Result<Guid>.Failure(new Error("Product.NotFound", "Không tìm thấy món ăn"));
         }
 
-        // 2. Cập nhật thông tin cơ bản
+        // 2. Cập nhật thông tin text
         product.Name = request.Name;
-        product.Description = request.Description;
+        product.Description = request.Description ?? string.Empty;
         product.Price = request.Price;
+        product.CategoryId = request.CategoryId;
         product.IsActive = request.IsActive;
 
-        // 3. Xử lý ảnh (Chỉ cập nhật nếu có file mới)
+        // 3. XỬ LÝ ẢNH (Logic chính nằm ở đây)
         if (request.ImageFile != null && request.ImageFile.Length > 0)
         {
-            // (Nâng cao: Có thể gọi hàm xóa ảnh cũ trên Cloudinary tại đây nếu muốn tiết kiệm dung lượng)
-            // await _fileStorage.DeleteFileAsync(product.ImageUrl);
+            try
+            {
+                // A. Xóa ảnh cũ trên Cloudinary (Nếu có)
+                if (!string.IsNullOrEmpty(product.ImageUrl))
+                {
+                    var publicId = GetPublicIdFromUrl(product.ImageUrl);
+                    if (!string.IsNullOrEmpty(publicId))
+                    {
+                        // Gọi hàm xóa của bạn
+                        await _fileService.DeleteFileAsync(publicId);
+                    }
+                }
 
-            using var stream = request.ImageFile.OpenReadStream();
-            var newImageUrl = await _fileStorage.UploadFileAsync(stream, request.ImageFile.FileName);
+                // B. Upload ảnh mới
+                using (var stream = request.ImageFile.OpenReadStream())
+                {
+                    // Gọi hàm upload của bạn
+                    var newUrl = await _fileService.UploadFileAsync(stream, request.ImageFile.FileName);
 
-            product.ImageUrl = newImageUrl; // Gán link mới
+                    // C. Cập nhật URL mới vào Entity
+                    product.ImageUrl = newUrl;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Tùy chọn: Log lỗi nhưng không chặn việc update thông tin khác
+                Console.WriteLine($"Lỗi upload ảnh: {ex.Message}");
+            }
         }
-        // Nếu ImageFile == null thì giữ nguyên product.ImageUrl cũ
 
-        // 4. Lưu thay đổi
+        // 4. Lưu Database
+        _context.Products.Update(product);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Result.Success();
+        return Result<Guid>.Success(product.Id);
+    }
+
+    private string? GetPublicIdFromUrl(string url)
+    {
+        try
+        {
+            var uri = new Uri(url);
+            var path = uri.AbsolutePath;
+            // path = "/tên_cloud/image/upload/v1234/s2o_restaurant/products/guid.jpg"
+
+            var segments = path.Split('/');
+            var uploadIndex = Array.IndexOf(segments, "upload");
+
+            if (uploadIndex != -1 && uploadIndex + 2 < segments.Length)
+            {
+                var publicIdParts = segments.Skip(uploadIndex + 2);
+                var publicIdWithExt = string.Join("/", publicIdParts);
+                return Path.ChangeExtension(publicIdWithExt, null);
+            }
+        }
+        catch
+        {
+            return null;
+        }
+        return null;
     }
 }

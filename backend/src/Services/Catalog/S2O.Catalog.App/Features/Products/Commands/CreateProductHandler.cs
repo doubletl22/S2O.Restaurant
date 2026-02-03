@@ -4,17 +4,20 @@ using S2O.Catalog.Domain.Entities;
 using S2O.Shared.Kernel.Results;
 using S2O.Shared.Kernel.Interfaces;
 
+
 namespace S2O.Catalog.App.Features.Products.Commands;
 
 public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result<Guid>>
 {
     private readonly ICatalogDbContext _context;
     private readonly IFileStorageService _fileStorage;
+    private readonly ICurrentUserService _currentUserService;
 
-    public CreateProductHandler(ICatalogDbContext context, IFileStorageService fileStorage)
+    public CreateProductHandler(ICatalogDbContext context, IFileStorageService fileStorage, ICurrentUserService currentUserService)
     {
         _context = context;
         _fileStorage = fileStorage;
+        _currentUserService = currentUserService;
     }
 
     public async Task<Result<Guid>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
@@ -37,7 +40,7 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
             CategoryId = request.CategoryId,
             ImageUrl = imageUrl,
             IsActive = true,
-            TenantId = request.TenantId
+            TenantId = _currentUserService.TenantId
         };
 
         // 2. Lưu vào DB

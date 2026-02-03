@@ -7,7 +7,7 @@ export const categoryService = {
     return await http.get("/api/v1/categories") as any;
   },
 
-  create: async (body: { name: string; description?: string }): Promise<Result<string>> => {
+  create: async (body: { name: string; description?: string; isActive?: boolean; }): Promise<Result<string>> => {
     return await http.post("/api/v1/categories", body) as any;
   },
 

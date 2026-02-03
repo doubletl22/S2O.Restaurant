@@ -5,15 +5,14 @@ using System.Text.Json.Serialization;
 
 namespace S2O.Catalog.App.Features.Products.Commands;
 
-public record UpdateProductCommand(
-    Guid ProductId,
-    string Name,
-    string Description,
-    decimal Price,
-    IFormFile? ImageFile, 
-    bool IsActive
-) : IRequest<Result>
+public class UpdateProductCommand : IRequest<Result<Guid>>
 {
-    [JsonIgnore]
-    public Guid TenantId { get; init; } // Cần TenantId để đảm bảo sửa đúng món của quán mình
+    public Guid Id { get; set; }
+    public string Name { get; set; } = default!;
+    public string? Description { get; set; }
+    public decimal Price { get; set; }
+    public Guid CategoryId { get; set; }
+    public bool IsActive { get; set; }
+
+    public IFormFile? ImageFile { get; set; }
 }

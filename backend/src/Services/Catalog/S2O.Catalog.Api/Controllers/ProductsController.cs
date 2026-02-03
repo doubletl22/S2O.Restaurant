@@ -48,7 +48,7 @@ public class ProductsController : ControllerBase
     // POST: api/v1/products
     [HttpPost]
     [Authorize(Roles = "RestaurantOwner")] // Chỉ chủ quán được tạo
-    public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
+    public async Task<IActionResult> CreateProduct([FromForm] CreateProductCommand command)
     {
         var result = await _sender.Send(command);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
@@ -57,12 +57,11 @@ public class ProductsController : ControllerBase
     // 4. Cập nhật món
     // PUT: api/v1/products/{id}
     [HttpPut("{id}")]
-    [Authorize(Roles = "RestaurantOwner")]
-    public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductCommand command)
+    public async Task<IActionResult> UpdateProduct(Guid id, [FromForm] UpdateProductCommand command)
     {
-        if (id != command.ProductId) return BadRequest("ID không khớp");
+        if (id != command.Id) return BadRequest();
         var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+        return Ok(result);
     }
 
     // 5. Xóa món

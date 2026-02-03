@@ -9,9 +9,17 @@ export const useProducts = (params?: { keyword?: string; categoryId?: string }) 
   return useQuery({
     queryKey: ["products", params], 
     queryFn: async () => {
-      const res = await productService.getAll(params);
-      if (!res.isSuccess) throw new Error(res.error?.description);
-      return res.value;
+      const res: any = await productService.getAll(params);
+
+      if (res.value && res.value.items) return res.value.items;
+      
+      if (res.value && Array.isArray(res.value)) return res.value;
+
+      if (Array.isArray(res)) return res;
+
+      if (res.items) return res.items;
+
+      return [];
     },
   });
 };
@@ -30,7 +38,20 @@ export const useCreateProduct = (onSuccess?: () => void) => {
   });
 };
 
-// 3. Xóa món
+export const useUpdateProduct = (onSuccess?: () => void) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => productService.update(id, data),
+    onSuccess: () => {
+      toast.success("Cập nhật món thành công");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      onSuccess?.();
+    },
+    onError: (err: any) => toast.error("Lỗi cập nhật món"),
+  });
+};
+
+// [FIX] Thêm luôn hook xóa để dùng cho nút xóa
 export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -42,5 +63,3 @@ export const useDeleteProduct = () => {
     onError: (err: any) => toast.error("Không thể xóa món này"),
   });
 };
-
-// 4. Cập nhật món (TODO: Cần backend hỗ trợ PUT multipart nếu muốn update ảnh)

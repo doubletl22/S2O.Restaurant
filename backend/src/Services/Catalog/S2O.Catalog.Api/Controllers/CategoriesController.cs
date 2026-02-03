@@ -43,4 +43,17 @@ public class CategoriesController : ControllerBase
         var result = await _sender.Send(new DeleteCategoryCommand(id));
         return result.IsSuccess ? NoContent() : BadRequest(result.Error);
     }
+    // PUT: api/v1/categories/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryCommand command)
+    {
+        if (id != command.Id)
+        {
+            return BadRequest("ID in URL does not match ID in body");
+        }
+
+        var result = await _sender.Send(command);
+        if (result.IsSuccess) return Ok(result);
+        return BadRequest(result.Error);
+    }
 }

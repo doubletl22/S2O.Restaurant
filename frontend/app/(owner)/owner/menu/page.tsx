@@ -24,7 +24,10 @@ export default function MenuPage() {
 
   const [isCatDialogOpen, setIsCatDialogOpen] = useState(false);
   const [isProdDialogOpen, setIsProdDialogOpen] = useState(false);
+  
   const [editingCategory, setEditingCategory] = useState<any>(null);
+  // [FIX 1] Thêm state để lưu món ăn đang sửa
+  const [editingProduct, setEditingProduct] = useState<any>(null);
   
   const { data: categories, isLoading: isLoadingCats } = useCategories();
   
@@ -43,6 +46,19 @@ export default function MenuPage() {
       setSelectedCategoryId(categories[0].id);
     }
   }, [categories, selectedCategoryId]);
+
+  // [FIX 2] Hàm mở dialog thêm món (Reset editingProduct về null)
+  const handleOpenCreateProduct = () => {
+    setEditingProduct(null);
+    setIsProdDialogOpen(true);
+  };
+
+  // [FIX 3] Hàm mở dialog sửa món
+  const handleOpenEditProduct = (product: any, e: React.MouseEvent) => {
+    e.stopPropagation(); // Ngăn chặn sự kiện click lan ra ngoài
+    setEditingProduct(product);
+    setIsProdDialogOpen(true);
+  };
 
   return (
     <div className="flex h-[calc(100vh-6rem)] flex-col gap-4 md:flex-row">
@@ -127,7 +143,8 @@ export default function MenuPage() {
                 onChange={(e) => setKeyword(e.target.value)}
               />
             </div>
-            <Button onClick={() => setIsProdDialogOpen(true)} disabled={!selectedCategoryId}>
+            {/* [FIX] Gọi hàm handleOpenCreateProduct */}
+            <Button onClick={handleOpenCreateProduct} disabled={!selectedCategoryId}>
               <Plus className="mr-2 h-4 w-4" /> Thêm món mới
             </Button>
           </div>
@@ -149,7 +166,7 @@ export default function MenuPage() {
               <div className="flex flex-col items-center justify-center h-full py-20 text-muted-foreground">
                 <Utensils className="h-12 w-12 mb-4 opacity-20" />
                 <p className="mb-4">Danh mục này chưa có món ăn nào.</p>
-                <Button variant="outline" onClick={() => setIsProdDialogOpen(true)}>
+                <Button variant="outline" onClick={handleOpenCreateProduct}>
                   Thêm món đầu tiên
                 </Button>
               </div>
@@ -157,7 +174,6 @@ export default function MenuPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-10">
                 {products.map((prod: any) => (
                   <Card key={prod.id} className="overflow-hidden group hover:shadow-lg transition-all border-muted">
-                    {/* [FIX] Tailwind Warning: aspect-[4/3] -> aspect-4/3 */}
                     <div className="aspect-4/3 relative bg-secondary">
                       {prod.imageUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -172,9 +188,21 @@ export default function MenuPage() {
                         </div>
                       )}
                       
-                      {/* [FIX] Tailwind Warning: translate-y-[-10px] -> -translate-y-2.5 */}
+                      {/* [FIX 4] Thêm nút Edit vào đây */}
                       <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all -translate-y-2.5 group-hover:translate-y-0">
-                         <Button 
+                          
+                          {/* Nút Edit */}
+                          <Button 
+                            size="icon" 
+                            variant="secondary" // Màu trắng/xám nhẹ để nổi trên ảnh
+                            className="h-8 w-8 shadow-sm hover:bg-primary hover:text-white"
+                            onClick={(e) => handleOpenEditProduct(prod, e)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+
+                          {/* Nút Delete (Cũ) */}
+                          <Button 
                             size="icon" 
                             variant="destructive" 
                             className="h-8 w-8 shadow-sm" 
@@ -184,7 +212,7 @@ export default function MenuPage() {
                             }}
                           >
                             <Trash2 className="h-4 w-4" />
-                         </Button>
+                          </Button>
                       </div>
                       
                       <div className="absolute bottom-2 left-2">
@@ -218,14 +246,15 @@ export default function MenuPage() {
         open={isCatDialogOpen} 
         onOpenChange={setIsCatDialogOpen} 
         categoryToEdit={editingCategory}
-        // [FIX] Error 2741: Thêm prop onSuccess
         onSuccess={() => setIsCatDialogOpen(false)}
       />
       
+      {/* [FIX 5] Truyền productToEdit xuống Dialog */}
       <ProductDialog 
         open={isProdDialogOpen} 
         onOpenChange={setIsProdDialogOpen} 
         defaultCategoryId={selectedCategoryId} 
+        productToEdit={editingProduct}
       />
     </div>
   );

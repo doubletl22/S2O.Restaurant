@@ -83,14 +83,16 @@ export function CategoryDialog({
     try {
       let res;
       if (categoryToEdit) {
-        // Update
-        res = await categoryService.update(categoryToEdit.id, data);
+        res = await categoryService.update(categoryToEdit.id, {
+            ...data,
+            id: categoryToEdit.id 
+        });
         if (res.isSuccess) toast.success("Cập nhật danh mục thành công");
       } else {
-        // Create (Backend create API có thể chưa cần isActive, nhưng gửi dư cũng không sao hoặc ta lọc bớt)
         res = await categoryService.create({
           name: data.name,
           description: data.description,
+          isActive: true,
         });
         if (res.isSuccess) toast.success("Tạo danh mục mới thành công");
       }
@@ -99,7 +101,6 @@ export function CategoryDialog({
         onSuccess();
         onOpenChange(false);
       } else {
-         // Error handled by interceptor, but fallback here
          if (!res.isSuccess && res.error) {
              toast.error(res.error.message);
          }

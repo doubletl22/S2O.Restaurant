@@ -4,9 +4,8 @@ using System.Text.Json.Serialization; // Để dùng JsonIgnore (Tùy chọn)
 
 namespace S2O.Catalog.App.Features.Categories.Commands;
 
-// Định nghĩa Command
-public record CreateCategoryCommand(string Name, string Description) : IRequest<Result<Guid>>
-{
-    [JsonIgnore] 
-    public Guid TenantId { get; init; }
-}
+public record CreateCategoryCommand(
+    string Name,
+    string? Description,
+    bool IsActive // <--- Thêm cái này
+) : IRequest<Result<Guid>>;
