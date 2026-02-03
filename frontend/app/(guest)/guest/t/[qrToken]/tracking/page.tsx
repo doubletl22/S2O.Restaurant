@@ -1,195 +1,262 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { 
-  ChevronLeft, 
-  RefreshCw, 
-  Clock, 
-  ChefHat, 
-  CheckCircle2, 
-  XCircle,
-  Utensils
-} from "lucide-react";
+import { useParams } from "next/navigation";
+import { ChevronLeft, RefreshCw, Utensils, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-
+import { BottomNavV2 } from "@/components/guest/bottom-nav-v2";
 import { guestService } from "@/services/guest.service";
-import { GuestOrderItem, OrderStatus } from "@/lib/types";
 
-// Helper render trạng thái
-const getStatusConfig = (status: OrderStatus) => {
-  switch (status) {
-    case OrderStatus.Pending:
-      return { label: "Chờ xác nhận", color: "bg-yellow-100 text-yellow-700 border-yellow-200", icon: Clock };
-    case OrderStatus.Confirmed:
-    case OrderStatus.Cooking:
-      return { label: "Đang chế biến", color: "bg-blue-100 text-blue-700 border-blue-200", icon: ChefHat };
-    case OrderStatus.Ready:
-      return { label: "Đã xong", color: "bg-green-100 text-green-700 border-green-200", icon: CheckCircle2 };
-    case OrderStatus.Served:
-      return { label: "Đã phục vụ", color: "bg-gray-100 text-gray-700 border-gray-200", icon: Utensils };
-    case OrderStatus.Cancelled:
-      return { label: "Đã hủy", color: "bg-red-50 text-red-600 border-red-200", icon: XCircle };
-    default:
-      return { label: status, color: "bg-gray-100 text-gray-700", icon: Clock };
-  }
+type LocalOrderItem = {
+  id: string;
+  productName: string;
+  quantity: number;
+  note?: string;
+  price: number;
+  status: number;
+  imageUrl?: string;
 };
 
-export default function TrackingPage({ params }: { params: { qrToken: string } }) {
-  const [items, setItems] = useState<GuestOrderItem[]>([]);
-  const [totalAmount, setTotalAmount] = useState(0);
-  const [loading, setLoading] = useState(true);
+type LocalOrder = {
+  orderId: string;
+  createdAt: number;
+  tableName?: string;
+  items: LocalOrderItem[];
+  totalAmount: number;
+  status?: any; // ✅ thêm status tổng (backend có thể trả number/string)
+};
 
-  const fetchOrders = async (showLoading = true) => {
-    if (showLoading) setLoading(true);
+export default function TrackingPage() {
+  const params = useParams<{ qrToken?: string | string[] }>();
+  const qrToken = useMemo(() => {
+    const t = params?.qrToken;
+    return Array.isArray(t) ? t[0] : t;
+  }, [params]);
+
+  const [order, setOrder] = useState<LocalOrder | null>(null);
+
+  const load = () => {
     try {
-      const res = await guestService.getOrders(params.qrToken);
-      if (res.isSuccess) {
-        setItems(res.value.items);
-        setTotalAmount(res.value.totalAmount);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      if (showLoading) setLoading(false);
+      const raw = localStorage.getItem("guest_last_order");
+      if (!raw) return setOrder(null);
+      setOrder(JSON.parse(raw));
+    } catch {
+      setOrder(null);
     }
   };
-
-  useEffect(() => {
-    fetchOrders();
-    
-    // Tự động refresh mỗi 15s để cập nhật trạng thái
-    const interval = setInterval(() => {
-      fetchOrders(false);
-    }, 15000);
-
-    return () => clearInterval(interval);
-  }, [params.qrToken]);
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
 
+  // ✅ map status -> text
+  const statusText = (s: any) => {
+    const str = String(s ?? "").toLowerCase();
+
+    // string status
+    if (str.includes("pending") || str.includes("new") || str.includes("confirm"))
+      return "Chờ xác nhận";
+    if (str.includes("prepar") || str.includes("cook") || str.includes("processing"))
+      return "Đang chế biến";
+    if (str.includes("done") || str.includes("complete") || str.includes("served"))
+      return "Hoàn thành";
+    if (str.includes("cancel")) return "Đã huỷ";
+
+    // numeric status
+    const v = Number(s);
+    if (v === 0) return "Chờ xác nhận";
+    if (v === 1) return "Đang chế biến";
+    if (v === 2) return "Hoàn thành";
+    if (v === 3) return "Đã phục vụ";
+    if (v === 4) return "Đã huỷ";
+
+    return "Đang xử lý";
+  };
+
+  // ✅ map status -> badge UI
+  const statusBadge = (s: any) => {
+    const text = statusText(s);
+    const str = String(s ?? "").toLowerCase();
+    const v = Number(s);
+
+    // done
+    if (text === "Hoàn thành" || str.includes("done") || str.includes("complete") || v === 2) {
+      return (
+        <Badge className="bg-green-50 text-green-700 gap-1">
+          <Clock className="h-3 w-3" /> Done
+        </Badge>
+      );
+    }
+
+    // cancelled
+    if (text === "Đã huỷ" || str.includes("cancel") || v === 4) {
+      return (
+        <Badge className="bg-red-50 text-red-700 gap-1">
+          <Clock className="h-3 w-3" /> Cancel
+        </Badge>
+      );
+    }
+
+    // processing
+    if (text === "Đang chế biến" || str.includes("processing") || v === 1) {
+      return (
+        <Badge className="bg-blue-50 text-blue-700 gap-1">
+          <Clock className="h-3 w-3" /> Processing
+        </Badge>
+      );
+    }
+
+    // default pending
+    return (
+      <Badge className="bg-yellow-50 text-yellow-700 gap-1">
+        <Clock className="h-3 w-3" /> Pending
+      </Badge>
+    );
+  };
+
+  useEffect(() => {
+    load();
+
+    // ✅ polling 5s: lấy status thật từ backend theo orderId (nếu có API)
+    const timer = setInterval(async () => {
+      try {
+        const raw = localStorage.getItem("guest_last_order");
+        if (!raw) return;
+
+        const o: any = JSON.parse(raw);
+        if (!o?.orderId) return;
+
+        const res = await guestService.getOrderStatus(o.orderId);
+
+        if (res?.isSuccess) {
+          const statusFromBackend =
+            res.value?.status ?? res.value?.orderStatus ?? res.value?.state;
+
+          const next = {
+            ...o,
+            status: statusFromBackend ?? o.status,
+          };
+
+          localStorage.setItem("guest_last_order", JSON.stringify(next));
+          setOrder(next);
+        }
+      } catch {
+        // ignore
+      }
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-[calc(100vh-60px)] space-y-4">
-      {/* Header Nav */}
-      <div className="flex items-center justify-between px-4 py-2 bg-background border-b sticky top-0 z-10">
-        <Link 
-          href={`/guest/t/${params.qrToken}`} 
-          className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary"
+    <div className="min-h-screen bg-gray-50 pb-24">
+      <div className="flex justify-between px-4 py-2 bg-white border-b sticky top-0">
+        <Link
+          href={qrToken ? `/guest/t/${qrToken}` : "#"}
+          className="flex items-center text-sm text-gray-500"
+          onClick={(e) => {
+            if (!qrToken) e.preventDefault();
+          }}
         >
-          <ChevronLeft className="h-4 w-4 mr-1" />
-          Menu
+          <ChevronLeft className="h-4 w-4 mr-1" /> Menu
         </Link>
-        <span className="font-semibold text-sm">Đơn hàng của bạn</span>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="h-8 w-8" 
+
+        <span className="font-semibold text-sm">Đơn hàng</span>
+
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => {
-            fetchOrders(true);
-            toast.info("Đã cập nhật trạng thái");
+            load();
+            toast.info("Đã cập nhật");
           }}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
       </div>
 
-      <ScrollArea className="flex-1 px-4 pb-20">
-        {loading && items.length === 0 ? (
-          <div className="space-y-4 pt-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex gap-4">
-                <Skeleton className="h-16 w-16 rounded-md" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              </div>
-            ))}
+      <ScrollArea className="px-4 pb-20">
+        {!qrToken ? (
+          <div className="flex flex-col items-center py-20 space-y-4 text-gray-500">
+            Thiếu QR Token. Vui lòng quét lại mã QR.
           </div>
-        ) : items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-            <div className="bg-muted p-4 rounded-full">
-               <Utensils className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <p className="text-muted-foreground">Bạn chưa gọi món nào.</p>
-            <Link href={`/guest/t/${params.qrToken}`}>
-              <Button>Xem Menu ngay</Button>
+        ) : !order ? (
+          <div className="flex flex-col items-center py-20 space-y-4">
+            <Utensils className="h-8 w-8 text-gray-400" />
+            <p>Bạn chưa gọi món nào</p>
+            <Link href={`/guest/t/${qrToken}`}>
+              <Button>Xem Menu</Button>
             </Link>
           </div>
         ) : (
-          <div className="space-y-6 pt-2">
-            {/* Group items by logic: Active (Pending/Cooking) first, then Served/Cancelled */}
-            <div className="space-y-4">
-               {items.map((item) => {
-                 const statusInfo = getStatusConfig(item.status);
-                 const Icon = statusInfo.icon;
+          <div className="space-y-6 pt-4">
+            <div className="bg-white p-4 rounded-xl border">
+              <div className="flex justify-between">
+                <div>
+                  <div className="font-semibold">Mã đơn: {order.orderId}</div>
+                  <div className="text-xs text-gray-500">
+                    {order.tableName ? `Bàn: ${order.tableName} • ` : ""}
+                    {statusText(order.status)}
+                  </div>
+                </div>
 
-                 return (
-                   <div key={item.id} className="bg-card border rounded-lg p-3 shadow-sm flex gap-3">
-                     {/* Image */}
-                     <div className="h-16 w-16 shrink-0 rounded-md bg-muted overflow-hidden">
-                       {item.imageUrl ? (
-                         <img src={item.imageUrl} alt={item.productName} className="h-full w-full object-cover" />
-                       ) : (
-                         <div className="h-full w-full flex items-center justify-center text-[10px] text-muted-foreground">IMG</div>
-                       )}
-                     </div>
-
-                     {/* Content */}
-                     <div className="flex-1 min-w-0">
-                       <div className="flex justify-between items-start">
-                          <h4 className="font-medium text-sm truncate pr-2">{item.productName}</h4>
-                          <span className="font-semibold text-sm">x{item.quantity}</span>
-                       </div>
-                       
-                       <div className="mt-2 flex justify-between items-end">
-                          <Badge variant="outline" className={`${statusInfo.color} gap-1 px-2 py-0.5 h-6`}>
-                            <Icon className="h-3 w-3" />
-                            {statusInfo.label}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">
-                            {formatPrice(item.price * item.quantity)}
-                          </span>
-                       </div>
-                       
-                       {item.note && (
-                         <p className="text-xs text-muted-foreground mt-2 italic bg-muted/50 p-1 rounded">
-                           Note: {item.note}
-                         </p>
-                       )}
-                     </div>
-                   </div>
-                 );
-               })}
+                {statusBadge(order.status)}
+              </div>
             </div>
 
-            <Separator />
-            
-            {/* Bill Info */}
-            <div className="bg-muted/30 p-4 rounded-lg space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tổng số món</span>
-                <span>{items.reduce((acc, i) => acc + i.quantity, 0)}</span>
+            {order.items.map((item) => (
+              <div key={item.id} className="bg-white p-3 rounded-xl border flex gap-3">
+                <div className="h-16 w-16 bg-gray-100 rounded-md overflow-hidden">
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.productName}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-xs text-gray-400">
+                      IMG
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1">
+                  <div className="flex justify-between">
+                    <h4 className="font-medium">{item.productName}</h4>
+                    <span>x{item.quantity}</span>
+                  </div>
+
+                  <div className="flex justify-between mt-2 text-sm text-gray-500">
+                    <span>{item.note || ""}</span>
+                    <span>{formatPrice(item.price * item.quantity)}</span>
+                  </div>
+                </div>
               </div>
+            ))}
+
+            <Separator />
+
+            <div className="bg-white p-4 rounded-xl border">
+              <div className="flex justify-between text-sm">
+                <span>Tổng món</span>
+                <span>{order.items.reduce((a, i) => a + i.quantity, 0)}</span>
+              </div>
+
               <div className="flex justify-between text-lg font-bold">
                 <span>Tạm tính</span>
-                <span className="text-primary">{formatPrice(totalAmount)}</span>
+                <span className="text-orange-600">{formatPrice(order.totalAmount)}</span>
               </div>
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                *Vui lòng thanh toán tại quầy thu ngân khi ra về.
-              </p>
             </div>
           </div>
         )}
       </ScrollArea>
+
+      {!!qrToken && <BottomNavV2 qrToken={qrToken} />}
     </div>
   );
-
 }

@@ -3,22 +3,25 @@
 import Link from "next/link";
 import { ShoppingCart, Utensils } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { GuestCartProvider, useGuestCart } from "@/components/guest/guest-cart-context";
+import {
+  GuestCartProvider,
+  useGuestCart,
+} from "@/components/guest/guest-cart-context";
 
-// Component con để lấy được state totalItems từ context (vì Layout là server component nếu không tách, nhưng ở đây ta dùng "use client" cho cả layout guest cho tiện)
+// Header nằm trong khung mobile
 function GuestHeader({ qrToken }: { qrToken: string }) {
   const { totalItems } = useGuestCart();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur shadow-sm">
-      <div className="container flex h-14 items-center justify-between px-4">
+      <div className="flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-2">
-           <div className="bg-primary/10 p-1.5 rounded-full">
-             <Utensils className="h-4 w-4 text-primary" />
-           </div>
-           <span className="font-bold text-lg">Menu</span>
+          <div className="bg-primary/10 p-1.5 rounded-full">
+            <Utensils className="h-4 w-4 text-primary" />
+          </div>
+          <span className="font-bold text-lg">Menu</span>
         </div>
-        
+
         <Link href={`/guest/t/${qrToken}/cart`}>
           <Button variant="ghost" size="icon" className="relative hover:bg-muted/50">
             <ShoppingCart className="h-5 w-5" />
@@ -43,11 +46,19 @@ export default function GuestLayout({
 }) {
   return (
     <GuestCartProvider>
-      <div className="flex min-h-screen flex-col bg-gray-50/50">
-        <GuestHeader qrToken={params.qrToken} />
-        <main className="flex-1 pb-20 px-4 pt-4">
-          {children}
-        </main>
+      {/* Nền ngoài (desktop) */}
+      <div className="min-h-screen bg-gray-100">
+        {/* Khung mobile */}
+        <div className="mx-auto w-full max-w-[420px] min-h-screen bg-gray-50 shadow-sm border border-gray-200">
+          <div className="flex min-h-screen flex-col">
+            <GuestHeader qrToken={params.qrToken} />
+
+            {/* Nội dung */}
+            <main className="flex-1 px-4 pt-4 pb-20">
+              {children}
+            </main>
+          </div>
+        </div>
       </div>
     </GuestCartProvider>
   );
