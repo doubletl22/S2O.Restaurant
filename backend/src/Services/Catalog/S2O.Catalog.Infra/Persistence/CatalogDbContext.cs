@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using S2O.Catalog.Domain.Entities;
 using S2O.Catalog.App.Abstractions;
+using S2O.Catalog.Domain.Entities;
 using S2O.Shared.Infra.Data;
 using S2O.Shared.Kernel.Interfaces;
 
@@ -18,6 +18,14 @@ public class CatalogDbContext : BaseDbContext, ICatalogDbContext
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<Product>().Property(p => p.Price).HasPrecision(18, 2);
+        // Price precision
+        builder.Entity<Product>()
+            .Property(p => p.Price)
+            .HasPrecision(18, 2);
+
+        // ✅ FIX DB DEFAULT: luôn mặc định có hàng
+        builder.Entity<Product>()
+            .Property(p => p.IsAvailable)
+            .HasDefaultValue(true);
     }
 }
