@@ -4,7 +4,6 @@ using S2O.Identity.App.Features.Login;
 
 namespace S2O.Identity.Api.Controllers;
 
-// 1. Đổi Route thành api/v1/auth
 [Route("api/v1/auth")]
 [ApiController]
 public class AuthController : ControllerBase
@@ -32,6 +31,4 @@ public class AuthController : ControllerBase
         return result.IsSuccess ? Ok(new { Token = result.Value }) : BadRequest(result.Error);
     }
 
-    // Đã xóa: RegisterStaff (Chuyển sang StaffController)
-    // Đã xóa: CreateTenant (Chuyển sang TenantRegistrationController)
 }

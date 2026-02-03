@@ -10,18 +10,16 @@ using S2O.Identity.Infra.Persistence;
 using MassTransit;
 using S2O.Infra.Services;
 using S2O.Shared.Kernel.Interfaces;
-using S2O.Shared.Infra; // Chứa AddSharedInfrastructure
+using S2O.Shared.Infra;
 using S2O.Shared.Infra.Interceptors;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Controller & Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "S2O Identity API", Version = "v1" });
 
-    // Config nút Authorize trên Swagger
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -37,7 +35,6 @@ builder.Services.AddSwaggerGen(options => {
     });
 });
 
-// 2. Database
 builder.Services.AddDbContext<AuthDbContext>((sp, options) =>
 {
     var interceptor = sp.GetRequiredService<UpdateAuditableEntitiesInterceptor>();
@@ -46,37 +43,40 @@ builder.Services.AddDbContext<AuthDbContext>((sp, options) =>
 });
 builder.Services.AddScoped<IAuthDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
 
-// 3. Identity Core (User, Role)
-builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+})
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
 
-// 4. Shared Infrastructure (Nó sẽ tự lo việc Config JWT/Bearer cho bạn)
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 
-// 5. Identity Services
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>(); // (Lưu ý: Shared cũng có UserContext, bạn nên kiểm tra xem có cần cái này không)
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
+
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(S2O.Identity.App.Features.Login.LoginCommand).Assembly));
+
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
     {
         var rabbitHost = builder.Configuration["MessageBroker:Host"] ?? "localhost";
-
         cfg.Host(rabbitHost, "/", h =>
         {
             h.Username("guest");
             h.Password("guest");
         });
-
         cfg.ConfigureEndpoints(context);
     });
 });
 
-// 6. Config Firebase
 if (File.Exists("firebase-adminsdk.json"))
 {
     FirebaseApp.Create(new AppOptions
@@ -90,38 +90,7 @@ else
 }
 
 var app = builder.Build();
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
 
-    try
-    {
-        // 1. Lấy các Service cần thiết từ Container (Khớp với tham số trong Seeder của bạn)
-        var context = services.GetRequiredService<AuthDbContext>();
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
-
-        // 2. Chạy Migration tự động (Tạo bảng trước khi Seed)
-        // Kiểm tra xem có bản cập nhật DB nào chưa chạy không
-        if (context.Database.GetPendingMigrations().Any())
-        {
-            logger.LogInformation("Đang cập nhật Database (Migration)...");
-            await context.Database.MigrateAsync();
-        }
-
-        // 3. Gọi hàm Seeder của bạn
-        logger.LogInformation("Đang khởi tạo dữ liệu mẫu (Seeding)...");
-        await IdentityDataSeeder.SeedAsync(userManager, roleManager, context);
-
-        logger.LogInformation("✅ Khởi tạo dữ liệu thành công!");
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "❌ Lỗi xảy ra trong quá trình Migration/Seeding.");
-    }
-}
-// Configure Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -130,27 +99,33 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
-// 7. Migration & Seeding Data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
     try
     {
-        // Lưu ý: Thay 'TenantsDbContext' bằng tên DbContext tương ứng của Service đó
-        // Ví dụ: CatalogDbContext, OrderDbContext...
-        var context = services.GetRequiredService<S2O.Identity.Infra.Persistence.AuthDbContext>();
+        var context = services.GetRequiredService<AuthDbContext>();
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+        var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
 
         if (context.Database.GetPendingMigrations().Any())
         {
-            context.Database.Migrate();
+            logger.LogInformation("Creating Database Migrations...");
+            await context.Database.MigrateAsync();
         }
+
+        logger.LogInformation("Seeding Data...");
+        await IdentityDataSeeder.SeedAsync(userManager, roleManager, context);
+        logger.LogInformation("Seeding Completed.");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Lỗi Migration: {ex.Message}");
+        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
     }
 }
 

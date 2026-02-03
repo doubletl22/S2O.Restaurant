@@ -28,6 +28,13 @@ export interface LoginRequest { email: string; password: string; }
 export type LoginBody = LoginRequest;
 export interface LoginResponse { accessToken: string; user: User; }
 
+export interface UserProfile {
+  id: string;
+  fullName: string;
+  email: string;
+  roles: string[]; // Backend phải trả về mảng role
+}
+
 export interface RegisterTenantRequest {
   name: string;
   email: string;

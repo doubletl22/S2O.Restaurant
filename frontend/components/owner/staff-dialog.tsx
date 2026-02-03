@@ -2,224 +2,267 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useCreateStaff, useUpdateStaff } from "@/hooks/use-staff";
+import { useBranches } from "@/hooks/use-branches";
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+  Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Loader2, Mail, Lock, User, Phone, MapPin, Briefcase, Pencil } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
-import { Branch, CreateStaffRequest } from "@/lib/types";
-import { ownerStaffService } from "@/services/owner-staff.service";
+const formSchema = z.object({
+  email: z.string().email("Email không hợp lệ"),
+  password: z.string().optional(),
+  name: z.string().min(1, "Họ tên bắt buộc"),
+  phoneNumber: z.string().min(9, "SĐT không hợp lệ"),
+  role: z.enum(["Manager", "Chef", "Waiter"], { required_error: "Chọn vai trò" }),
+  branchId: z.string().min(1, "Chọn chi nhánh"),
+  isActive: z.boolean().default(true),
+});
 
-interface StaffDialogProps {
+interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  branches: Branch[];
-  onSuccess: () => void;
+  staffToEdit?: any;
+  initialViewMode?: boolean; // [NEW] Prop để xác định mở lên là xem hay sửa
 }
 
-export function StaffDialog({
-  open,
-  onOpenChange,
-  branches,
-  onSuccess,
-}: StaffDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+export function StaffDialog({ open, onOpenChange, staffToEdit, initialViewMode = false }: Props) {
+  const { data: branches } = useBranches();
+  
+  // State nội bộ để chuyển đổi giữa Xem và Sửa
+  const [isViewMode, setIsViewMode] = useState(initialViewMode);
 
-  const form = useForm<CreateStaffRequest>({
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: "",
-      email: "",
-      password: "",
-      phoneNumber: "",
-      branchId: "",
-      role: "Staff", // Default role
+      email: "", password: "",
+      name: "", phoneNumber: "", 
+      role: "Waiter", branchId: "", isActive: true 
     },
   });
 
+  const createMutation = useCreateStaff(() => onClose());
+  const updateMutation = useUpdateStaff(() => onClose());
+
   useEffect(() => {
     if (open) {
-      form.reset();
-    }
-  }, [open, form]);
+      // Mỗi khi mở dialog, reset lại chế độ view theo prop truyền vào
+      setIsViewMode(initialViewMode);
 
-  const onSubmit = async (data: CreateStaffRequest) => {
-    setIsLoading(true);
-    try {
-      const res = await ownerStaffService.create(data);
-      if (res.isSuccess) {
-        toast.success("Tạo nhân viên thành công", {
-           description: `Email: ${data.email} - Pass: ${data.password}`
+      if (staffToEdit) {
+        form.reset({
+          email: staffToEdit.email || "",
+          password: "", 
+          name: staffToEdit.fullName,
+          phoneNumber: staffToEdit.phoneNumber,
+          role: staffToEdit.role,
+          branchId: staffToEdit.branchId,
+          isActive: staffToEdit.isActive,
         });
-        onSuccess();
-        onOpenChange(false);
       } else {
-        toast.error("Thất bại", { description: res.error?.message });
+        const firstBranchId = branches && branches.length > 0 ? branches[0].id : "";
+        form.reset({
+          email: "", password: "",
+          name: "", phoneNumber: "", 
+          role: "Waiter", branchId: firstBranchId, isActive: true 
+        });
       }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
     }
+  }, [open, staffToEdit, branches, form, initialViewMode]);
+
+  const onClose = () => {
+    onOpenChange(false);
+    form.reset();
+  };
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    if (!staffToEdit && !values.password) {
+        form.setError("password", { message: "Mật khẩu bắt buộc khi tạo mới" });
+        return;
+    }
+    if (staffToEdit) {
+      updateMutation.mutate({ id: staffToEdit.id, data: values });
+    } else {
+      createMutation.mutate(values);
+    }
+  };
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
+
+  // Title thay đổi tùy trạng thái
+  const getTitle = () => {
+      if (!staffToEdit) return "Thêm nhân viên mới";
+      return isViewMode ? "Thông tin nhân viên" : "Cập nhật nhân viên";
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-125">
+      <DialogContent className="sm:max-w-137.5">
         <DialogHeader>
-          <DialogTitle>Thêm nhân viên mới</DialogTitle>
-          <DialogDescription>
-            Tạo tài khoản để nhân viên truy cập vào hệ thống Bếp/Phục vụ.
-          </DialogDescription>
+          <DialogTitle className="flex justify-between items-center pr-8">
+            {getTitle()}
+            {/* Nếu đang xem, hiển thị nút sửa nhanh ở header */}
+            {isViewMode && staffToEdit && (
+                <Button variant="ghost" size="sm" onClick={() => setIsViewMode(false)} className="text-primary h-8">
+                    <Pencil className="w-4 h-4 mr-1"/> Sửa
+                </Button>
+            )}
+          </DialogTitle>
         </DialogHeader>
-
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="fullName"
-                rules={{ required: "Nhập họ tên" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Họ và tên <span className="text-red-500">*</span></FormLabel>
-                    <FormControl><Input placeholder="Nguyễn Văn A" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="phoneNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Số điện thoại</FormLabel>
-                    <FormControl><Input placeholder="0909..." {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/* Disable toàn bộ fieldset nếu đang ở ViewMode */}
+            <fieldset disabled={isViewMode} className="space-y-6 group-disabled:opacity-100">
 
-            <FormField
-              control={form.control}
-              name="email"
-              rules={{ required: "Nhập email", pattern: { value: /^\S+@\S+$/i, message: "Email không hợp lệ" } }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email đăng nhập <span className="text-red-500">*</span></FormLabel>
-                  <FormControl><Input type="email" placeholder="staff@restaurant.com" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
+                {/* --- KHỐI 1: TÀI KHOẢN --- */}
+                <div className="space-y-3 bg-muted/30 p-4 rounded-lg border">
+                    <h3 className="text-sm font-semibold flex items-center gap-2 text-primary">
+                        <Lock className="h-4 w-4" /> Thông tin đăng nhập
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField control={form.control} name="email" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                                <div className="relative">
+                                    <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    {/* Email luôn disable khi edit hoặc view */}
+                                    <Input className="pl-9" {...field} disabled={!!staffToEdit} />
+                                </div>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )} />
+
+                        {/* Ẩn mật khẩu khi đang xem để đỡ rối */}
+                        {!isViewMode && (
+                            <FormField control={form.control} name="password" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Mật khẩu {staffToEdit && "(Để trống nếu không đổi)"}</FormLabel>
+                                <FormControl>
+                                    <Input type="password" placeholder="******" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )} />
+                        )}
+                    </div>
+                </div>
+
+                <Separator />
+
+                {/* --- KHỐI 2: THÔNG TIN CÁ NHÂN --- */}
+                <div className="space-y-3">
+                    <h3 className="text-sm font-semibold flex items-center gap-2 text-primary">
+                        <User className="h-4 w-4" /> Thông tin chi tiết
+                    </h3>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField control={form.control} name="name" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Họ và tên</FormLabel>
+                            <FormControl><Input {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )} />
+
+                        <FormField control={form.control} name="phoneNumber" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Số điện thoại</FormLabel>
+                            <FormControl>
+                                <div className="relative">
+                                    <Phone className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                    <Input className="pl-9" {...field} />
+                                </div>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )} />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField control={form.control} name="role" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Vai trò</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value} disabled={isViewMode}>
+                                <FormControl>
+                                    <div className="relative">
+                                        <Briefcase className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground z-10" />
+                                        <SelectTrigger className="pl-9"><SelectValue /></SelectTrigger>
+                                    </div>
+                                </FormControl>
+                                <SelectContent>
+                                    <SelectItem value="Manager">Quản lý</SelectItem>
+                                    <SelectItem value="Chef">Bếp</SelectItem>
+                                    <SelectItem value="Waiter">Phục vụ</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )} />
+
+                        <FormField control={form.control} name="branchId" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Chi nhánh</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value} disabled={isViewMode}>
+                                <FormControl>
+                                    <div className="relative">
+                                        <MapPin className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground z-10" />
+                                        <SelectTrigger className="pl-9"><SelectValue /></SelectTrigger>
+                                    </div>
+                                </FormControl>
+                                <SelectContent>
+                                    {branches?.map((b: any) => (
+                                        <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )} />
+                    </div>
+                </div>
+
+                {staffToEdit && (
+                    <FormField control={form.control} name="isActive" render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm bg-muted/20">
+                        <div className="space-y-0.5">
+                            <FormLabel>Trạng thái hoạt động</FormLabel>
+                        </div>
+                        <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} disabled={isViewMode} />
+                        </FormControl>
+                    </FormItem>
+                    )} />
+                )}
+            </fieldset>
+
+            <DialogFooter>
+              {isViewMode ? (
+                  <Button type="button" onClick={() => setIsViewMode(false)}>
+                    <Pencil className="w-4 h-4 mr-2" /> Chỉnh sửa
+                  </Button>
+              ) : (
+                  <>
+                    <Button type="button" variant="outline" onClick={onClose}>Hủy</Button>
+                    <Button type="submit" disabled={isPending}>
+                        {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Lưu thay đổi
+                    </Button>
+                  </>
               )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              rules={{ required: "Nhập mật khẩu", minLength: { value: 6, message: "Tối thiểu 6 ký tự" } }}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mật khẩu <span className="text-red-500">*</span></FormLabel>
-                  <div className="relative">
-                    <FormControl>
-                      <Input type={showPassword ? "text" : "password"} {...field} />
-                    </FormControl>
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-               <FormField
-                control={form.control}
-                name="branchId"
-                rules={{ required: "Chọn chi nhánh" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Chi nhánh <span className="text-red-500">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Chọn chi nhánh" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {branches.map((b) => (
-                          <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="role"
-                rules={{ required: "Chọn vai trò" }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Vai trò <span className="text-red-500">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Chọn vai trò" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Staff">Phục vụ (Waiter)</SelectItem>
-                        <SelectItem value="Chef">Đầu bếp (Chef)</SelectItem>
-                        <SelectItem value="Cashier">Thu ngân (Cashier)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <DialogFooter className="pt-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Hủy</Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Tạo tài khoản
-              </Button>
             </DialogFooter>
           </form>
         </Form>

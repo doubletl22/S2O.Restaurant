@@ -1,12 +1,10 @@
 import http from "@/lib/http";
-import { LoginBody, RegisterTenantBody, LoginResponse } from "@/lib/types";
+import { LoginBody, RegisterTenantBody, LoginResponse, LoginRequest } from "@/lib/types";
 
 export const authService = {
   // Login: /api/v1/auth/login
-  login: async (body: LoginBody) => {
-    // [FIX] Không destructure { data } vì http interceptor đã unwrap data rồi.
-    // Ép kiểu 'as any' để tránh xung đột type với Axios nếu cần thiết
-    const response = await http.post<LoginResponse>("/api/v1/auth/login", body);
+   login: async (data: LoginRequest): Promise<LoginResponse> => {
+    const response = await http.post<LoginResponse>("/api/v1/auth/login", data);
     return response as unknown as LoginResponse;
   },
 

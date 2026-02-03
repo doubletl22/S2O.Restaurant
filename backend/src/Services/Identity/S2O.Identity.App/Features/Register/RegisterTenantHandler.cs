@@ -45,8 +45,8 @@ public class RegisterTenantHandler : IRequestHandler<RegisterTenantCommand, Resu
             FullName = request.OwnerName,
             PhoneNumber = request.PhoneNumber,
             IsActive = true,
-            TenantId = newTenantId,   // Gán Tenant
-            BranchId = defaultBranchId, // Gán BrandId mặc định
+            TenantId = newTenantId,   
+            BranchId = defaultBranchId, 
             CreatedAtUtc = DateTime.UtcNow
         };
 
@@ -56,26 +56,20 @@ public class RegisterTenantHandler : IRequestHandler<RegisterTenantCommand, Resu
             return Result<Guid>.Failure(new Error("Identity.Error", createResult.Errors.First().Description));
         }
 
-        // 4. Gán Role "RestaurantOwner"
         if (!await _roleManager.RoleExistsAsync("RestaurantOwner"))
         {
             await _roleManager.CreateAsync(new ApplicationRole { Name = "RestaurantOwner" });
         }
         await _userManager.AddToRoleAsync(user, "RestaurantOwner");
 
-        // 5. Thêm Claims để Identity Token mang theo thông tin ngữ cảnh
         var claims = new List<Claim>
     {
         new Claim("tenant_id", newTenantId.ToString()),
-        new Claim("branch_id", defaultBranchId.ToString()), // Quan trọng để lọc dữ liệu theo chi nhánh
+        new Claim("branch_id", defaultBranchId.ToString()), 
         new Claim("restaurant_name", request.RestaurantName)
     };
         await _userManager.AddClaimsAsync(user, claims);
 
-        // 6. PHẦN QUAN TRỌNG: Đồng bộ sang Tenant Service
-        // Ở đây bạn cần bắn 1 Integration Event hoặc gọi trực tiếp Service để tạo bản ghi Tenant và Branch
-        // Nếu dùng Masstransit/RabbitMQ: 
-        // _publishEndpoint.Publish(new TenantCreatedIntegrationEvent(newTenantId, defaultBranchId, request.RestaurantName, request.Address, ...));
         await _publishEndpoint.Publish(new TenantCreatedEvent(
         newTenantId,
         defaultBranchId,

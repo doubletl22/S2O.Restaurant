@@ -1,7 +1,7 @@
-﻿using MediatR;
+﻿using System.Security.Claims;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
-using S2O.Identity.Domain.Entities;
-using S2O.Shared.Kernel.Interfaces;
+using S2O.Identity.Domain.Entities; 
 using S2O.Shared.Kernel.Results;
 
 namespace S2O.Identity.App.Features.Register;
@@ -9,50 +9,54 @@ namespace S2O.Identity.App.Features.Register;
 public class RegisterStaffHandler : IRequestHandler<RegisterStaffCommand, Result<Guid>>
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IUserContext _userContext;
-    private readonly ITenantContext _tenantContext;
-
-    public RegisterStaffHandler(UserManager<ApplicationUser> userManager, 
-        IUserContext userContext,
-        ITenantContext tenantContext)
+    private readonly RoleManager<ApplicationRole> _roleManager;
+    public RegisterStaffHandler(
+        UserManager<ApplicationUser> userManager,
+        RoleManager<ApplicationRole> roleManager)
     {
         _userManager = userManager;
-        _userContext = userContext;
-        _tenantContext = tenantContext;
+        _roleManager = roleManager;
     }
-
-
 
     public async Task<Result<Guid>> Handle(RegisterStaffCommand request, CancellationToken cancellationToken)
     {
-        var currentTenantId = _tenantContext.TenantId;
-        if (currentTenantId == null)
+        if (!await _roleManager.RoleExistsAsync(request.Role))
         {
-            return Result<Guid>.Failure(Error.Validation("Auth.Invalid", "Chỉ Owner đã đăng nhập mới được tạo Staff."));
+            var newRole = new ApplicationRole { Name = request.Role };
+            await _roleManager.CreateAsync(newRole);
         }
 
         var user = new ApplicationUser
         {
-            UserName = request.Username,
+            UserName = request.Email,
             Email = request.Email,
             FullName = request.FullName,
-            TenantId = currentTenantId.Value, // <--- QUAN TRỌNG: Lấy theo Owner
-            BranchId = request.BranchId,      // Staff thuộc chi nhánh nào do Owner chọn
-            IsActive = true
+            BranchId = request.BranchId, 
+            TenantId = request.TenantId, 
+            PhoneNumber = request.PhoneNumber,
+            IsActive = true,
+            EmailConfirmed = true 
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
+
         if (!result.Succeeded)
         {
-            return Result<Guid>.Failure(new Error("Identity.RegisterFailed", result.Errors.First().Description));
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return Result<Guid>.Failure(new Error("Identity.RegisterFailed", errors));
         }
 
-        // 2. Gán Role "Staff"
-        await _userManager.AddToRoleAsync(user, "Staff");
+        await _userManager.AddToRoleAsync(user, request.Role);
 
-        // 3. Thêm Claim BranchId (Để sau này Token có thông tin chi nhánh)
-        await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("branch_id", request.BranchId.ToString()));
+        var claims = new List<Claim>
+        {
+            new Claim("tenant_id", request.TenantId.ToString()),
+            new Claim("branch_id", request.BranchId.ToString()),
+            new Claim("full_name", request.FullName),
+            new Claim("role", request.Role)
+        };
+        await _userManager.AddClaimsAsync(user, claims);
 
-        return Result<Guid>.Success((user.Id));
+        return Result<Guid>.Success(user.Id);
     }
 }

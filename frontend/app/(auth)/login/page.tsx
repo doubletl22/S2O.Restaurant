@@ -11,8 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authService } from "@/services/auth.service";
-// [FIX 1] Import LoginRequest từ types
-import { LoginRequest } from "@/lib/types";
+import { LoginRequest } from "@/lib/types"; // Đảm bảo file này tồn tại (xem bước 2)
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,19 +23,18 @@ export default function LoginPage() {
 
     try {
       // 1. Gọi API
-      // [FIX 2] AuthController trả về trực tiếp LoginResponse, không có wrapper Result
       const res = await authService.login(data);
 
       // 2. Kiểm tra kết quả
       if (res && res.accessToken) {
         const { accessToken, user } = res;
 
-        // 3. Lưu LocalStorage
+        // 3. Lưu LocalStorage (để dùng cho các request API sau này)
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("user", JSON.stringify(user));
 
-        // 4. Cookie & Decode Token
-        let maxAge = 86400; // 1 ngày
+        // 4. Set Cookie (để Middleware của Next.js đọc được)
+        let maxAge = 86400; // Mặc định 1 ngày
         try {
           const decoded: any = jwtDecode(accessToken);
           const currentTime = Math.floor(Date.now() / 1000);
@@ -46,39 +44,49 @@ export default function LoginPage() {
         } catch (e) {
           console.error("Lỗi decode token:", e);
         }
-        
         document.cookie = `token=${accessToken}; path=/; max-age=${maxAge}; SameSite=Lax`;
 
         toast.success(`Xin chào, ${user.fullName}`);
 
-        // 5. Điều hướng
+        // 5. Điều hướng phân quyền
+        // [QUAN TRỌNG] Kiểm tra role kỹ lưỡng
         const roles = user.roles || [];
-        if (roles.includes("SystemAdmin")) {
+        
+        // Helper function kiểm tra role
+        const hasRole = (roleName: string) => roles.includes(roleName);
+
+        if (hasRole("SystemAdmin")) {
           router.push("/sysadmin/dashboard");
-        } else if (roles.includes("RestaurantOwner")) {
+        } 
+        else if (hasRole("RestaurantOwner") || hasRole("Owner")) {
           router.push("/owner/dashboard");
-        } else if (roles.includes("RestaurantStaff") || roles.includes("Chef")) {
-          router.push("/staff/order-ticket");
-        } else {
+        } 
+        else if (hasRole("Chef")) {
+          router.push("/kitchen");
+        } 
+        else if (hasRole("Waiter") || hasRole("RestaurantStaff")) {
+          router.push("/staff/order-ticket"); // Hoặc /pos
+        } 
+        else {
+          console.warn("User không có role hợp lệ:", roles);
           router.push("/");
         }
+        
+        router.refresh();
       }
     } catch (error: any) {
-      // [FIX 3] Xử lý lỗi
-      // Nếu login sai, backend trả về 400 -> http interceptor ném lỗi vào đây
       console.error("Login Error:", error);
       
       let msg = "Đăng nhập thất bại";
-      // Backend trả về lỗi dạng { code, description } hoặc { detail }
-      if (error?.description) {
-        msg = error.description;
-      } else if (error?.detail) {
-        msg = error.detail;
+      if (error?.response?.data?.detail) {
+        msg = error.response.data.detail;
+      } else if (error?.response?.data?.title) {
+        msg = error.response.data.title; // Lỗi 400 validation
       } else if (error?.message) {
         msg = error.message;
       }
 
-      toast.error("Lỗi", { description: msg });
+      toast.error("Lỗi đăng nhập", { description: msg });
     } finally {
       setIsLoading(false);
     }
@@ -86,10 +94,10 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-sm space-y-6 bg-white p-6 rounded-lg shadow-md">
+      <div className="w-full max-w-sm space-y-6 bg-white p-8 rounded-xl shadow-lg border">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Đăng nhập</h1>
-          <p className="text-gray-500">Nhập email và mật khẩu hệ thống</p>
+          <h1 className="text-3xl font-bold text-primary">S2O Restaurant</h1>
+          <p className="text-gray-500">Đăng nhập hệ thống quản lý</p>
         </div>
         
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -98,7 +106,7 @@ export default function LoginPage() {
             <Input 
               id="email" 
               type="email" 
-              placeholder="admin@example.com" 
+              placeholder="owner@example.com" 
               required 
               {...register("email")}
             />
@@ -116,6 +124,10 @@ export default function LoginPage() {
             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Đăng nhập"}
           </Button>
         </form>
+
+        <div className="text-center text-xs text-gray-400">
+             Quên mật khẩu? Liên hệ quản trị viên.
+        </div>
       </div>
     </div>
   );
