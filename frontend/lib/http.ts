@@ -6,8 +6,10 @@ import axios, {
 } from 'axios';
 import { toast } from 'sonner';
 
+// [DEBUG] In ra console để kiểm tra xem Next.js đã load được biến môi trường chưa
+// Bạn có thể xem log này ở Terminal (nếu SSR) hoặc F12 Console (nếu Client)
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-console.log(" [HTTP Client] Base URL:", apiUrl);
+console.log("🚀 [HTTP Client] Base URL:", apiUrl);
 
 const config: AxiosRequestConfig = {
   baseURL: apiUrl,
@@ -17,20 +19,15 @@ const config: AxiosRequestConfig = {
 
 const http: AxiosInstance = axios.create(config);
 
-<<<<<<< HEAD
-=======
-/* ================= REQUEST ================= */
->>>>>>> 98f502a017b968266f72ce2c7b3d1a9609db6743
+/* ================= REQUEST INTERCEPTOR ================= */
 
 http.interceptors.request.use(
   (config) => {
+    // Chỉ truy cập localStorage khi chạy ở phía Client (Browser)
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken');
 
-<<<<<<< HEAD
-=======
-      // ✅ Chỉ gắn token nếu có
->>>>>>> 98f502a017b968266f72ce2c7b3d1a9609db6743
+      // Nếu có token thì gắn vào Header Authorization
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -41,10 +38,7 @@ http.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-<<<<<<< HEAD
-=======
-/* ================= RESPONSE ================= */
->>>>>>> 98f502a017b968266f72ce2c7b3d1a9609db6743
+/* ================= RESPONSE INTERCEPTOR ================= */
 
 http.interceptors.response.use(
   (response: AxiosResponse) => response.data,
@@ -55,37 +49,23 @@ http.interceptors.response.use(
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('accessToken');
 
-<<<<<<< HEAD
-=======
-      // ✅ CHỈ đá login nếu:
-      // - Có token (đang đăng nhập)
-      // - Bị 401 từ API protected
->>>>>>> 98f502a017b968266f72ce2c7b3d1a9609db6743
+      // Tự động logout nếu gặp lỗi 401 (Unauthorized) và đang có token
       if (
         status === 401 &&
         token && 
         !window.location.pathname.includes('/login')
       ) {
-<<<<<<< HEAD
         toast.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.');
         
         // Xóa token cũ
         localStorage.removeItem('accessToken'); 
         
         // Chuyển hướng về trang login
-=======
-        toast.error('Phiên đăng nhập hết hạn');
-        localStorage.removeItem('accessToken'); // ❗không clear hết
-
->>>>>>> 98f502a017b968266f72ce2c7b3d1a9609db6743
         window.location.href = '/login';
       }
     }
 
-<<<<<<< HEAD
-=======
-    // Trả lỗi chuẩn cho service xử lý tiếp
->>>>>>> 98f502a017b968266f72ce2c7b3d1a9609db6743
+    // Trả lỗi về để component xử lý tiếp (hiện toast lỗi, v.v.)
     return Promise.reject(error.response?.data || error);
   }
 );
