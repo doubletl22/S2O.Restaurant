@@ -6,8 +6,6 @@ import axios, {
 } from 'axios';
 import { toast } from 'sonner';
 
-// [DEBUG] In ra console để kiểm tra xem Next.js đã load được biến môi trường chưa
-// Bạn có thể xem log này ở Terminal (nếu SSR) hoặc F12 Console (nếu Client)
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 console.log("🚀 [HTTP Client] Base URL:", apiUrl);
 
