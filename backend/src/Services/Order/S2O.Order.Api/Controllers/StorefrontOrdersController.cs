@@ -5,8 +5,8 @@ using S2O.Order.App.Features.Orders.Commands;
 
 namespace S2O.Order.Api.Controllers;
 
-[Route("api/v1/storefront/orders")]
 [ApiController]
+[Route("api/v1/storefront/orders")] // ✅ khớp Gateway + Frontend
 public class StorefrontOrdersController : ControllerBase
 {
     private readonly ISender _sender;
@@ -16,17 +16,17 @@ public class StorefrontOrdersController : ControllerBase
         _sender = sender;
     }
 
-    // POST: api/v1/storefront/orders/guest
-    [HttpPost("guest")]
-    [AllowAnonymous] // Khách vãng lai không cần login
-    public async Task<IActionResult> PlaceGuestOrder([FromBody] PlaceGuestOrderCommand command)
+    [HttpPost("guest")] // ✅ khớp /guest
+    [AllowAnonymous]
+    public async Task<IActionResult> PlaceGuestOrder(
+        [FromBody] PlaceGuestOrderCommand command,
+        CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
-    }
+        var result = await _sender.Send(command, cancellationToken);
 
-    // Nếu có tính năng khách hàng đăng nhập rồi đặt (Customer), thêm vào đây:
-    // [HttpPost("customer")]
-    // [Authorize(Roles = "Customer")]
-    // ...
+        if (result.IsSuccess)
+            return Ok(result);
+
+        return BadRequest(result); // ✅ trả nguyên result cho frontend đọc lỗi
+    }
 }

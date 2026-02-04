@@ -13,7 +13,7 @@ public class CatalogClient : ICatalogClient
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<ProductResponse>($"api/products/{productId}", ct);
+            var response = await _httpClient.GetFromJsonAsync<ProductResponse>($"api/v1/products/{productId}", ct);
             return response;
         }
         catch (Exception)
