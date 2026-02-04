@@ -1,20 +1,27 @@
 import http from "@/lib/http";
-import { StaffOrderDto, OrderStatus, Result } from "@/lib/types";
+import { OrderStatus, StaffOrderDto, Result } from "@/lib/types";
 
 export const staffService = {
-  // Lấy danh sách đơn hàng
+  // 1. Dùng cho trang Order Ticket (Phục vụ)
   getOrders: async (status?: OrderStatus): Promise<Result<StaffOrderDto[]>> => {
     const params = status !== undefined ? { status } : {};
-    // Ép kiểu any để tránh lỗi type check của axios interceptor
     return await http.get("/api/v1/orders", { params }) as any; 
   },
+
+  // 2. Dùng cho trang Kitchen (Bếp)
+  getKitchenOrders: async (branchId: string) => {
+    return await http.get(`/api/v1/kitchen?branchId=${branchId}`) as any;
+  },
   
-  // Cập nhật trạng thái từng món
+  // 3. Cập nhật trạng thái món (Chung cho cả 2)
   updateOrderItemStatus: async (orderId: string, itemId: string, status: OrderStatus) => {
+    // API: PUT /api/v1/orders/{orderId}/items/{itemId}/status
+    // Hoặc nếu bạn dùng route kitchen: PUT /api/v1/kitchen/{itemId}/status (tùy backend)
+    // Ở đây tôi dùng route chuẩn của Order:
     return await http.patch(`/api/v1/orders/${orderId}/items/${itemId}/status`, { status }) as any;
   },
 
-  // Lấy chi tiết (nếu cần)
+  // 4. Lấy chi tiết đơn
   getOrderDetail: async (id: string) => {
     return await http.get(`/api/v1/orders/${id}`) as any;
   }

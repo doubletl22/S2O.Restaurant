@@ -20,7 +20,7 @@ public class ProductsController : ControllerBase
     // 1. Lấy danh sách món (Dùng chung cho Owner và Staff)
     // GET: api/v1/products?page=1&size=10&keyword=pho&categoryId=...
     [HttpGet]
-    [Authorize(Roles = "RestaurantOwner, Staff")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetProducts(
         [FromQuery] int page = 1,
         [FromQuery] int size = 10,

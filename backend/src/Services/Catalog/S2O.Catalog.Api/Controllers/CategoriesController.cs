@@ -19,7 +19,7 @@ public class CategoriesController : ControllerBase
 
     // GET: api/v1/categories
     [HttpGet]
-    [Authorize(Roles = "RestaurantOwner, Staff")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetCategories()
     {
         var result = await _sender.Send(new GetCategoriesQuery());

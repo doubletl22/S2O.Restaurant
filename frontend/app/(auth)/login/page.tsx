@@ -62,7 +62,7 @@ export default function LoginPage() {
           router.push("/owner/dashboard");
         } 
         else if (hasRole("Chef")) {
-          router.push("/kitchen");
+          router.push("/staff/kitchen");
         } 
         else if (hasRole("Waiter") || hasRole("RestaurantStaff")) {
           router.push("/staff/order-ticket"); // Hoặc /pos
