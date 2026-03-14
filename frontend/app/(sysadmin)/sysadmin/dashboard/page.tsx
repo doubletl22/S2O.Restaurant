@@ -5,26 +5,75 @@ import { Users, Building2, DollarSign, Activity, Server, TrendingUp } from "luci
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { adminService } from "@/services/admin.service";
-import { SysAdminStats } from "@/lib/types";
+import { tenantService } from "@/services/tenant.service";
+import { SysAdminStats, Tenant } from "@/lib/types";
+
+function toDateValue(v?: string) {
+  if (!v) return 0;
+  const t = new Date(v).getTime();
+  return Number.isNaN(t) ? 0 : t;
+}
+
+function normalizeTenantList(payload: any): Tenant[] {
+  if (Array.isArray(payload?.value)) return payload.value;
+  if (Array.isArray(payload)) return payload;
+  return [];
+}
 
 export default function SysAdminDashboard() {
   const [stats, setStats] = useState<SysAdminStats | null>(null);
+  const [recentTenants, setRecentTenants] = useState<Tenant[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadStats = async () => {
+    const loadStats = async (showLoading = false) => {
       try {
-        const res = await adminService.getStats();
-        if (res.isSuccess) {
-            setStats(res.value);
-        }
+        if (showLoading) setLoading(true);
+
+        const [statsRes, tenantsRes, usersRes] = await Promise.allSettled([
+          adminService.getStats(),
+          tenantService.getAll(),
+          adminService.getSystemUsers(),
+        ]);
+
+        const apiStats = statsRes.status === "fulfilled" && statsRes.value?.isSuccess
+          ? statsRes.value.value
+          : null;
+
+        const tenantsRaw = tenantsRes.status === "fulfilled" ? tenantsRes.value : null;
+        const tenants = normalizeTenantList(tenantsRaw);
+
+        const usersRaw = usersRes.status === "fulfilled" ? usersRes.value : null;
+        const usersCount = Number((usersRaw as any)?.totalCount || (usersRaw as any)?.items?.length || 0);
+
+        const activeTenants = tenants.filter((t) => t.isActive && !t.isLocked).length;
+        const computedTotalTenants = tenants.length;
+        const computedStats: SysAdminStats = {
+          totalTenants: apiStats?.totalTenants ?? computedTotalTenants,
+          activeTenants: apiStats?.activeTenants ?? activeTenants,
+          totalRevenue: apiStats?.totalRevenue ?? 0,
+          totalUsers: apiStats?.totalUsers && apiStats.totalUsers > 0 ? apiStats.totalUsers : usersCount,
+          recentTenants: tenants
+            .slice()
+            .sort((a, b) => toDateValue(b.createdAt || b.createdOn) - toDateValue(a.createdAt || a.createdOn))
+            .slice(0, 5),
+        };
+
+        setStats(computedStats);
+        setRecentTenants((computedStats.recentTenants as Tenant[]) || []);
+        setLastUpdated(new Date().toLocaleTimeString("vi-VN"));
       } catch (e) {
         console.error("Lỗi tải dashboard stats:", e);
       } finally {
-        setLoading(false);
+        if (showLoading) setLoading(false);
       }
     };
-    loadStats();
+
+    loadStats(true);
+    const timer = setInterval(() => loadStats(false), 30000);
+
+    return () => clearInterval(timer);
   }, []);
 
   const formatMoney = (v: number) => 
@@ -37,6 +86,7 @@ export default function SysAdminDashboard() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Tổng quan Hệ thống</h1>
         <p className="text-muted-foreground">Theo dõi hoạt động của nền tảng S2O Restaurant SaaS.</p>
+        <p className="text-xs text-muted-foreground mt-1">Cập nhật lúc: {lastUpdated || "--:--:--"}</p>
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -108,6 +158,32 @@ export default function SysAdminDashboard() {
                  </div>
                ))}
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle>Nhà hàng mới đăng ký</CardTitle>
+            <CardDescription>Top 5 tenant gần nhất</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {recentTenants.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Chưa có dữ liệu gần đây.</p>
+            ) : (
+              <div className="space-y-3">
+                {recentTenants.map((tenant) => (
+                  <div key={tenant.id} className="flex items-center justify-between border-b pb-2 last:border-0">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{tenant.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{tenant.ownerEmail || tenant.email || "--"}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(tenant.createdAt || tenant.createdOn || Date.now()).toLocaleDateString("vi-VN")}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
