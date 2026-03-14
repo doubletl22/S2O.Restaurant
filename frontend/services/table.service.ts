@@ -2,8 +2,10 @@ import http from "@/lib/http";
 import { Table, Result } from "@/lib/types";
 
 export const tableService = {
-  getByBranch: async (branchId: string): Promise<Result<Table[]>> => {
-    const response = await http.get("/api/v1/tables", { params: { branchId } });
+  getByBranch: async (branchId?: string | null): Promise<Result<Table[]>> => {
+    const response = await http.get("/api/v1/tables", {
+      params: branchId ? { branchId } : undefined,
+    });
     return response as any;
   },
 
@@ -23,7 +25,8 @@ export const tableService = {
   },
 
   // Alias
-  getTables: async (branchId: string) => tableService.getByBranch(branchId),
+  getTables: async (branchId?: string | null) => tableService.getByBranch(branchId),
+  getAll: async () => tableService.getByBranch(null),
   createTable: async (b: any) => tableService.create(b),
   updateTable: async (id: string, b: any) => tableService.update(id, b),
   deleteTable: async (id: string) => tableService.delete(id),

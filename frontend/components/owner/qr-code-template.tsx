@@ -20,7 +20,8 @@ export const QRCodeTemplate = forwardRef<HTMLDivElement, Props>(({ tables, branc
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
         {tables.map((table) => {
-          const qrToken = table.id; 
+          // Prefer stable primary key to match resolve-table lookup across backend versions.
+          const qrToken = table.id || table.qrCodeGuid || table.qrToken;
           const qrUrl = `${baseUrl}/guest/t/${qrToken}`;
 
           return (

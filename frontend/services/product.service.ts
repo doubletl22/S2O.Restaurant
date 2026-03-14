@@ -3,15 +3,15 @@ import { Product, Result, CreateProductRequest } from "@/lib/types";
 
 const toFormData = (data: CreateProductRequest) => {
   const formData = new FormData();
-  formData.append('name', data.name);
-  formData.append('price', data.price.toString());
-  formData.append('categoryId', data.categoryId);
-  formData.append('isActive', String(data.isActive)); 
-  
-  if (data.description) formData.append('description', data.description);
+  // ✅ Dùng PascalCase để match với C# model binding
+  formData.append('Name', data.name);
+  formData.append('Price', data.price.toString());
+  formData.append('CategoryId', data.categoryId);
+  formData.append('IsActive', data.isActive ? 'true' : 'false');
+  formData.append('Description', data.description || '');
   
   if (data.imageFile) {
-    formData.append('imageFile', data.imageFile);
+    formData.append('ImageFile', data.imageFile);
   }
   
   return formData;

@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 
 import { Category } from "@/lib/types";
-import { categoryService } from "@/services/category.service";
+import { useCreateCategory, useUpdateCategory } from "@/hooks/use-categories";
 
 interface CategoryDialogProps {
   open: boolean;
@@ -49,8 +48,6 @@ export function CategoryDialog({
   categoryToEdit,
   onSuccess,
 }: CategoryDialogProps) {
-  const [isLoading, setIsLoading] = useState(false);
-
   const form = useForm<CategoryFormValues>({
     defaultValues: {
       name: "",
@@ -58,6 +55,15 @@ export function CategoryDialog({
       isActive: true,
     },
   });
+
+  const onClose = () => {
+    onOpenChange(false);
+    onSuccess();
+    form.reset();
+  };
+
+  const createMutation = useCreateCategory(onClose);
+  const updateMutation = useUpdateCategory(onClose);
 
   // Reset form khi mở dialog
   useEffect(() => {
@@ -78,39 +84,22 @@ export function CategoryDialog({
     }
   }, [open, categoryToEdit, form]);
 
-  const onSubmit = async (data: CategoryFormValues) => {
-    setIsLoading(true);
-    try {
-      let res;
-      if (categoryToEdit) {
-        res = await categoryService.update(categoryToEdit.id, {
-            ...data,
-            id: categoryToEdit.id 
-        });
-        if (res.isSuccess) toast.success("Cập nhật danh mục thành công");
-      } else {
-        res = await categoryService.create({
-          name: data.name,
-          description: data.description,
-          isActive: true,
-        });
-        if (res.isSuccess) toast.success("Tạo danh mục mới thành công");
-      }
-
-      if (res.isSuccess) {
-        onSuccess();
-        onOpenChange(false);
-      } else {
-         if (!res.isSuccess && res.error) {
-             toast.error(res.error.message);
-         }
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
+  const onSubmit = (data: CategoryFormValues) => {
+    if (categoryToEdit) {
+      updateMutation.mutate({
+        id: categoryToEdit.id,
+        data: { ...data, id: categoryToEdit.id },
+      });
+    } else {
+      createMutation.mutate({
+        name: data.name,
+        description: data.description,
+        isActive: true,
+      });
     }
   };
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -184,8 +173,8 @@ export function CategoryDialog({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Hủy bỏ
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button type="submit" disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {categoryToEdit ? "Lưu thay đổi" : "Tạo mới"}
               </Button>
             </DialogFooter>

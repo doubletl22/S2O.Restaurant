@@ -50,17 +50,19 @@ function toBool(v: any, defaultValue: boolean) {
 
 export const guestService = {
   /**
-   * Resolve table info from QR token (actually tableId GUID in your QR code template)
-   * Backend: GET /api/v1/storefront/tenants/resolve-table/{tableId}
+   * Resolve table info from QR token.
+   * Backend: GET /api/v1/storefront/tenants/resolve-table/{token}
+   * token can be tableId GUID, qr token, or token embedded in full URL.
    * Returns: { TableId, TableName, TenantId, TenantName, BranchId }
    */
   resolveTable: async (qrTokenOrTableId: string): Promise<PublicTableInfo> => {
-    if (!qrTokenOrTableId || !isGuid(qrTokenOrTableId)) {
+    if (!qrTokenOrTableId || !String(qrTokenOrTableId).trim()) {
       throw { code: "400", description: "QR token / TableId không hợp lệ" };
     }
 
+    const token = encodeURIComponent(String(qrTokenOrTableId).trim());
     const raw = (await http.get(
-      `/api/v1/storefront/tenants/resolve-table/${qrTokenOrTableId}`
+      `/api/v1/storefront/tenants/resolve-table/${token}`
     )) as any;
 
     const data = toCamelDeep<PublicTableInfo>(raw);
@@ -176,21 +178,106 @@ export const guestService = {
 
       return { isSuccess: true, value: { table, menu: menuRes.value } };
     } catch (error: any) {
+      const fallback = "Mã QR không hợp lệ hoặc đã hết hiệu lực. Vui lòng quét lại mã mới.";
+      const normalizedError =
+        typeof error === "string"
+          ? { code: "404", description: error || fallback }
+          : {
+              code:
+                error?.code ||
+                error?.error?.code ||
+                error?.status?.toString?.() ||
+                "500",
+              description:
+                error?.description ||
+                error?.error?.description ||
+                error?.message ||
+                fallback,
+            };
+
       return {
         isSuccess: false,
         value: null as any,
-        error: error?.error || error || { code: "500", description: "Lỗi tải dữ liệu" },
+        error: normalizedError,
       };
     }
   },
 
   /**
-   * Place order (backend accepts extra fields too, it will ignore unknown props)
-   * Backend: POST /api/v1/storefront/orders/guest (PlaceGuestOrderCommand)
-   * expects: { tableId, tenantId, items: [{productId, name, quantity, note}] }
+   * Add items to an existing guest order
+   * Backend: POST /api/v1/storefront/orders/{id}/items
    */
-  placeOrder: async (payload: any) => {
-    return (await http.post("/api/v1/storefront/orders/guest", payload)) as any;
+  addItemsToOrder: async (
+    orderId: string,
+    payload: { tenantId: string; items: { productId: string; name: string; quantity: number; note: string }[] }
+  ): Promise<Result<null>> => {
+    try {
+      const resp = (await http.post(`/api/v1/storefront/orders/${orderId}/items`, payload)) as any;
+      if (typeof resp === 'object' && 'isSuccess' in resp) return resp;
+      return { isSuccess: true, value: null };
+    } catch (error: any) {
+      const errorData = error?.response?.data || error;
+      if (errorData?.isSuccess === false) {
+        return { isSuccess: false, value: null, error: errorData?.error || { code: "500", description: "Lỗi không xác định" } };
+      }
+      const fallbackMsg = errorData?.message || errorData?.description || "Lỗi khi thêm món";
+      return { isSuccess: false, value: null, error: { code: error?.response?.status?.toString() || "500", description: String(fallbackMsg) } };
+    }
+  },
+
+  /**
+   * Place order - wraps error responses into Result format
+   * Backend: POST /api/v1/storefront/orders/guest (PlaceGuestOrderCommand)
+    * expects: { tableId, tableName, tenantId, branchId, items: [{productId, name, quantity, note}] }
+   */
+  placeOrder: async (payload: any): Promise<Result<{orderId: string}>> => {
+    try {
+      const resp = (await http.post("/api/v1/storefront/orders/guest", payload)) as any;
+      
+      // ✅ Nếu backend trả {isSuccess, value/error}, return như vậy
+      if (typeof resp === 'object' && 'isSuccess' in resp) {
+        return resp;
+      }
+      
+      // ✅ Nếu backend trả raw id/orderId (success), wrap vào Result
+      if (resp) {
+        return { isSuccess: true, value: { orderId: resp?.id ?? resp?.orderId ?? resp } };
+      }
+      
+      return { isSuccess: true, value: { orderId: resp?.id ?? resp?.orderId ?? "UNKNOWN" } };
+    } catch (error: any) {
+      // ✅ Catch Axios error từ http interceptor reject
+      const errorData = error?.response?.data || error;
+      
+      // Nếu backend trả {isSuccess:false, error:{...}}, extract nó
+      if (errorData?.isSuccess === false) {
+        return {
+          isSuccess: false,
+          value: null as any,
+          error: errorData?.error || { code: "500", description: "Lỗi không xác định" },
+        };
+      }
+      
+      // Nếu là ASP.NET validation error
+      if (errorData?.errors && typeof errorData.errors === 'object') {
+        const firstKey = Object.keys(errorData.errors)[0];
+        const msg = (errorData.errors as any)[firstKey];
+        const desc = Array.isArray(msg) ? msg[0] : msg;
+        return {
+          isSuccess: false,
+          value: null as any,
+          error: { code: "400", description: String(desc || "Dữ liệu không hợp lệ") },
+        };
+      }
+      
+      // Fallback
+      const fallbackMsg = errorData?.message || errorData?.description || "Lỗi khi đặt món";
+      return {
+        isSuccess: false,
+        value: null as any,
+        error: { code: error?.response?.status?.toString() || "500", description: String(fallbackMsg) },
+      };
+    }
   },
 
   /**
@@ -212,7 +299,7 @@ export const guestService = {
   },
 
   /**
-   * Poll order status by orderId (try multiple endpoints - tùy backend bạn đang có)
+   * Poll order status by orderId
    * Trả về Result<OrderLike>
    */
   getOrderStatus: async (orderId: string): Promise<Result<any>> => {
@@ -224,42 +311,33 @@ export const guestService = {
       };
     }
 
-    const endpoints = [
-      `/api/v1/storefront/orders/${orderId}`,
-      `/api/v1/storefront/orders/guest/${orderId}`,
-      `/api/v1/orders/${orderId}`,
-      `/api/orders/${orderId}`,
-    ];
+    try {
+      const raw = (await http.get(`/api/v1/storefront/orders/${orderId}`)) as any;
+      const data = toCamelDeep<any>(raw);
 
-    for (const url of endpoints) {
-      try {
-        const raw = (await http.get(url)) as any;
-        const data = toCamelDeep<any>(raw);
-
-        // Case A: backend trả Result<T>
-        if (data?.isSuccess === true && data?.value) {
-          return { isSuccess: true, value: data.value };
-        }
-
-        // Case B: backend trả thẳng order object
-        if (
-          data &&
-          (data.id || data.orderId) &&
-          (data.status !== undefined ||
-            data.orderStatus !== undefined ||
-            data.state !== undefined)
-        ) {
-          return { isSuccess: true, value: data };
-        }
-      } catch {
-        // thử endpoint khác
+      // Case A: backend trả Result<T>
+      if (data?.isSuccess === true && data?.value) {
+        return { isSuccess: true, value: data.value };
       }
+
+      // Case B: backend trả thẳng order object
+      if (
+        data &&
+        (data.id || data.orderId) &&
+        (data.status !== undefined ||
+          data.orderStatus !== undefined ||
+          data.state !== undefined)
+      ) {
+        return { isSuccess: true, value: data };
+      }
+    } catch {
+      // endpoint không phản hồi
     }
 
     return {
       isSuccess: false,
       value: null as any,
-      error: { code: "404", description: "Backend chưa có API lấy trạng thái đơn hàng" },
+      error: { code: "404", description: "Không tìm thấy trạng thái đơn hàng" },
     };
   },
 };

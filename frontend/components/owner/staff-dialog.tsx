@@ -42,6 +42,8 @@ export function StaffDialog({ open, onOpenChange, staffToEdit, initialViewMode =
   
   // State nội bộ để chuyển đổi giữa Xem và Sửa
   const [isViewMode, setIsViewMode] = useState(initialViewMode);
+  // State để quản lý việc đổi mật khẩu
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,6 +61,7 @@ export function StaffDialog({ open, onOpenChange, staffToEdit, initialViewMode =
     if (open) {
       // Mỗi khi mở dialog, reset lại chế độ view theo prop truyền vào
       setIsViewMode(initialViewMode);
+      setIsChangingPassword(false); // Reset trạng thái đổi mật khẩu
 
       if (staffToEdit) {
         form.reset({
@@ -92,7 +95,11 @@ export function StaffDialog({ open, onOpenChange, staffToEdit, initialViewMode =
         return;
     }
     if (staffToEdit) {
-      updateMutation.mutate({ id: staffToEdit.id, data: values });
+      // Nếu không đổi mật khẩu (isChangingPassword = false), xóa password khỏi payload
+      const payload = isChangingPassword && values.password 
+        ? values 
+        : { ...values, password: undefined };
+      updateMutation.mutate({ id: staffToEdit.id, data: payload });
     } else {
       createMutation.mutate(values);
     }
@@ -138,7 +145,7 @@ export function StaffDialog({ open, onOpenChange, staffToEdit, initialViewMode =
                             <FormControl>
                                 <div className="relative">
                                     <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    {/* Email luôn disable khi edit hoặc view */}
+                                    {/* Email chỉ disable khi edit, nhưng vẫn hiển thị rõ */}
                                     <Input className="pl-9" {...field} disabled={!!staffToEdit} />
                                 </div>
                             </FormControl>
@@ -146,17 +153,71 @@ export function StaffDialog({ open, onOpenChange, staffToEdit, initialViewMode =
                         </FormItem>
                         )} />
 
-                        {/* Ẩn mật khẩu khi đang xem để đỡ rối */}
-                        {!isViewMode && (
+                        {/* Logic mật khẩu */}
+                        {!staffToEdit ? (
+                            // TẠO MỚI: Hiển thị input password dạng text để chủ thấy
                             <FormField control={form.control} name="password" render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Mật khẩu {staffToEdit && "(Để trống nếu không đổi)"}</FormLabel>
+                                <FormLabel>Mật khẩu</FormLabel>
                                 <FormControl>
-                                    <Input type="password" placeholder="******" {...field} />
+                                    <div className="relative">
+                                        <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                        <Input type="text" className="pl-9" placeholder="Nhập mật khẩu" {...field} />
+                                    </div>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                             )} />
+                        ) : (
+                            // CHỈNH SỬA: Hiển thị ******** hoặc form đổi mật khẩu
+                            <FormItem>
+                                <FormLabel>Mật khẩu</FormLabel>
+                                {!isChangingPassword ? (
+                                    <div className="flex items-center gap-2">
+                                        <Input 
+                                            type="password" 
+                                            value="********" 
+                                            disabled 
+                                            className="flex-1"
+                                        />
+                                        {!isViewMode && (
+                                            <Button 
+                                                type="button" 
+                                                variant="outline" 
+                                                size="sm"
+                                                onClick={() => setIsChangingPassword(true)}
+                                            >
+                                                Đổi
+                                            </Button>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <FormField control={form.control} name="password" render={({ field }) => (
+                                        <div className="space-y-2">
+                                            <div className="relative">
+                                                <Lock className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                <Input 
+                                                    type="text" 
+                                                    className="pl-9" 
+                                                    placeholder="Nhập mật khẩu mới" 
+                                                    {...field} 
+                                                />
+                                            </div>
+                                            <Button 
+                                                type="button" 
+                                                variant="ghost" 
+                                                size="sm"
+                                                onClick={() => {
+                                                    setIsChangingPassword(false);
+                                                    form.setValue("password", "");
+                                                }}
+                                            >
+                                                Hủy đổi mật khẩu
+                                            </Button>
+                                        </div>
+                                    )} />
+                                )}
+                            </FormItem>
                         )}
                     </div>
                 </div>

@@ -7,7 +7,6 @@ import axios, {
 import { toast } from 'sonner';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-console.log("🚀 [HTTP Client] Base URL:", apiUrl);
 
 const config: AxiosRequestConfig = {
   baseURL: apiUrl,

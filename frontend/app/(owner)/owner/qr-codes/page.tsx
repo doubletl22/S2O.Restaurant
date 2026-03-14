@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useBranches, useTables } from "@/hooks/use-branches"; // Tận dụng hook cũ
 import { QRCodeTemplate } from "@/components/owner/qr-code-template";
@@ -12,8 +12,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Printer, CheckSquare, Square, Loader2, QrCode } from "lucide-react";
 
-// [CẤU HÌNH] Thay đổi URL này thành domain thật của Customer App
-const CUSTOMER_APP_URL = "http://localhost:3000"; 
+const getConfiguredCustomerAppUrl = () => {
+  const configured = process.env.NEXT_PUBLIC_CUSTOMER_APP_URL;
+  if (configured && configured.trim()) {
+    return configured.trim().replace(/\/$/, "");
+  }
+
+  return "http://localhost:3000";
+};
 
 export default function QrCodesPage() {
   const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
@@ -21,6 +27,17 @@ export default function QrCodesPage() {
   const { data: branches, isLoading: isLoadingBranches } = useBranches();
   const { data: tables, isLoading: isLoadingTables } = useTables(selectedBranchId);
   const printComponentRef = useRef<HTMLDivElement>(null);
+  const configuredCustomerAppUrl = useMemo(() => getConfiguredCustomerAppUrl(), []);
+  const [customerAppUrl, setCustomerAppUrl] = useState(configuredCustomerAppUrl);
+
+  useEffect(() => {
+    // Keep initial SSR/CSR render identical to avoid hydration mismatch.
+    // If env var is not set, resolve runtime origin only after mount.
+    if (!process.env.NEXT_PUBLIC_CUSTOMER_APP_URL) {
+      setCustomerAppUrl(window.location.origin);
+    }
+  }, []);
+
   const handlePrint = useReactToPrint({
     contentRef: printComponentRef, 
     documentTitle: `QR_Codes_${selectedBranchId || "All"}`,
@@ -151,7 +168,7 @@ export default function QrCodesPage() {
                     ref={printComponentRef} 
                     tables={tablesToPrint}
                     branchName={currentBranchName}
-                    baseUrl={CUSTOMER_APP_URL}
+                  baseUrl={customerAppUrl}
                 />
             </div>
         )}

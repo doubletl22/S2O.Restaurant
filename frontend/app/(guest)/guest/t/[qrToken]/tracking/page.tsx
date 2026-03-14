@@ -15,12 +15,14 @@ import { guestService } from "@/services/guest.service";
 
 type LocalOrderItem = {
   id: string;
+  productId?: string;
   productName: string;
   quantity: number;
   note?: string;
   price: number;
   status: number;
   imageUrl?: string;
+  unitPrice?: number;
 };
 
 type LocalOrder = {
@@ -41,6 +43,13 @@ export default function TrackingPage() {
 
   const [order, setOrder] = useState<LocalOrder | null>(null);
 
+  const clearLocalOrder = () => {
+    try {
+      localStorage.removeItem("guest_last_order");
+    } catch {}
+    setOrder(null);
+  };
+
   const load = () => {
     try {
       const raw = localStorage.getItem("guest_last_order");
@@ -54,13 +63,113 @@ export default function TrackingPage() {
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
 
+  const toNumericStatus = (s: any): number => {
+    const str = String(s ?? "").toLowerCase();
+    if (str.includes("pending") || str.includes("new")) return 0;
+    if (str.includes("confirm")) return 1;
+    if (str.includes("prepar") || str.includes("cook") || str.includes("processing")) return 2;
+    if (str.includes("done") || str.includes("complete")) return 3;
+    if (str.includes("served")) return 6;
+    if (str.includes("cancel")) return 5;
+
+    const n = Number(s);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const mapBackendOrder = (current: any, backend: any) => {
+    const currentItems: LocalOrderItem[] = Array.isArray(current?.items) ? current.items : [];
+
+    // Build lookup: productId -> local item (local snapshot stores id = productId)
+    const localByProductId = new Map<string, LocalOrderItem>();
+    currentItems.forEach((item) => {
+      const pid = String(item?.productId || item?.id || "");
+      if (pid) localByProductId.set(pid, item);
+    });
+
+    const backendItems = Array.isArray(backend?.items)
+      ? backend.items.map((item: any, index: number) => {
+          const quantity = Number(item?.quantity || 0);
+          const unitPrice = Number(item?.unitPrice ?? item?.price ?? 0);
+          const productId = String(item?.productId || "");
+
+          // Try to find matching local item for name/image recovery
+          const localItem = (productId && localByProductId.get(productId)) || currentItems[index];
+
+          // Prefer backend name (now fixed), fallback to local
+          const productName = String(
+            item?.productName || item?.name || localItem?.productName || "Món ăn"
+          );
+
+          // Backend DTO has no imageUrl - always recover from local snapshot
+          const imageUrl = localItem?.imageUrl || "";
+
+          return {
+            id: String(item?.id || item?.productId || localItem?.id || `${index}`),
+            productId,
+            productName,
+            quantity,
+            note: item?.note || localItem?.note || "",
+            price: unitPrice,
+            unitPrice,
+            status: toNumericStatus(item?.status),
+            imageUrl,
+          } as LocalOrderItem;
+        })
+      : [];
+
+    const totalAmount =
+      Number(backend?.totalAmount) ||
+      backendItems.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0) ||
+      Number(current?.totalAmount || 0);
+
+    return {
+      ...current,
+      status: backend?.status ?? backend?.orderStatus ?? backend?.state ?? current?.status,
+      tableName: backend?.tableName || current?.tableName,
+      items: backendItems.length > 0 ? backendItems : currentItems,
+      totalAmount,
+    } as LocalOrder;
+  };
+
+  const syncOrderStatus = async () => {
+    const raw = localStorage.getItem("guest_last_order");
+    if (!raw) {
+      setOrder(null);
+      return false;
+    }
+
+    const o: any = JSON.parse(raw);
+    if (!o?.orderId) {
+      clearLocalOrder();
+      return false;
+    }
+
+    const res = await guestService.getOrderStatus(o.orderId);
+    if (!res?.isSuccess) {
+      const errCode = String(res?.error?.code || "").toLowerCase();
+      if (errCode === "404" || errCode.includes("notfound")) {
+        clearLocalOrder();
+        return true;
+      }
+      return false;
+    }
+
+    const next = mapBackendOrder(o, res.value || {});
+
+    localStorage.setItem("guest_last_order", JSON.stringify(next));
+    setOrder(next);
+    return true;
+  };
+
   // ✅ map status -> text
   const statusText = (s: any) => {
     const str = String(s ?? "").toLowerCase();
 
     // string status
-    if (str.includes("pending") || str.includes("new") || str.includes("confirm"))
+    if (str.includes("pending") || str.includes("new"))
       return "Chờ xác nhận";
+    if (str.includes("confirm"))
+      return "Đã xác nhận";
     if (str.includes("prepar") || str.includes("cook") || str.includes("processing"))
       return "Đang chế biến";
     if (str.includes("done") || str.includes("complete") || str.includes("served"))
@@ -70,10 +179,12 @@ export default function TrackingPage() {
     // numeric status
     const v = Number(s);
     if (v === 0) return "Chờ xác nhận";
-    if (v === 1) return "Đang chế biến";
-    if (v === 2) return "Hoàn thành";
-    if (v === 3) return "Đã phục vụ";
-    if (v === 4) return "Đã huỷ";
+    if (v === 1) return "Đã xác nhận";
+    if (v === 2) return "Đang chế biến";
+    if (v === 3) return "Hoàn thành";
+    if (v === 4) return "Hoàn tất phục vụ";
+    if (v === 5) return "Đã huỷ";
+    if (v === 6) return "Hoàn tất phục vụ";
 
     return "Đang xử lý";
   };
@@ -102,11 +213,19 @@ export default function TrackingPage() {
       );
     }
 
-    // processing
-    if (text === "Đang chế biến" || str.includes("processing") || v === 1) {
+    // confirmed / processing
+    if (
+      text === "Đã xác nhận" ||
+      text === "Đang chế biến" ||
+      str.includes("confirm") ||
+      str.includes("processing") ||
+      str.includes("cook") ||
+      v === 1 ||
+      v === 2
+    ) {
       return (
         <Badge className="bg-blue-50 text-blue-700 gap-1">
-          <Clock className="h-3 w-3" /> Processing
+          <Clock className="h-3 w-3" /> {text === "Đã xác nhận" ? "Đã xác nhận" : "Đang chế biến"}
         </Badge>
       );
     }
@@ -122,31 +241,28 @@ export default function TrackingPage() {
   useEffect(() => {
     load();
 
-    // ✅ polling 5s: lấy status thật từ backend theo orderId (nếu có API)
+    // Sync ngay khi mở trang để dọn local cache nếu đơn đã bị xóa khỏi DB.
+    void syncOrderStatus();
+
+    // Polling 5s: lấy status từ backend, dừng sau 3 lần thất bại liên tiếp
+    let failCount = 0;
+    const MAX_FAILS = 3;
+
     const timer = setInterval(async () => {
       try {
-        const raw = localStorage.getItem("guest_last_order");
-        if (!raw) return;
-
-        const o: any = JSON.parse(raw);
-        if (!o?.orderId) return;
-
-        const res = await guestService.getOrderStatus(o.orderId);
-
-        if (res?.isSuccess) {
-          const statusFromBackend =
-            res.value?.status ?? res.value?.orderStatus ?? res.value?.state;
-
-          const next = {
-            ...o,
-            status: statusFromBackend ?? o.status,
-          };
-
-          localStorage.setItem("guest_last_order", JSON.stringify(next));
-          setOrder(next);
+        if (await syncOrderStatus()) {
+          failCount = 0; // reset khi thành công
+        } else {
+          failCount++;
+          if (failCount >= MAX_FAILS) {
+            clearInterval(timer);
+          }
         }
       } catch {
-        // ignore
+        failCount++;
+        if (failCount >= MAX_FAILS) {
+          clearInterval(timer);
+        }
       }
     }, 5000);
 
@@ -171,8 +287,11 @@ export default function TrackingPage() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => {
-            load();
+          onClick={async () => {
+            const synced = await syncOrderStatus();
+            if (!synced) {
+              load();
+            }
             toast.info("Đã cập nhật");
           }}
         >
@@ -209,6 +328,13 @@ export default function TrackingPage() {
               </div>
             </div>
 
+            <div className="bg-white p-4 rounded-xl border">
+              <div className="font-semibold">Xem trước đơn hàng</div>
+              <div className="text-xs text-gray-500 mt-1">
+                Danh sách món và giá được xác nhận từ hệ thống.
+              </div>
+            </div>
+
             {order.items.map((item) => (
               <div key={item.id} className="bg-white p-3 rounded-xl border flex gap-3">
                 <div className="h-16 w-16 bg-gray-100 rounded-md overflow-hidden">
@@ -233,7 +359,7 @@ export default function TrackingPage() {
 
                   <div className="flex justify-between mt-2 text-sm text-gray-500">
                     <span>{item.note || ""}</span>
-                    <span>{formatPrice(item.price * item.quantity)}</span>
+                    <span>{formatPrice((item.unitPrice ?? item.price) * item.quantity)}</span>
                   </div>
                 </div>
               </div>
@@ -248,7 +374,7 @@ export default function TrackingPage() {
               </div>
 
               <div className="flex justify-between text-lg font-bold">
-                <span>Tạm tính</span>
+                <span>{statusText(order.status) === "Đã xác nhận" || statusText(order.status) === "Đang chế biến" || statusText(order.status) === "Hoàn thành" ? "Tổng giá đã xác nhận" : "Tạm tính"}</span>
                 <span className="text-orange-600">{formatPrice(order.totalAmount)}</span>
               </div>
             </div>

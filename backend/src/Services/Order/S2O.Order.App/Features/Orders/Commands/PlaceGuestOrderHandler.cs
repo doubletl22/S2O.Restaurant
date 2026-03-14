@@ -24,7 +24,9 @@ public class PlaceGuestOrderHandler : IRequestHandler<PlaceGuestOrderCommand, Re
         {
             Id = Guid.NewGuid(),
             TableId = request.TableId,
+            TableName = string.IsNullOrWhiteSpace(request.TableName) ? "Mang về" : request.TableName.Trim(),
             TenantId = request.TenantId,
+            BranchId = request.BranchId, // ✅ Set BranchId
             Status = OrderStatus.Pending, // Mới đặt, chờ bếp
             OrderDate = DateTime.UtcNow,
             TotalAmount = 0 // Sẽ cộng dồn bên dưới
@@ -34,8 +36,9 @@ public class PlaceGuestOrderHandler : IRequestHandler<PlaceGuestOrderCommand, Re
         foreach (var itemDto in request.Items)
         {
             // 3. QUAN TRỌNG: Gọi Catalog Service để lấy thông tin món ăn mới nhất
+            // ✅ Pass tenantId để Catalog Service biết filter theo tenant nào
             // Giả sử hàm GetProductAsync trả về { Id, Name, Price, ImageUrl }
-            var productInfo = await _catalogClient.GetProductAsync(itemDto.ProductId, ct);
+            var productInfo = await _catalogClient.GetProductAsync(itemDto.ProductId, request.TenantId, ct);
 
             if (productInfo == null)
             {
@@ -52,7 +55,8 @@ public class PlaceGuestOrderHandler : IRequestHandler<PlaceGuestOrderCommand, Re
                 UnitPrice = productInfo.Price,  // Lưu cứng giá tại thời điểm đặt
                 Quantity = itemDto.Quantity,
                 Note = itemDto.Note,
-                TotalPrice = productInfo.Price * itemDto.Quantity
+                TotalPrice = productInfo.Price * itemDto.Quantity,
+                TenantId = request.TenantId
             };
 
             order.Items.Add(orderItem);

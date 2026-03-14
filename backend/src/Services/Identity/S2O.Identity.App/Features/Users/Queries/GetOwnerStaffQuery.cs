@@ -9,6 +9,7 @@ namespace S2O.Identity.App.Features.Users.Queries;
 public class StaffDto
 {
     public Guid Id { get; set; }
+    public string Email { get; set; } = default!;
     public string FullName { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
     public string Role { get; set; } = default!;
@@ -50,15 +51,23 @@ public class GetOwnerStaffHandler : IRequestHandler<GetOwnerStaffQuery, Result<L
         foreach (var user in users)
         {
             var roles = await _userManager.GetRolesAsync(user);
+            var primaryRole = roles.FirstOrDefault() ?? "Staff";
+
+            // Bỏ qua RestaurantOwner và SystemAdmin - chỉ hiển thị staff
+            if (primaryRole == "RestaurantOwner" || primaryRole == "SystemAdmin")
+            {
+                continue;
+            }
 
             Guid userId = Guid.Parse(user.Id.ToString());
 
             staffList.Add(new StaffDto
             {
                 Id = userId,
+                Email = user.Email ?? "",
                 FullName = user.FullName,
                 PhoneNumber = user.PhoneNumber ?? "",
-                Role = roles.FirstOrDefault() ?? "Staff",
+                Role = primaryRole,
                 BranchId = user.BranchId,
                 IsActive = user.IsActive
             });

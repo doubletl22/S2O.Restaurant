@@ -1,14 +1,15 @@
 import { GuestShell } from "@/components/guest/guest-shell";
 
-export default function GuestLayout({
+export default async function GuestLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { qrToken: string };
+  params: Promise<{ qrToken: string }>;
 }) {
+  const { qrToken } = await params;
   return (
-    <GuestShell qrToken={params.qrToken}>
+    <GuestShell qrToken={qrToken}>
       {children}
     </GuestShell>
   );

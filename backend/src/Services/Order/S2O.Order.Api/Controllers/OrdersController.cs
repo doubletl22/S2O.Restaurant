@@ -29,7 +29,7 @@ public class OrdersController : ControllerBase
 
     // GET: api/v1/orders?status=Cooking
     [HttpGet]
-    [Authorize(Roles = "RestaurantOwner, Staff")]
+    [Authorize(Roles = "RestaurantOwner, Staff, Manager")]
     public async Task<IActionResult> GetOrders([FromQuery] OrderStatus? status)
     {
         var branchId = GetBranchIdFromToken();
@@ -40,7 +40,7 @@ public class OrdersController : ControllerBase
 
     // GET: api/v1/orders/{id}
     [HttpGet("{id}")]
-    [Authorize(Roles = "RestaurantOwner, Staff")]
+    [Authorize(Roles = "RestaurantOwner, Staff, Manager")]
     public async Task<IActionResult> GetOrderDetail(Guid id)
     {
         var branchId = GetBranchIdFromToken();
@@ -50,12 +50,34 @@ public class OrdersController : ControllerBase
 
     // PATCH: api/v1/orders/{id}/status
     [HttpPatch("{id}/status")]
-    [Authorize(Roles = "RestaurantOwner, Staff")]
+    [Authorize(Roles = "RestaurantOwner, Staff, Manager")]
     public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateOrderStatusCommand command)
     {
         if (id != command.OrderId) return BadRequest("ID không khớp");
 
         var result = await _sender.Send(command);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
+    // PATCH: api/v1/orders/{orderId}/items/{itemId}
+    [HttpPatch("{orderId:guid}/items/{itemId:guid}")]
+    [Authorize(Roles = "RestaurantOwner, Staff, Manager")]
+    public async Task<IActionResult> UpdateOrderItemQuantity(
+        Guid orderId,
+        Guid itemId,
+        [FromBody] UpdateOrderItemQuantityCommand command)
+    {
+        var branchId = GetBranchIdFromToken();
+        if (branchId == Guid.Empty) return BadRequest("Không xác định được chi nhánh.");
+
+        var fixedCommand = command with
+        {
+            OrderId = orderId,
+            OrderItemId = itemId,
+            CurrentBranchId = branchId
+        };
+
+        var result = await _sender.Send(fixedCommand);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
@@ -81,6 +103,87 @@ public class OrdersController : ControllerBase
         return Ok(orders);
     }
 
+    // GET: api/v1/orders/owner/revenue-series
+    [HttpGet("owner/revenue-series")]
+    [Authorize(Roles = "RestaurantOwner")]
+    public async Task<IActionResult> GetOwnerRevenueSeries(
+        [FromQuery] DateTime? from,
+        [FromQuery] DateTime? to,
+        [FromQuery] bool allTime = false,
+        [FromQuery] Guid? branchId = null)
+    {
+        var tenantId = GetTenantIdFromToken();
+        if (tenantId == Guid.Empty) return BadRequest("Không xác định được tenant.");
+
+        var query = _context.Orders
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(o => o.TenantId == tenantId)
+            .Where(o => o.Status == OrderStatus.Paid || o.Status == OrderStatus.Completed);
+
+        if (branchId.HasValue && branchId != Guid.Empty)
+        {
+            query = query.Where(o => o.BranchId == branchId.Value);
+        }
+
+        if (!allTime)
+        {
+            var fromDate = DateTime.SpecifyKind((from ?? DateTime.UtcNow.Date.AddDays(-6)).Date, DateTimeKind.Utc);
+            var toDate = DateTime.SpecifyKind((to ?? DateTime.UtcNow.Date).Date.AddDays(1).AddTicks(-1), DateTimeKind.Utc);
+            query = query.Where(o => o.OrderDate >= fromDate && o.OrderDate <= toDate);
+        }
+
+        var result = await query
+            .GroupBy(o => o.OrderDate.Date)
+            .Select(g => new
+            {
+                Date = g.Key,
+                Revenue = g.Sum(x => x.TotalAmount)
+            })
+            .OrderBy(x => x.Date)
+            .ToListAsync();
+
+        return Ok(result);
+    }
+
+    // GET: api/v1/orders/owner/revenue-by-branch
+    [HttpGet("owner/revenue-by-branch")]
+    [Authorize(Roles = "RestaurantOwner")]
+    public async Task<IActionResult> GetOwnerRevenueByBranch(
+        [FromQuery] DateTime? from,
+        [FromQuery] DateTime? to,
+        [FromQuery] bool allTime = false)
+    {
+        var tenantId = GetTenantIdFromToken();
+        if (tenantId == Guid.Empty) return BadRequest("Không xác định được tenant.");
+
+        var query = _context.Orders
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(o => o.TenantId == tenantId)
+            .Where(o => o.Status == OrderStatus.Paid || o.Status == OrderStatus.Completed);
+
+        if (!allTime)
+        {
+            var fromDate = DateTime.SpecifyKind((from ?? DateTime.UtcNow.Date.AddDays(-6)).Date, DateTimeKind.Utc);
+            var toDate = DateTime.SpecifyKind((to ?? DateTime.UtcNow.Date).Date.AddDays(1).AddTicks(-1), DateTimeKind.Utc);
+            query = query.Where(o => o.OrderDate >= fromDate && o.OrderDate <= toDate);
+        }
+
+        var result = await query
+            .GroupBy(o => o.BranchId)
+            .Select(g => new
+            {
+                BranchId = g.Key,
+                Revenue = g.Sum(x => x.TotalAmount),
+                OrderCount = g.Count()
+            })
+            .OrderByDescending(x => x.Revenue)
+            .ToListAsync();
+
+        return Ok(result);
+    }
+
     // ==========================================
     // HELPER
     // ==========================================
@@ -94,5 +197,12 @@ public class OrdersController : ControllerBase
             return Guid.Empty;
         }
         return Guid.Parse(branchClaim);
+    }
+
+    private Guid GetTenantIdFromToken()
+    {
+        var tenantClaim = User.FindFirst("tenant_id")?.Value;
+        if (string.IsNullOrEmpty(tenantClaim)) return Guid.Empty;
+        return Guid.Parse(tenantClaim);
     }
 }

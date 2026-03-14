@@ -1,7 +1,7 @@
 import http from "@/lib/http";
 import { StaffProfile, CreateStaffRequest, Result } from "@/lib/types";
 
-const ENDPOINT = "/api/v1/staffs"; // Hoặc /api/v1/owner/staffs tùy route backend
+const ENDPOINT = "/api/v1/staff";
 
 export const ownerStaffService = {
   // Lấy danh sách nhân viên

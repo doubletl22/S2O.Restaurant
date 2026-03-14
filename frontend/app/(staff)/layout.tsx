@@ -1,20 +1,49 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ChefHat, ListOrdered, History, LogOut, Utensils } from "lucide-react";
+import { History, LogOut, Utensils, BellRing, Table2, ChefHat, HandPlatter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/services/auth.service";
+import { getRoles } from "@/lib/jwt";
 
 const menuItems = [
-  { title: "Bếp (KDS)", href: "/staff/kitchen", icon: ChefHat },
-  { title: "Tiếp nhận (Waiter)", href: "/staff/order-ticket", icon: ListOrdered },
+  { title: "Tiếp nhận (Manager)", href: "/staff/order-ticket", icon: BellRing },
+  { title: "Các bàn", href: "/staff/tables", icon: Table2 },
   { title: "Lịch sử", href: "/staff/history", icon: History },
 ];
 
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [roles, setRoles] = useState<string[]>([]);
+
+  useEffect(() => {
+    setRoles(getRoles());
+  }, []);
+
+  const menuItems = useMemo(() => {
+    const hasRole = (name: string) => roles.includes(name);
+
+    if (hasRole("Manager")) {
+      return [
+        { title: "Tiếp nhận (Manager)", href: "/staff/order-ticket", icon: BellRing },
+        { title: "Các bàn", href: "/staff/tables", icon: Table2 },
+        { title: "Lịch sử", href: "/staff/history", icon: History },
+      ];
+    }
+
+    if (hasRole("Chef")) {
+      return [{ title: "Khu vực bếp", href: "/staff/kitchen", icon: ChefHat }];
+    }
+
+    if (hasRole("Waiter") || hasRole("RestaurantStaff")) {
+      return [{ title: "Khu vực phục vụ", href: "/staff/service", icon: HandPlatter }];
+    }
+
+    return [];
+  }, [roles]);
 
   return (
     <div className="flex min-h-screen w-full bg-gray-100">

@@ -26,10 +26,17 @@ export function CalendarDateRangePicker({
   onDateChange,
 }: DateRangePickerProps) {
   // State nội bộ nếu không truyền props (Uncontrolled mode)
-  const [internalDate, setInternalDate] = React.useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 7),
-  });
+  const [internalDate, setInternalDate] = React.useState<DateRange | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (date || internalDate) return;
+
+    const now = new Date();
+    setInternalDate({
+      from: now,
+      to: addDays(now, 7),
+    });
+  }, [date, internalDate]);
 
   const selectedDate = date || internalDate;
   const setSelectedDate = (d: DateRange | undefined) => {

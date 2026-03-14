@@ -2,11 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using S2O.Catalog.App.Abstractions;
 using S2O.Catalog.App.DTOs;
+using S2O.Catalog.Domain.Entities;
 using S2O.Shared.Kernel.Results;
 
 namespace S2O.Catalog.App.Features.Products.Queries;
 
-public record GetProductByIdQuery(Guid Id) : IRequest<Result<ProductResponse>>;
+public record GetProductByIdQuery(Guid Id, Guid? TenantId = null) : IRequest<Result<ProductResponse>>;
 
 public class GetProductByIdHandler : IRequestHandler<GetProductByIdQuery, Result<ProductResponse>>
 {
@@ -16,9 +17,23 @@ public class GetProductByIdHandler : IRequestHandler<GetProductByIdQuery, Result
 
     public async Task<Result<ProductResponse>> Handle(GetProductByIdQuery request, CancellationToken ct)
     {
-        // Global Query Filter (TenantId) sẽ tự động được áp dụng ở đây
-        var product = await _context.Products
-            .AsNoTracking()
+        IQueryable<Product> query;
+
+        // ✅ Nếu tenantId được cung cấp (từ Order Service), bypass global filter & explicit check tenant
+        if (request.TenantId.HasValue)
+        {
+            query = _context.Products
+                .AsNoTracking()
+                .IgnoreQueryFilters()  // ✅ Bypass global TenantId filter
+                .Where(p => p.TenantId == request.TenantId.Value);
+        }
+        else
+        {
+            // Nếu không có tenantId, dùng global filter (sẽ lọc theo HttpContext TenantId)
+            query = _context.Products.AsNoTracking();
+        }
+
+        var product = await query
             .Where(p => p.Id == request.Id)
             .Select(p => new ProductResponse
             {

@@ -24,7 +24,7 @@ public class UpdateBranchHandler : IRequestHandler<UpdateBranchCommand, Result<G
 
         branch.Name = request.Name;
         branch.Address = request.Address;
-        branch.PhoneNumber = request.PhoneNumber;
+        branch.PhoneNumber = request.Phone;
         branch.IsActive = request.IsActive;
 
         _context.Branches.Update(branch);

@@ -7,11 +7,9 @@ namespace S2O.Catalog.App.Features.Products.Commands;
 
 public record CreateProductCommand(
     string Name,
-    string Description,
+    string? Description,
     decimal Price,
-    Guid CategoryId, 
+    Guid CategoryId,
+    bool IsActive,
     IFormFile? ImageFile  
-) : IRequest<Result<Guid>>
-{
-public Guid TenantId { get; init; }
-}
+) : IRequest<Result<Guid>>;

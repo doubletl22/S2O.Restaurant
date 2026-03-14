@@ -15,15 +15,44 @@ public class StorefrontTenantController : ControllerBase
         _context = context;
     }
 
-    // GET: api/v1/storefront/tenants/resolve-table/{tableId}
-    [HttpGet("resolve-table/{tableId}")]
+    // GET: api/v1/storefront/tenants/resolve-table/{token}
+    // token can be: tableId GUID, qr token GUID, or a full QR URL containing the token
+    [HttpGet("resolve-table/{token}")]
     [Microsoft.AspNetCore.Authorization.AllowAnonymous]
-    public async Task<IActionResult> ResolveTable(Guid tableId)
+    public async Task<IActionResult> ResolveTable(string token)
     {
-        var table = await _context.Tables.AsNoTracking().FirstOrDefaultAsync(t => t.Id == tableId);
+        if (string.IsNullOrWhiteSpace(token))
+            return BadRequest("Token không hợp lệ.");
+
+        token = token.Trim();
+        var parsedGuid = Guid.Empty;
+        var hasGuid = Guid.TryParse(token, out parsedGuid);
+
+            var table = await _context.Tables
+                .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(t =>
+                (hasGuid && t.Id == parsedGuid) ||
+                (t.QrCodeUrl != null && (
+                    t.QrCodeUrl == token ||
+                    t.QrCodeUrl.EndsWith(token) ||
+                    t.QrCodeUrl.Contains($"/guest/t/{token}")
+                ))
+            );
+
         if (table == null) return NotFound("Không tìm thấy bàn.");
 
-        var tenant = await _context.Tenants.AsNoTracking().FirstOrDefaultAsync(t => t.Id == table.TenantId);
+        // MVP phiên bàn: khi khách quét QR lần đầu thì đánh dấu bàn đang có khách.
+        // Các lần quét tiếp theo vẫn cho vào menu nhưng giữ nguyên trạng thái bàn.
+        if (!table.IsOccupied)
+        {
+            table.IsOccupied = true;
+            await _context.SaveChangesAsync();
+        }
+
+            var tenant = await _context.Tenants
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == table.TenantId);
         if (tenant == null) return NotFound("Lỗi dữ liệu quán.");
 
         return Ok(new
@@ -32,7 +61,9 @@ public class StorefrontTenantController : ControllerBase
             TableName = table.Name,
             TenantId = tenant.Id,
             TenantName = tenant.Name,
-            BranchId = table.BranchId ?? Guid.Empty
+            BranchId = table.BranchId ?? Guid.Empty,
+            IsOccupied = table.IsOccupied,
+            ScannedAtUtc = DateTime.UtcNow
         });
     }
 }

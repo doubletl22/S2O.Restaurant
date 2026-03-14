@@ -29,3 +29,27 @@ export function getClaim(name: string): string | null {
   if (!v) return null;
   return typeof v === "string" ? v : Array.isArray(v) ? v[0] : String(v);
 }
+
+// Helper: Lấy BranchId từ JWT token
+export function getBranchId(): string | null {
+  return getClaim("BranchId") || getClaim("branchId") || getClaim("branch_id");
+}
+
+// Helper: Lấy UserId từ JWT token
+export function getUserId(): string | null {
+  return getClaim("sub") || getClaim("userId") || getClaim("UserId");
+}
+
+export function getRoles(): string[] {
+  const p = getJwtPayload();
+  if (!p) return [];
+
+  const raw =
+    p?.role ??
+    p?.roles ??
+    p?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw.map((r) => String(r));
+  return [String(raw)];
+}

@@ -13,7 +13,7 @@ public class BranchDto
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
-    public string PhoneNumber { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
     public bool IsActive { get; set; }
 }
 
@@ -33,7 +33,7 @@ public class GetOwnerBranchesHandler : IRequestHandler<GetOwnerBranchesQuery, Re
                 Id = b.Id,
                 Name = b.Name,
                 Address = b.Address ?? "",
-                PhoneNumber = b.PhoneNumber ?? "",
+                Phone = b.PhoneNumber ?? "",
                 IsActive = b.IsActive
             })
             .ToListAsync(ct);

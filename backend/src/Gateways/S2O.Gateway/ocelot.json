@@ -165,7 +165,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
       "UpstreamPathTemplate": "/api/v1/storefront/orders/{everything}",
-      "UpstreamHttpMethod": [ "POST" ]
+      "UpstreamHttpMethod": [ "GET", "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/v1/orders/{everything}",

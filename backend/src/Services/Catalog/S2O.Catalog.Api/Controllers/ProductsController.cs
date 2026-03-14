@@ -40,12 +40,13 @@ public class ProductsController : ControllerBase
     // ===============================
     // 2. Lấy chi tiết món (CHO PHÉP GUEST + ORDER SERVICE)
     // ===============================
-    // GET: api/v1/products/{id}
+    // GET: api/v1/products/{id}?tenantId=...
     [HttpGet("{id}")]
     [AllowAnonymous]   // 🔥 QUAN TRỌNG: bỏ login cho guest quét QR
-    public async Task<IActionResult> GetProductById(Guid id)
+    public async Task<IActionResult> GetProductById(Guid id, [FromQuery] Guid? tenantId = null)
     {
-        var result = await _sender.Send(new GetProductByIdQuery(id));
+        // ✅ Pass tenantId vào query (nếu có, sẽ bypass global filter)
+        var result = await _sender.Send(new GetProductByIdQuery(id, tenantId));
 
         return result.IsSuccess 
             ? Ok(result.Value) 

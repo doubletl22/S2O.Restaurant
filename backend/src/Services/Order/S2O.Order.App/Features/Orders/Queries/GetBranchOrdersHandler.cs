@@ -37,15 +37,23 @@ public class GetBranchOrdersHandler : IRequestHandler<GetBranchOrdersQuery, Resu
             {
                 Id = o.Id,
                 TableId = o.TableId.HasValue ? o.TableId.Value.ToString() : "Mang về",
+                TableName = o.TableName ?? "Mang về", // ✅ Map TableName
+                OrderNumber = o.OrderNumber, // ✅ Map OrderNumber
                 Note = o.Note ?? string.Empty,
                 TotalAmount = o.TotalAmount,
                 Status = o.Status,
                 CreatedAtUtc = o.CreatedAtUtc,
+                CreatedAt = o.CreatedAtUtc.ToString("yyyy-MM-ddTHH:mm:ss"), // ✅ ISO format
+                CreatedOn = o.CreatedAtUtc.ToString("yyyy-MM-ddTHH:mm:ss"), // ✅ Compat
                 Items = o.Items.Select(i => new StaffOrderItemDto
                 {
+                    Id = i.Id.ToString(), // ✅ Item Id
                     ProductId = i.ProductId.ToString(),
+                    ProductName = i.ProductName, // ✅ ProductName
                     Quantity = i.Quantity,
-                    UnitPrice = i.UnitPrice
+                    UnitPrice = i.UnitPrice,
+                    Note = i.Note, // ✅ Item Note
+                    Status = i.Status // ✅ Item Status
                 }).ToList()
             })
             .ToListAsync(cancellationToken);

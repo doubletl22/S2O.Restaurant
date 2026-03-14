@@ -9,11 +9,18 @@ public class CatalogClient : ICatalogClient
 
     public CatalogClient(HttpClient httpClient) => _httpClient = httpClient;
 
-    public async Task<ProductResponse?> GetProductAsync(Guid productId, CancellationToken ct = default)
+    public async Task<ProductResponse?> GetProductAsync(Guid productId, Guid? tenantId = null, CancellationToken ct = default)
     {
         try
         {
-            var response = await _httpClient.GetFromJsonAsync<ProductResponse>($"api/v1/products/{productId}", ct);
+            // ✅ Pass tenantId as query parameter để bypass global TenantId filter
+            var url = $"api/v1/products/{productId}";
+            if (tenantId.HasValue)
+            {
+                url += $"?tenantId={tenantId.Value}";
+            }
+            
+            var response = await _httpClient.GetFromJsonAsync<ProductResponse>(url, ct);
             return response;
         }
         catch (Exception)

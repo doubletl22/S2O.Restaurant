@@ -22,15 +22,16 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
 
     public async Task<Result<Guid>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
+        // ✅ Upload Image
         string imageUrl = "https://placehold.co/600x400";
 
         if (request.ImageFile != null && request.ImageFile.Length > 0)
         {
-            // Mở stream và upload
             using var stream = request.ImageFile.OpenReadStream();
             imageUrl = await _fileStorage.UploadFileAsync(stream, request.ImageFile.FileName);
         }
-        // 1. Tạo Entity
+        
+        // ✅ Tạo Entity với đầy đủ required fields
         var product = new Product
         {
             Id = Guid.NewGuid(),
@@ -39,11 +40,13 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
             Price = request.Price,
             CategoryId = request.CategoryId,
             ImageUrl = imageUrl,
-            IsActive = true,
-            TenantId = _currentUserService.TenantId
+            IsActive = request.IsActive,
+            IsAvailable = true,  // ✅ Fix lỗi NOT NULL constraint
+            TenantId = _currentUserService.TenantId,
+            CreatedAtUtc = DateTime.UtcNow
         };
 
-        // 2. Lưu vào DB
+        // ✅ Lưu vào DB
         _context.Products.Add(product);
         await _context.SaveChangesAsync(cancellationToken);
 

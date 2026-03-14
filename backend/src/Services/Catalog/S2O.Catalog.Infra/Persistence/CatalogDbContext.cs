@@ -23,9 +23,16 @@ public class CatalogDbContext : BaseDbContext, ICatalogDbContext
             .Property(p => p.Price)
             .HasPrecision(18, 2);
 
-        // ✅ FIX DB DEFAULT: luôn mặc định có hàng
+        // ✅ IsAvailable: Required với default value
         builder.Entity<Product>()
             .Property(p => p.IsAvailable)
+            .IsRequired()
+            .HasDefaultValue(true);
+            
+        // ✅ IsActive: Required với default value
+        builder.Entity<Product>()
+            .Property(p => p.IsActive)
+            .IsRequired()
             .HasDefaultValue(true);
     }
 }

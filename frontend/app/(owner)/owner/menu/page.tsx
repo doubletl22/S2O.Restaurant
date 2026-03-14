@@ -176,7 +176,6 @@ export default function MenuPage() {
                   <Card key={prod.id} className="overflow-hidden group hover:shadow-lg transition-all border-muted">
                     <div className="aspect-4/3 relative bg-secondary">
                       {prod.imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
                         <img 
                           src={prod.imageUrl} 
                           alt={prod.name} 

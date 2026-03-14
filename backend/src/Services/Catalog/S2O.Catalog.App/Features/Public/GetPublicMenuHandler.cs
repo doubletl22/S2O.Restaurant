@@ -18,6 +18,7 @@ public class GetPublicMenuHandler : IRequestHandler<GetPublicMenuQuery, Result<P
     public async Task<Result<PublicMenuDto>> Handle(GetPublicMenuQuery request, CancellationToken ct)
     {
         var categories = await _context.Categories
+            .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(c => c.TenantId == request.TenantId && c.IsActive)
             .OrderBy(c => c.Name) 
@@ -25,11 +26,13 @@ public class GetPublicMenuHandler : IRequestHandler<GetPublicMenuQuery, Result<P
             {
                 Id = c.Id,
                 Name = c.Name,
-                Description = c.Description
+                Description = c.Description,
+                IsActive = c.IsActive
             })
             .ToListAsync(ct);
 
         var productQuery = _context.Products
+            .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(p => p.TenantId == request.TenantId && p.IsActive);
 
@@ -47,7 +50,8 @@ public class GetPublicMenuHandler : IRequestHandler<GetPublicMenuQuery, Result<P
                 Description = p.Description,
                 ImageUrl = p.ImageUrl,
                 CategoryId = p.CategoryId,
-                IsAvailable = p.IsAvailable
+                IsAvailable = p.IsAvailable,
+                IsActive = p.IsActive
             })
             .ToListAsync(ct);
 

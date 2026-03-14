@@ -22,8 +22,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadStats = async () => {
+    const loadStats = async (showLoading = false) => {
       try {
+        if (showLoading) setLoading(true);
         const res = await ownerReportService.getDashboardStats();
         if (res.isSuccess) {
           setStats(res.value);
@@ -31,10 +32,16 @@ export default function DashboardPage() {
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false);
+        if (showLoading) setLoading(false);
       }
     };
-    loadStats();
+
+    loadStats(true);
+    const timer = setInterval(() => {
+      loadStats(false);
+    }, 15000);
+
+    return () => clearInterval(timer);
   }, []);
 
   const formatMoney = (amount: number) => 
@@ -159,11 +166,11 @@ export default function DashboardPage() {
              <CardTitle className="text-primary">Thao tác nhanh</CardTitle>
            </CardHeader>
            <CardContent className="grid gap-2">
-              <Link href="/owner/products" className="flex items-center justify-between p-3 bg-background rounded-lg hover:shadow-sm transition-all cursor-pointer">
+                <Link href="/owner/menu" className="flex items-center justify-between p-3 bg-background rounded-lg hover:shadow-sm transition-all cursor-pointer">
                  <span className="font-medium text-sm">Thêm món mới</span>
                  <ArrowUpRight className="h-4 w-4 text-muted-foreground"/>
               </Link>
-              <Link href="/owner/branches" className="flex items-center justify-between p-3 bg-background rounded-lg hover:shadow-sm transition-all cursor-pointer">
+                <Link href="/owner/qr-codes" className="flex items-center justify-between p-3 bg-background rounded-lg hover:shadow-sm transition-all cursor-pointer">
                  <span className="font-medium text-sm">Tạo mã QR bàn</span>
                  <ArrowUpRight className="h-4 w-4 text-muted-foreground"/>
               </Link>

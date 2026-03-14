@@ -62,6 +62,60 @@ export default function CartPage() {
 
   const [submitting, setSubmitting] = useState(false);
 
+  // Đơn hàng hiện có (nếu có) - để thêm món vào đơn cũ
+  const [existingOrder, setExistingOrder] = useState<{
+    orderId: string;
+    status: number;
+  } | null>(null);
+
+  const toNumericStatus = (s: any): number => {
+    const str = String(s ?? "").toLowerCase();
+    if (str.includes("pending") || str.includes("new")) return 0;
+    if (str.includes("confirm")) return 1;
+    if (str.includes("prepar") || str.includes("cook") || str.includes("processing")) return 2;
+    if (str.includes("ready")) return 3;
+    if (str.includes("complete") || str.includes("served")) return 4;
+    if (str.includes("cancel")) return 5;
+    if (str.includes("paid")) return 6;
+
+    const n = Number(s);
+    return Number.isFinite(n) ? n : -1;
+  };
+
+  useEffect(() => {
+    const validateExistingOrder = async () => {
+      try {
+        const raw = localStorage.getItem("guest_last_order");
+        if (!raw) return;
+        const o = JSON.parse(raw);
+        if (!o?.orderId) return;
+
+        const statusRes = await guestService.getOrderStatus(String(o.orderId));
+        if (!statusRes?.isSuccess) {
+          const errCode = String(statusRes?.error?.code || "").toLowerCase();
+          if (errCode === "404" || errCode.includes("notfound")) {
+            localStorage.removeItem("guest_last_order");
+            setExistingOrder(null);
+          }
+          return;
+        }
+
+        const serverStatus = toNumericStatus(
+          statusRes.value?.status ?? statusRes.value?.orderStatus ?? statusRes.value?.state ?? o?.status
+        );
+
+        // Chỉ cho thêm nếu đơn chưa đóng (Pending=0, Confirmed=1, Cooking=2, Ready=3)
+        if (serverStatus >= 0 && serverStatus <= 3) {
+          setExistingOrder({ orderId: String(o.orderId), status: serverStatus });
+        } else {
+          setExistingOrder(null);
+        }
+      } catch {}
+    };
+
+    void validateExistingOrder();
+  }, []);
+
   // ✅ normalize qty/quantity để không crash + gửi đúng backend
   const getQty = (item: any) => {
     const q = item?.quantity ?? item?.qty ?? 0;
@@ -122,21 +176,65 @@ export default function CartPage() {
 
     setSubmitting(true);
     try {
-      // ✅ Payload chuẩn như yêu cầu backend
+      const newItems = safeCart.map((i) => ({
+        productId: i.id,
+        name: i.name,
+        quantity: i.__qty,
+        note: i.note || "",
+      }));
+
+      // ── Thêm vào đơn hiện có ─────────────────────────────
+      if (existingOrder) {
+        const res: any = await guestService.addItemsToOrder(existingOrder.orderId, {
+          tenantId: tableInfo.tenantId,
+          items: newItems,
+        });
+
+        if (res?.isSuccess) {
+          // Cập nhật snapshot local: gộp items mới vào
+          try {
+            const raw = localStorage.getItem("guest_last_order");
+            if (raw) {
+              const prev = JSON.parse(raw);
+              const addedItems = safeCart.map((i) => ({
+                id: i.id,
+                productId: i.id,
+                productName: i.name,
+                quantity: i.__qty,
+                note: i.note || "",
+                price: i.price,
+                status: 0,
+                imageUrl: i.imageUrl || "",
+              }));
+              prev.items = [...(prev.items || []), ...addedItems];
+              prev.totalAmount = (Number(prev.totalAmount) || 0) + computedTotal;
+              localStorage.setItem("guest_last_order", JSON.stringify(prev));
+            }
+          } catch {}
+
+          toast.success("Đã thêm món vào đơn!");
+          clearCart();
+          router.push(`/guest/t/${qrToken}/tracking`);
+          return;
+        }
+
+        const desc =
+          res?.error?.description || res?.error?.message || res?.message || "Vui lòng thử lại";
+        toast.error("Thêm món thất bại", { description: String(desc) });
+        return;
+      }
+
+      // ── Tạo đơn mới ──────────────────────────────────────
       const payload = {
         tenantId: tableInfo.tenantId,
         tableId: tableInfo.tableId,
-        items: safeCart.map((i) => ({
-          productId: i.id, // menuItemId
-          name: i.name,
-          quantity: i.__qty,
-          note: i.note || "",
-        })),
+        tableName: tableInfo.tableName,
+        branchId: tableInfo.branchId || "00000000-0000-0000-0000-000000000000",
+        items: newItems,
       };
 
       const res: any = await guestService.placeOrder(payload);
 
-      // Nếu backend trả về {isSuccess: true/false}
       if (res?.isSuccess) {
         const orderId =
           res?.value?.orderId ??
@@ -151,6 +249,7 @@ export default function CartPage() {
           tableName: tableInfo.tableName,
           items: safeCart.map((i) => ({
             id: i.id,
+            productId: i.id,
             productName: i.name,
             quantity: i.__qty,
             note: i.note || "",
@@ -171,7 +270,6 @@ export default function CartPage() {
         return;
       }
 
-      // ✅ show lỗi backend trả về khi isSuccess=false
       const desc =
         res?.error?.description ||
         res?.error?.message ||
@@ -181,15 +279,7 @@ export default function CartPage() {
 
       toast.error("Đặt món thất bại", { description: String(desc) });
     } catch (e: any) {
-      // ✅ FIX BONUS: show lỗi thật (khỏi "Lỗi kết nối máy chủ")
-      console.error("PLACE_ORDER_ERROR:", e);
-
       const desc = extractApiError(e);
-
-      // Nếu muốn kèm status code thì mở comment:
-      // const status = e?.response?.status;
-      // toast.error("Đặt món thất bại", { description: status ? `[${status}] ${desc}` : desc });
-
       toast.error("Đặt món thất bại", { description: desc });
     } finally {
       setSubmitting(false);
@@ -197,7 +287,7 @@ export default function CartPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-24" suppressHydrationWarning>
       <div className="bg-white p-4 shadow-sm flex items-center gap-2 sticky top-0 z-10">
         <Button variant="ghost" size="icon" onClick={() => router.back()} disabled={submitting}>
           <ArrowLeft className="h-5 w-5" />
@@ -206,6 +296,13 @@ export default function CartPage() {
       </div>
 
       <div className="p-4 space-y-4">
+        {/* Banner thêm vào đơn hiện có */}
+        {existingOrder && safeCart.length > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-700">
+            Đang có đơn hàng <span className="font-medium">#{existingOrder.orderId.substring(0, 8)}</span>. Món mới sẽ được <span className="font-semibold">thêm vào đơn đó</span> thay vì tạo đơn mới.
+          </div>
+        )}
+
         {safeCart.length === 0 ? (
           <div className="text-center py-10 text-gray-400">
             Giỏ hàng trống
@@ -240,6 +337,8 @@ export default function CartPage() {
                   onClick={() => removeFromCart(item.cartId ?? item.id)}
                   className="text-gray-400 hover:text-red-500"
                   disabled={submitting}
+                  aria-label="Xóa món"
+                  title="Xóa món"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -285,7 +384,11 @@ export default function CartPage() {
             onClick={placeOrder}
             disabled={submitting}
           >
-            {submitting ? "Đang gửi đơn..." : "Xác nhận đặt món"}
+            {submitting
+              ? "Đang gửi..."
+              : existingOrder
+              ? "Thêm vào đơn hiện tại"
+              : "Xác nhận đặt món"}
           </Button>
         </div>
       )}

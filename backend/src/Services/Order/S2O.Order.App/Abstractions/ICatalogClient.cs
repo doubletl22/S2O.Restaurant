@@ -4,5 +4,5 @@ namespace S2O.Order.App.Abstractions;
 
 public interface ICatalogClient
 {
-    Task<ProductResponse?> GetProductAsync(Guid productId, CancellationToken ct = default);
+    Task<ProductResponse?> GetProductAsync(Guid productId, Guid? tenantId = null, CancellationToken ct = default);
 }

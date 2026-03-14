@@ -61,12 +61,15 @@ export default function LoginPage() {
         else if (hasRole("RestaurantOwner") || hasRole("Owner")) {
           router.push("/owner/dashboard");
         } 
+        else if (hasRole("Manager")) {
+          router.push("/staff/order-ticket");
+        }
         else if (hasRole("Chef")) {
           router.push("/staff/kitchen");
-        } 
+        }
         else if (hasRole("Waiter") || hasRole("RestaurantStaff")) {
-          router.push("/staff/order-ticket"); // Hoặc /pos
-        } 
+          router.push("/staff/service");
+        }
         else {
           console.warn("User không có role hợp lệ:", roles);
           router.push("/");

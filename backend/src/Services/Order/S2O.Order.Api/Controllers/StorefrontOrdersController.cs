@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using S2O.Order.App.Features.Orders.Commands;
+using S2O.Order.App.Features.Orders.Queries;
 
 namespace S2O.Order.Api.Controllers;
 
@@ -16,6 +17,19 @@ public class StorefrontOrdersController : ControllerBase
         _sender = sender;
     }
 
+    // GET: api/v1/storefront/orders/{id} – Guest xem trạng thái đơn hàng
+    [HttpGet("{id:guid}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetGuestOrderStatus(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new GetGuestOrderStatusQuery(id), cancellationToken);
+
+        if (result.IsSuccess)
+            return Ok(new { isSuccess = true, value = result.Value });
+
+        return NotFound(new { isSuccess = false, error = new { code = result.Error.Code, description = result.Error.Description } });
+    }
+
     [HttpPost("guest")] // ✅ khớp /guest
     [AllowAnonymous]
     public async Task<IActionResult> PlaceGuestOrder(
@@ -25,8 +39,28 @@ public class StorefrontOrdersController : ControllerBase
         var result = await _sender.Send(command, cancellationToken);
 
         if (result.IsSuccess)
-            return Ok(result);
+            return Ok(new { isSuccess = true, value = new { orderId = result.Value } });
 
-        return BadRequest(result); // ✅ trả nguyên result cho frontend đọc lỗi
+        return BadRequest(new { isSuccess = false, error = new { code = result.Error.Code, description = result.Error.Description } }); // ✅ Safe response
+    }
+
+    // POST: api/v1/storefront/orders/{id}/items – Guest thêm món vào đơn hiện có
+    [HttpPost("{id:guid}/items")]
+    [AllowAnonymous]
+    public async Task<IActionResult> AddItemsToGuestOrder(
+        Guid id,
+        [FromBody] AddItemsToGuestOrderCommand command,
+        CancellationToken cancellationToken)
+    {
+        command.OrderId = id;
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsSuccess)
+            return Ok(new { isSuccess = true });
+
+        if (result.Error.Code == "Order.NotFound")
+            return NotFound(new { isSuccess = false, error = new { code = result.Error.Code, description = result.Error.Description } });
+
+        return BadRequest(new { isSuccess = false, error = new { code = result.Error.Code, description = result.Error.Description } });
     }
 }

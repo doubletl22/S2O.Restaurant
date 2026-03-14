@@ -18,7 +18,7 @@ public class TablesController : ControllerBase
 
     // GET: api/v1/tables
     [HttpGet]
-    [Authorize(Roles = "RestaurantOwner, Staff")]
+    [Authorize(Roles = "RestaurantOwner,RestaurantStaff,Manager,Chef,Waiter,Staff")]
     public async Task<IActionResult> GetTables([FromQuery] Guid? branchId)
     {
         // Nên thêm filter theo BranchId nếu quán có nhiều chi nhánh
