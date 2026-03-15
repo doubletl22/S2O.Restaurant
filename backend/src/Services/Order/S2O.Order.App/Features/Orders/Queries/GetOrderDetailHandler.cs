@@ -46,6 +46,7 @@ public class GetOrderDetailHandler : IRequestHandler<GetOrderDetailQuery, Result
 
             // Xử lý Null an toàn
             TableId = order.TableId.HasValue ? order.TableId.Value.ToString() : "Mang về",
+            TableName = order.TableName ?? string.Empty,
             Note = order.Note ?? string.Empty,
 
             TotalAmount = order.TotalAmount,
@@ -55,9 +56,13 @@ public class GetOrderDetailHandler : IRequestHandler<GetOrderDetailQuery, Result
             // Map danh sách món
             Items = order.Items.Select(i => new StaffOrderItemDto
             {
+                Id = i.Id.ToString(),
                 ProductId = i.ProductId.ToString(),
+                ProductName = i.ProductName,
                 Quantity = i.Quantity,
-                UnitPrice = i.UnitPrice
+                UnitPrice = i.UnitPrice,
+                Note = i.Note,
+                Status = i.Status,
             }).ToList()
         };
 
