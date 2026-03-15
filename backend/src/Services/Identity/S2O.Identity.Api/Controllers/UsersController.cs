@@ -38,7 +38,7 @@ public class UsersController : ControllerBase
     [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
-        var requesterRole = User.FindFirst(ClaimTypes.Role)?.Value;
+        var requesterRole = User.FindFirst("role")?.Value;
         var requesterTenantIdString = User.FindFirst("tenant_id")?.Value;
 
         Guid? targetTenantId;
