@@ -65,6 +65,10 @@ builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["ExternalServices:CatalogUrl"]!);
 })
 .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+builder.Services.AddHttpClient<ITableResolverClient, TableResolverClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ExternalServices:TenantUrl"]!);
+});
 
 var app = builder.Build();
 
@@ -101,6 +105,23 @@ using (var scope = app.Services.CreateScope())
         {
             context.Database.Migrate();
         }
+
+        // Backward-compatible hotfix for environments where Orders.OrderDate
+        // has not been created yet (older DB without latest schema).
+        context.Database.ExecuteSqlRaw(@"
+            ALTER TABLE ""Orders""
+            ADD COLUMN IF NOT EXISTS ""OrderDate"" timestamp with time zone NOT NULL DEFAULT NOW();
+        ");
+
+        context.Database.ExecuteSqlRaw(@"
+            ALTER TABLE ""OrderItems""
+            ADD COLUMN IF NOT EXISTS ""Status"" integer NOT NULL DEFAULT 0;
+        ");
+
+        context.Database.ExecuteSqlRaw(@"
+            ALTER TABLE ""OrderItems""
+            ADD COLUMN IF NOT EXISTS ""TotalPrice"" numeric(18,2) NOT NULL DEFAULT 0;
+        ");
     }
     catch (Exception ex)
     {

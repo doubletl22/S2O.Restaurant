@@ -28,4 +28,12 @@ public class StorefrontMenuController : ControllerBase
         // Code cũ của bạn return Ok(result) nên tôi giữ nguyên.
         return Ok(result);
     }
+
+    [HttpGet("{tenantId}/products/{productId}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetProduct(Guid tenantId, Guid productId)
+    {
+        var result = await _sender.Send(new GetPublicProductByIdQuery(tenantId, productId));
+        return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
+    }
 }

@@ -49,18 +49,46 @@ public class StorefrontTenantController : ControllerBase
             await _context.SaveChangesAsync();
         }
 
-            var tenant = await _context.Tenants
+        // Fallback for legacy data: some old tables were created without TenantId.
+        // Resolve tenant through BranchId to keep QR flow working.
+        var resolvedTenantId = table.TenantId;
+        string? resolvedTenantName = null;
+
+        if (resolvedTenantId == null && table.BranchId != null)
+        {
+            var branchTenant = await _context.Branches
                 .IgnoreQueryFilters()
                 .AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Id == table.TenantId);
-        if (tenant == null) return NotFound("Lỗi dữ liệu quán.");
+                .Where(b => b.Id == table.BranchId)
+                .Select(b => new { b.TenantId, b.Name })
+                .FirstOrDefaultAsync();
+
+            resolvedTenantId = branchTenant?.TenantId;
+            resolvedTenantName = branchTenant?.Name;
+
+            // Self-heal the table record for subsequent scans.
+            if (resolvedTenantId != null)
+            {
+                table.TenantId = resolvedTenantId;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        if (resolvedTenantId == null) return NotFound("Lỗi dữ liệu quán.");
+
+        var tenant = await _context.Tenants
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(t => t.Id == resolvedTenantId);
+
+        resolvedTenantName ??= tenant?.Name;
 
         return Ok(new
         {
             TableId = table.Id,
             TableName = table.Name,
-            TenantId = tenant.Id,
-            TenantName = tenant.Name,
+            TenantId = resolvedTenantId.Value,
+            TenantName = resolvedTenantName ?? string.Empty,
             BranchId = table.BranchId ?? Guid.Empty,
             IsOccupied = table.IsOccupied,
             ScannedAtUtc = DateTime.UtcNow

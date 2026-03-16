@@ -63,6 +63,7 @@ services:
       - Cloudinary__ApiKey=${CLOUDINARY_KEY}
       - Cloudinary__ApiSecret=${CLOUDINARY_SECRET}
       - ExternalServices__CatalogUrl=http://catalog-api:8080
+      - ExternalServices__TenantUrl=http://tenant-api:8080
     ports:
       - "5003:8080"
 

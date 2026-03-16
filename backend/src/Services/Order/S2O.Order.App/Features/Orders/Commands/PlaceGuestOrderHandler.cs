@@ -10,23 +10,39 @@ public class PlaceGuestOrderHandler : IRequestHandler<PlaceGuestOrderCommand, Re
 {
     private readonly IOrderDbContext _context;
     private readonly ICatalogClient _catalogClient; // Service gọi sang Catalog
+    private readonly ITableResolverClient _tableResolverClient;
 
-    public PlaceGuestOrderHandler(IOrderDbContext context, ICatalogClient catalogClient)
+    public PlaceGuestOrderHandler(
+        IOrderDbContext context,
+        ICatalogClient catalogClient,
+        ITableResolverClient tableResolverClient)
     {
         _context = context;
         _catalogClient = catalogClient;
+        _tableResolverClient = tableResolverClient;
     }
 
     public async Task<Result<Guid>> Handle(PlaceGuestOrderCommand request, CancellationToken ct)
     {
+        var resolvedTable = await _tableResolverClient.ResolveAsync(request.TableId, ct);
+        if (resolvedTable == null)
+        {
+            return Result<Guid>.Failure(new Error("Order.InvalidTable", "Không xác thực được bàn cho đơn hàng này."));
+        }
+
+        if (resolvedTable.TenantId == Guid.Empty || resolvedTable.BranchId == Guid.Empty)
+        {
+            return Result<Guid>.Failure(new Error("Order.InvalidTable", "Thông tin tenant hoặc chi nhánh của bàn không hợp lệ."));
+        }
+
         // 1. Tạo đơn hàng (Order Header)
         var order = new Domain.Entities.Order
         {
             Id = Guid.NewGuid(),
             TableId = request.TableId,
-            TableName = string.IsNullOrWhiteSpace(request.TableName) ? "Mang về" : request.TableName.Trim(),
-            TenantId = request.TenantId,
-            BranchId = request.BranchId, // ✅ Set BranchId
+            TableName = string.IsNullOrWhiteSpace(resolvedTable.TableName) ? "Mang về" : resolvedTable.TableName.Trim(),
+            TenantId = resolvedTable.TenantId,
+            BranchId = resolvedTable.BranchId,
             Status = OrderStatus.Pending, // Mới đặt, chờ bếp
             OrderDate = DateTime.UtcNow,
             TotalAmount = 0 // Sẽ cộng dồn bên dưới
@@ -38,7 +54,7 @@ public class PlaceGuestOrderHandler : IRequestHandler<PlaceGuestOrderCommand, Re
             // 3. QUAN TRỌNG: Gọi Catalog Service để lấy thông tin món ăn mới nhất
             // ✅ Pass tenantId để Catalog Service biết filter theo tenant nào
             // Giả sử hàm GetProductAsync trả về { Id, Name, Price, ImageUrl }
-            var productInfo = await _catalogClient.GetProductAsync(itemDto.ProductId, request.TenantId, ct);
+            var productInfo = await _catalogClient.GetProductAsync(itemDto.ProductId, resolvedTable.TenantId, ct);
 
             if (productInfo == null)
             {
@@ -56,7 +72,7 @@ public class PlaceGuestOrderHandler : IRequestHandler<PlaceGuestOrderCommand, Re
                 Quantity = itemDto.Quantity,
                 Note = itemDto.Note,
                 TotalPrice = productInfo.Price * itemDto.Quantity,
-                TenantId = request.TenantId
+                TenantId = resolvedTable.TenantId
             };
 
             order.Items.Add(orderItem);

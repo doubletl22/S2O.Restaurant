@@ -13,12 +13,9 @@ public class CatalogClient : ICatalogClient
     {
         try
         {
-            // ✅ Pass tenantId as query parameter để bypass global TenantId filter
-            var url = $"api/v1/products/{productId}";
-            if (tenantId.HasValue)
-            {
-                url += $"?tenantId={tenantId.Value}";
-            }
+            var url = tenantId.HasValue
+                ? $"api/v1/storefront/menus/{tenantId.Value}/products/{productId}"
+                : $"api/v1/products/{productId}";
             
             var response = await _httpClient.GetFromJsonAsync<ProductResponse>(url, ct);
             return response;

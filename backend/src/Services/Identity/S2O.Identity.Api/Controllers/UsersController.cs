@@ -38,12 +38,11 @@ public class UsersController : ControllerBase
     [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
-        var requesterRole = User.FindFirst("role")?.Value;
-        var requesterTenantIdString = User.FindFirst("tenant_id")?.Value;
+        var requesterTenantId = GetRequesterTenantId();
 
         Guid? targetTenantId;
 
-        if (requesterRole == "SystemAdmin")
+        if (User.IsInRole("SystemAdmin"))
         {
             // --- TRƯỜNG HỢP SYSTEM ADMIN ---
             // SystemAdmin đang tạo tài khoản cho Chủ nhà hàng (RestaurantOwner)
@@ -74,12 +73,12 @@ public class UsersController : ControllerBase
             }
 
             // Owner bắt buộc phải tạo Staff/User thuộc cùng Tenant với mình
-            if (string.IsNullOrEmpty(requesterTenantIdString))
+            if (!requesterTenantId.HasValue)
             {
                 return BadRequest("Lỗi Token: Tài khoản của bạn bị thiếu TenantId.");
             }
 
-            targetTenantId = Guid.Parse(requesterTenantIdString);
+            targetTenantId = requesterTenantId.Value;
         }
 
         // 3. Khởi tạo User
@@ -113,9 +112,12 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}/reset-password")]
-    // [Authorize(Roles = "SysAdmin")] 
+    [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
     public async Task<IActionResult> ResetPassword(Guid id, [FromBody] string newPassword)
     {
+        var scopeError = await ValidateManagedUserScopeAsync(id, newPassword);
+        if (scopeError != null) return scopeError;
+
         var command = new AdminResetPasswordCommand(id, newPassword);
         var result = await _sender.Send(command);
 
@@ -128,6 +130,9 @@ public class UsersController : ControllerBase
     [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
+        var scopeError = await ValidateManagedUserScopeAsync(id);
+        if (scopeError != null) return scopeError;
+
         var command = new DeleteUserCommand(id);
         var result = await _sender.Send(command);
 
@@ -141,14 +146,14 @@ public class UsersController : ControllerBase
     {
         if (id != command.UserId) return BadRequest("ID không khớp");
 
+        var scopeError = await ValidateManagedUserScopeAsync(id, command.NewRole);
+        if (scopeError != null) return scopeError;
+
         var result = await _sender.Send(command);
 
         if (result.IsFailure) return BadRequest(result.Error);
         return Ok(result.Value);
     }
-    [HttpPut("{id}")]
-    [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
-
 
     [HttpPost("{id}/lock")]
     [Authorize(Roles = "SystemAdmin")]
@@ -237,6 +242,64 @@ public class UsersController : ControllerBase
             Size = size,
             TotalPages = (int)Math.Ceiling(totalCount / (double)size)
         });
+    }
+
+    private Guid? GetRequesterTenantId()
+    {
+        var tenantClaim = User.FindFirst("tenant_id")?.Value
+            ?? User.FindFirst("tenantId")?.Value
+            ?? User.FindFirst("TenantId")?.Value;
+
+        return Guid.TryParse(tenantClaim, out var tenantId) ? tenantId : null;
+    }
+
+    private async Task<IActionResult?> ValidateManagedUserScopeAsync(Guid targetUserId, string? nextRole = null)
+    {
+        if (string.IsNullOrWhiteSpace(nextRole) == false)
+        {
+            nextRole = nextRole.Trim();
+        }
+
+        var targetUser = await _userManager.FindByIdAsync(targetUserId.ToString());
+        if (targetUser == null)
+        {
+            return NotFound("Không tìm thấy user");
+        }
+
+        if (User.IsInRole("SystemAdmin"))
+        {
+            return null;
+        }
+
+        if (!User.IsInRole("RestaurantOwner"))
+        {
+            return Forbid();
+        }
+
+        var requesterTenantId = GetRequesterTenantId();
+        if (!requesterTenantId.HasValue)
+        {
+            return BadRequest("Lỗi Token: Tài khoản của bạn bị thiếu TenantId.");
+        }
+
+        if (targetUser.TenantId != requesterTenantId.Value)
+        {
+            return Forbid();
+        }
+
+        var targetRoles = await _userManager.GetRolesAsync(targetUser);
+        if (targetRoles.Contains("SystemAdmin") || targetRoles.Contains("RestaurantOwner"))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, "Bạn không đủ quyền thao tác với tài khoản này.");
+        }
+
+        if (string.Equals(nextRole, "SystemAdmin", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(nextRole, "RestaurantOwner", StringComparison.OrdinalIgnoreCase))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, "Bạn không đủ quyền gán vai trò này.");
+        }
+
+        return null;
     }
 
 }

@@ -87,13 +87,21 @@ public class OrdersController : ControllerBase
 
     // GET: api/v1/orders/active?branchId=...
     [HttpGet("active")]
-    // [Authorize(Roles = "RestaurantOwner, Staff")] // Nên bật Authorize
+    [Authorize(Roles = "RestaurantOwner, Staff, Manager")]
     public async Task<IActionResult> GetActiveOrders([FromQuery] Guid branchId)
     {
+        var branchScopeResult = ResolveRequestedBranch(branchId);
+        if (branchScopeResult.error != null)
+        {
+            return branchScopeResult.error;
+        }
+
+        var effectiveBranchId = branchScopeResult.branchId!.Value;
+
         // [FIX 2] Sử dụng _context đã inject ở trên
         var orders = await _context.Orders
             .Include(o => o.Items)
-            .Where(o => o.BranchId == branchId
+            .Where(o => o.BranchId == effectiveBranchId
                         // [FIX 3] So sánh với Enum thay vì string "Paid"
                         && o.Status != OrderStatus.Paid
                         && o.Status != OrderStatus.Cancelled)
@@ -204,5 +212,31 @@ public class OrdersController : ControllerBase
         var tenantClaim = User.FindFirst("tenant_id")?.Value;
         if (string.IsNullOrEmpty(tenantClaim)) return Guid.Empty;
         return Guid.Parse(tenantClaim);
+    }
+
+    private (Guid? branchId, IActionResult? error) ResolveRequestedBranch(Guid requestedBranchId)
+    {
+        if (User.IsInRole("RestaurantOwner"))
+        {
+            if (requestedBranchId == Guid.Empty)
+            {
+                return (null, BadRequest("BranchId là bắt buộc."));
+            }
+
+            return (requestedBranchId, null);
+        }
+
+        var branchIdFromToken = GetBranchIdFromToken();
+        if (branchIdFromToken == Guid.Empty)
+        {
+            return (null, BadRequest("Không xác định được chi nhánh."));
+        }
+
+        if (requestedBranchId != Guid.Empty && requestedBranchId != branchIdFromToken)
+        {
+            return (null, Forbid());
+        }
+
+        return (branchIdFromToken, null);
     }
 }

@@ -11,11 +11,16 @@ public class AddItemsToGuestOrderHandler : IRequestHandler<AddItemsToGuestOrderC
 {
     private readonly IOrderDbContext _context;
     private readonly ICatalogClient _catalogClient;
+    private readonly ITableResolverClient _tableResolverClient;
 
-    public AddItemsToGuestOrderHandler(IOrderDbContext context, ICatalogClient catalogClient)
+    public AddItemsToGuestOrderHandler(
+        IOrderDbContext context,
+        ICatalogClient catalogClient,
+        ITableResolverClient tableResolverClient)
     {
         _context = context;
         _catalogClient = catalogClient;
+        _tableResolverClient = tableResolverClient;
     }
 
     public async Task<Result> Handle(AddItemsToGuestOrderCommand request, CancellationToken ct)
@@ -32,12 +37,25 @@ public class AddItemsToGuestOrderHandler : IRequestHandler<AddItemsToGuestOrderC
             order.Status == OrderStatus.Paid)
             return Result.Failure(new Error("Order.Closed", "Đơn hàng đã đóng, không thể thêm món."));
 
+        if (!order.TableId.HasValue)
+            return Result.Failure(new Error("Order.InvalidTable", "Đơn hàng không gắn với bàn hợp lệ."));
+
+        var resolvedTable = await _tableResolverClient.ResolveAsync(order.TableId.Value, ct);
+        if (resolvedTable == null)
+            return Result.Failure(new Error("Order.InvalidTable", "Không xác thực được bàn cho đơn hàng này."));
+
+        if (order.TenantId != resolvedTable.TenantId || order.BranchId != resolvedTable.BranchId)
+            return Result.Failure(new Error("Order.ScopeMismatch", "Thông tin đơn hàng không còn khớp với bàn hiện tại."));
+
+        if (request.TenantId != Guid.Empty && order.TenantId.HasValue && request.TenantId != order.TenantId.Value)
+            return Result.Failure(new Error("Order.ScopeMismatch", "TenantId không hợp lệ."));
+
         foreach (var itemDto in request.Items)
         {
             if (itemDto.Quantity <= 0)
                 return Result.Failure(new Error("Order.InvalidQuantity", "Số lượng món phải lớn hơn 0."));
 
-            var productInfo = await _catalogClient.GetProductAsync(itemDto.ProductId, request.TenantId, ct);
+            var productInfo = await _catalogClient.GetProductAsync(itemDto.ProductId, order.TenantId, ct);
 
             if (productInfo == null)
                 return Result.Failure(new Error("Order.ProductNotFound",

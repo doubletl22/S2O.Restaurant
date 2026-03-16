@@ -19,11 +19,20 @@ public class KitchenController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "RestaurantOwner, Staff, Manager, Chef")]
     public async Task<IActionResult> GetKitchenTickets([FromQuery] Guid branchId)
     {
+        var branchScopeResult = ResolveRequestedBranch(branchId);
+        if (branchScopeResult.error != null)
+        {
+            return branchScopeResult.error;
+        }
+
+        var effectiveBranchId = branchScopeResult.branchId!.Value;
+
         var activeOrders = await _context.Orders
             .Include(o => o.Items)
-            .Where(o => o.BranchId == branchId
+            .Where(o => o.BranchId == effectiveBranchId
                         && o.Status != OrderStatus.Paid
                         && o.Status != OrderStatus.Cancelled)
             .OrderBy(o => o.OrderDate) 
@@ -60,5 +69,37 @@ public class KitchenController : ControllerBase
     {
         // TODO: Implement logic update status món ăn
         return Ok(new { message = "Update status success" });
+    }
+
+    private Guid GetBranchIdFromToken()
+    {
+        var branchClaim = User.FindFirst("branch_id")?.Value;
+        return Guid.TryParse(branchClaim, out var branchId) ? branchId : Guid.Empty;
+    }
+
+    private (Guid? branchId, IActionResult? error) ResolveRequestedBranch(Guid requestedBranchId)
+    {
+        if (User.IsInRole("RestaurantOwner"))
+        {
+            if (requestedBranchId == Guid.Empty)
+            {
+                return (null, BadRequest("BranchId là bắt buộc."));
+            }
+
+            return (requestedBranchId, null);
+        }
+
+        var branchIdFromToken = GetBranchIdFromToken();
+        if (branchIdFromToken == Guid.Empty)
+        {
+            return (null, BadRequest("Không xác định được chi nhánh."));
+        }
+
+        if (requestedBranchId != Guid.Empty && requestedBranchId != branchIdFromToken)
+        {
+            return (null, Forbid());
+        }
+
+        return (branchIdFromToken, null);
     }
 }
