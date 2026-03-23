@@ -81,6 +81,11 @@ services:
       - Jwt__Key=S2O_Super_Secret_Key_For_Identity_Service_2026
       - Jwt__Issuer=S2O.Identity
       - Jwt__Audience=S2O.Restaurant
+      - ExternalServices__IdentityApiBaseUrl=http://identity-api:8080
+      - ExternalServices__CatalogApiBaseUrl=http://catalog-api:8080
+      - ExternalServices__OrderApiBaseUrl=http://order-api:8080
+      - ExternalServices__BookingApiBaseUrl=http://booking-api:8080
+      - ExternalServices__PaymentApiBaseUrl=http://payment-api:8080
     depends_on:
       - rabbitmq
     ports:  

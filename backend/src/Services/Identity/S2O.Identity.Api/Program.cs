@@ -120,7 +120,11 @@ using (var scope = app.Services.CreateScope())
         }
 
         logger.LogInformation("Seeding Data...");
-        await IdentityDataSeeder.SeedAsync(userManager, roleManager, context);
+        await IdentityDataSeeder.SeedAsync(
+            userManager,
+            roleManager,
+            context,
+            resetAdminPassword: app.Environment.IsDevelopment());
         logger.LogInformation("Seeding Completed.");
     }
     catch (Exception ex)
