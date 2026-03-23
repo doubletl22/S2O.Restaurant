@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using S2O.Shared.Kernel.Results;
 using S2O.Tenant.App.Abstractions;
 
@@ -20,8 +21,26 @@ public class DeleteTenantHandler : IRequestHandler<DeleteTenantCommand, Result<b
         var tenant = await _context.Tenants.FindAsync(new object[] { request.Id }, ct);
         if (tenant == null) return Result<bool>.Failure(new Error("Tenant.NotFound", "Không tìm thấy nhà hàng"));
 
-        // Xóa cứng (Hard Delete) hoặc Soft Delete tùy nghiệp vụ. 
-        // Ở đây làm xóa cứng để dọn sạch dữ liệu test.
+        var tables = await _context.Tables
+            .IgnoreQueryFilters()
+            .Where(t => t.TenantId == request.Id)
+            .ToListAsync(ct);
+
+        var branches = await _context.Branches
+            .IgnoreQueryFilters()
+            .Where(b => b.TenantId == request.Id)
+            .ToListAsync(ct);
+
+        if (tables.Count > 0)
+        {
+            _context.Tables.RemoveRange(tables);
+        }
+
+        if (branches.Count > 0)
+        {
+            _context.Branches.RemoveRange(branches);
+        }
+
         _context.Tenants.Remove(tenant);
 
         await _context.SaveChangesAsync(ct);

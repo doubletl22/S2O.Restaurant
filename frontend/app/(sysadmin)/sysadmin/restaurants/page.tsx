@@ -23,11 +23,13 @@ export default function RestaurantsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
-  const loadData = async () => {
+  const loadData = async (keyword?: string) => {
     try {
       setLoading(true);
-      const res = await tenantService.getAll();
+      const res = await tenantService.getAll(keyword);
       
       if (res && res.isSuccess && Array.isArray(res.value)) {
         setTenants(res.value);
@@ -46,8 +48,16 @@ export default function RestaurantsPage() {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    const timer = setTimeout(() => {
+      loadData(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleToggleLock = async (tenant: Tenant) => {
     // Nếu đang khóa (isLocked=true) -> Cần mở (isLocked mới = false)
@@ -90,9 +100,14 @@ export default function RestaurantsPage() {
     }
   };
 
-  const filteredTenants = tenants.filter(t => 
-    t.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const totalPages = Math.max(1, Math.ceil(tenants.length / pageSize));
+  const pagedTenants = tenants.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   return (
     <div className="space-y-6">
@@ -106,11 +121,11 @@ export default function RestaurantsPage() {
         </Button>
       </div>
 
-      <div className="flex items-center gap-2 bg-card p-2 rounded-md border w-full sm:max-w-sm">
-        <Search className="h-4 w-4 text-muted-foreground ml-2" />
+      <div className="flex bg-card p-2 rounded-md border w-full sm:max-w-sm">
+        <Search className="h-4 w-4 text-muted-foreground ml-2 mt-3" />
         <Input 
           placeholder="Tìm kiếm nhà hàng..." 
-          className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="border-0 focus-visible:ring-0"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -120,7 +135,7 @@ export default function RestaurantsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Tên Nhà hàng</TableHead>
+              <TableHead>Nhà hàng</TableHead>
               <TableHead>Gói cước</TableHead>
               <TableHead>Trạng thái</TableHead>
               <TableHead>Ngày tạo</TableHead>
@@ -131,19 +146,19 @@ export default function RestaurantsPage() {
           <TableBody>
             {loading ? (
                <TableRow><TableCell colSpan={5} className="text-center h-24">Đang tải...</TableCell></TableRow>
-            ) : filteredTenants.length === 0 ? (
+            ) : tenants.length === 0 ? (
               <TableRow><TableCell colSpan={5} className="text-center h-32">Không có dữ liệu.</TableCell></TableRow>
             ) : (
-              filteredTenants.map((tenant) => (
+              pagedTenants.map((tenant) => (
                 <TableRow key={tenant.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded bg-primary/10 flex items-center justify-center">
-                        <Building2 className="h-4 w-4 text-primary" />
+                      <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center border">
+                        <Building2 className="h-5 w-5 text-slate-500" />
                       </div>
                       <div className="flex flex-col">
                         <span>{tenant.name}</span>
-                        <span className="text-xs text-muted-foreground">{tenant.id}</span>
+                        <span className="text-xs text-muted-foreground truncate max-w-[260px]">{tenant.id}</span>
                       </div>
                     </div>
                   </TableCell>
@@ -156,11 +171,9 @@ export default function RestaurantsPage() {
 
                   <TableCell>
                     {tenant.isLocked ? (
-                      <Badge variant="destructive" className="gap-1"><Lock className="h-3 w-3" /> Đã khóa</Badge>
+                      <Badge variant="destructive">Locked</Badge>
                     ) : (
-                      <Badge variant="secondary" className="gap-1 bg-green-100 text-green-700 hover:bg-green-200">
-                        <Unlock className="h-3 w-3" /> Hoạt động
-                      </Badge>
+                      <Badge variant="secondary" className="text-green-600 bg-green-50">Active</Badge>
                     )}
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
@@ -189,6 +202,30 @@ export default function RestaurantsPage() {
             )}
           </TableBody>
         </Table>
+        <div className="flex items-center justify-between border-t px-4 py-3 text-sm">
+          <div className="text-muted-foreground">
+            Hiển thị {pagedTenants.length} / {tenants.length} nhà hàng
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Trước
+            </Button>
+            <span className="text-muted-foreground">Trang {currentPage}/{totalPages}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Sau
+            </Button>
+          </div>
+        </div>
       </div>
       
       {/* Dialogs logic... */}

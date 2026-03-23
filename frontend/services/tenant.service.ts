@@ -5,9 +5,9 @@ const ENDPOINT = "/api/v1/tenants";
 
 export const tenantService = {
   // GET All
-  getAll: async (): Promise<Result<Tenant[]>> => {
+  getAll: async (keyword?: string): Promise<Result<Tenant[]>> => {
     // Interceptor đã trả về data (Result object), ta chỉ cần ép kiểu về Result<Tenant[]>
-    const response = await http.get<Result<Tenant[]>>(ENDPOINT);
+    const response = await http.get<Result<Tenant[]>>(ENDPOINT, { params: { keyword } });
     return response as unknown as Result<Tenant[]>;
   },
 

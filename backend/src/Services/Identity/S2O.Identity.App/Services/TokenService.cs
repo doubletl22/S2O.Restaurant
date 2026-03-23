@@ -2,7 +2,6 @@
 using Microsoft.IdentityModel.Tokens;
 using S2O.Identity.Domain.Entities;
 using S2O.Shared.Kernel.Constants;
-using System.Data;
 using System.IdentityModel.Tokens.Jwt; // Thư viện chính cho TokenHandler
 using System.Security.Claims;
 using System.Text;
@@ -30,7 +29,8 @@ public class TokenService
         }
         foreach (var role in roles)
         {
-            claims.Add(new Claim(ClaimTypes.Role, role));
+            // Keep this aligned with Shared.Infra Jwt config (RoleClaimType = "role").
+            claims.Add(new Claim("role", role));
         }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Secret"] ?? throw new InvalidOperationException("JWT Secret is missing")));

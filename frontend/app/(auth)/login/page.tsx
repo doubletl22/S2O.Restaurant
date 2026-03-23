@@ -18,6 +18,26 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit } = useForm<LoginRequest>();
 
+  const getErrorMessage = (error: any): string => {
+    if (!error) return "Đăng nhập thất bại";
+
+    // Trường hợp interceptor trả thẳng payload lỗi từ backend
+    if (typeof error === "object") {
+      if (typeof error.description === "string") return error.description;
+      if (typeof error.detail === "string") return error.detail;
+      if (typeof error.title === "string") return error.title;
+
+      // Trường hợp vẫn nhận AxiosError gốc
+      const responseData = error.response?.data;
+      if (typeof responseData?.description === "string") return responseData.description;
+      if (typeof responseData?.detail === "string") return responseData.detail;
+      if (typeof responseData?.title === "string") return responseData.title;
+    }
+
+    if (typeof error.message === "string") return error.message;
+    return "Đăng nhập thất bại";
+  };
+
   const onSubmit = async (data: LoginRequest) => {
     setIsLoading(true);
 
@@ -79,15 +99,8 @@ export default function LoginPage() {
       }
     } catch (error: any) {
       console.error("Login Error:", error);
-      
-      let msg = "Đăng nhập thất bại";
-      if (error?.response?.data?.detail) {
-        msg = error.response.data.detail;
-      } else if (error?.response?.data?.title) {
-        msg = error.response.data.title; // Lỗi 400 validation
-      } else if (error?.message) {
-        msg = error.message;
-      }
+
+      const msg = getErrorMessage(error);
 
       toast.error("Lỗi đăng nhập", { description: msg });
     } finally {

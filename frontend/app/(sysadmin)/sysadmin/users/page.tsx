@@ -19,6 +19,8 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   
   // Create User State
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -32,7 +34,7 @@ export default function UsersPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const res = await adminService.getSystemUsers();
+      const res = await adminService.getSystemUsers({ page: 1, size: 1000 });
       
       // Kiểm tra res có dữ liệu items không (PagedResult)
       if (res && Array.isArray(res.items)) {
@@ -49,6 +51,7 @@ export default function UsersPage() {
   };
 
   useEffect(() => { loadData(); }, []);
+  useEffect(() => { setCurrentPage(1); }, [searchTerm]);
 
   const handleCreateUser = async () => {
       try {
@@ -112,6 +115,15 @@ export default function UsersPage() {
     (u.fullName?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   );
 
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / pageSize));
+  const pagedUsers = filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -134,7 +146,7 @@ export default function UsersPage() {
         />
       </div>
 
-      <div className="rounded-md border bg-card">
+      <div className="rounded-md border bg-card max-h-[65vh] overflow-y-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -146,7 +158,7 @@ export default function UsersPage() {
           </TableHeader>
           <TableBody>
             {loading ? <TableRow><TableCell colSpan={4} className="text-center h-24">Đang tải...</TableCell></TableRow> : 
-            filteredUsers.map((user) => (
+            pagedUsers.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -194,6 +206,30 @@ export default function UsersPage() {
             ))}
           </TableBody>
         </Table>
+        <div className="flex items-center justify-between border-t px-4 py-3 text-sm">
+          <div className="text-muted-foreground">
+            Hiển thị {pagedUsers.length} / {filteredUsers.length} người dùng
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Trước
+            </Button>
+            <span className="text-muted-foreground">Trang {currentPage}/{totalPages}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Sau
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Dialog Create Admin */}

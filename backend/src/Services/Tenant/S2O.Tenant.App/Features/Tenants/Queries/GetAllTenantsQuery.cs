@@ -8,7 +8,7 @@ namespace S2O.Tenant.App.Features.Tenants.Queries;
 // DTO trả về
 public record TenantDto(Guid Id, string Name, string Plan, bool IsLocked, DateTime CreatedAt);
 
-public record GetAllTenantsQuery : IRequest<Result<List<TenantDto>>>;
+public record GetAllTenantsQuery(string? Keyword = null) : IRequest<Result<List<TenantDto>>>;
 
 public class GetAllTenantsHandler : IRequestHandler<GetAllTenantsQuery, Result<List<TenantDto>>>
 {
@@ -22,8 +22,17 @@ public class GetAllTenantsHandler : IRequestHandler<GetAllTenantsQuery, Result<L
     public async Task<Result<List<TenantDto>>> Handle(GetAllTenantsQuery request, CancellationToken ct)
     {
         // Super Admin được quyền xem hết, không lọc theo TenantId
-        var tenants = await _context.Tenants
+        var query = _context.Tenants
             .AsNoTracking()
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(request.Keyword))
+        {
+            var keyword = request.Keyword.Trim().ToLower();
+            query = query.Where(t => t.Name.ToLower().Contains(keyword));
+        }
+
+        var tenants = await query
             .Select(t => new TenantDto(t.Id, t.Name, t.SubscriptionPlan, t.IsLocked, t.CreatedAt))
             .ToListAsync(ct);
 
