@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/products?page=1&size=10&keyword=&categoryId="
+method: GET
+queryParams:
+  page: "1"
+  size: "10"
+  keyword: ""
+  categoryId: ""
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("List products success", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 204]);
+      });
+    language: text/javascript
+order: 2000

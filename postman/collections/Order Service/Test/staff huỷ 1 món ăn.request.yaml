@@ -1,0 +1,22 @@
+$kind: http-request
+name: staff huỷ 1 món ăn
+url: "{{baseUrl}}/api/v1/orders/{{orderId}}/items/{{lastOrderId}}"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+        "quantity": 0
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Hủy/Xóa món ăn thành công", function () {
+          pm.response.to.be.success;
+      });
+    language: text/javascript
+order: 4496229984723288

@@ -1,0 +1,35 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/products/{{product_id}}"
+method: PUT
+body:
+  type: formdata
+  content:
+    - type: text
+      key: Id
+      value: "{{product_id}}"
+    - type: text
+      key: Name
+      value: Tra dao cap nhat
+    - type: text
+      key: Description
+      value: Da cap nhat mo ta
+    - type: text
+      key: Price
+      value: "32000"
+    - type: text
+      key: CategoryId
+      value: "{{category_id}}"
+    - type: text
+      key: IsActive
+      value: "true"
+    - type: file
+      key: ImageFile
+      src: ""
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Update product success", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 204]);
+      });
+    language: text/javascript
+order: 4000

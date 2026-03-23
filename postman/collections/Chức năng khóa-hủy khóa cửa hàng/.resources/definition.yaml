@@ -1,0 +1,13 @@
+$kind: collection
+name: Chức năng khóa/hủy khóa cửa hàng
+variables:
+  c_email: ""
+  c_password: ""
+  c_token: ""
+  kw: ""
+  c_tenant_id: ""
+  tenant_name: ""
+  tenant_search_keyword: ""
+  tenant_search_count: ""
+  tenant_search_list_json: ""
+  tenant_locked_status: ""

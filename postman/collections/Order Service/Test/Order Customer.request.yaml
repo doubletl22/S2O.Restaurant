@@ -1,0 +1,36 @@
+$kind: http-request
+name: Order Customer
+url: "{{baseUrl}}/api/v1/orders/customer"
+method: POST
+body:
+  type: json
+  content: >-
+    {
+        "tableId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "userName": "Nguyễn Văn A",
+        "items": [
+            { "productId": "3fa85f64-5717-4562-b3fc-2c963f66afa6", "quantity": 2 }
+        ]
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{baseUrl}}"
+scripts:
+  - type: afterResponse
+    code: >-
+      pm.test("Tạo đơn hàng thành công", function () {
+          pm.response.to.be.success;
+      });
+
+
+      pm.test("Nghiệm thu Bug: Có OrderNumber và OrderDate", function () {
+          var jsonData = pm.response.json();
+          pm.expect(jsonData.orderNumber).to.not.be.empty;
+          pm.expect(jsonData.orderDate).to.not.include("0001-01-01"); // Không được là ngày mặc định
+          
+          // Lưu ID đơn hàng lại cho bước sau
+          pm.environment.set("orderId", jsonData.id);
+      });
+    language: text/javascript
+order: 1774199801905

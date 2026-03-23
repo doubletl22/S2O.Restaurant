@@ -1,0 +1,63 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/tenants"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{c_token}}"
+scripts:
+  - type: afterResponse
+    code: "let res = {};\r
+
+      try { res = pm.response.json(); } catch (e) { res = {}; }\r
+
+      \r
+
+      pm.test(\"Verify list tenant HTTP 200\", function () {\r
+
+      \  pm.expect(pm.response.code).to.eql(200);\r
+
+      });\r
+
+      \r
+
+      const items = Array.isArray(res.value) ? res.value : [];\r
+
+      const cTenantId = pm.collectionVariables.get(\"c_tenant_id\");\r
+
+      const found = items.find(x => String(x.id) === String(cTenantId));\r
+
+      \r
+
+      pm.test(\"Tìm thấy tenant vừa thao tác\", function () {\r
+
+      \  pm.expect(found).to.not.eql(undefined);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Tenant đã bị khóa\", function () {\r
+
+      \  pm.expect(Boolean(found?.isLocked)).to.eql(true);\r
+
+      });\r
+
+      \r
+
+      pm.collectionVariables.set(\"tenant_locked_status\",
+      String(Boolean(found?.isLocked)));\r
+
+      \r
+
+      console.log(\"Verify lock:\", {\r
+
+      \  id: cTenantId,\r
+
+      \  name: found?.name || \"\",\r
+
+      \  isLocked: found?.isLocked\r
+
+      });"
+    language: text/javascript
+order: 4000

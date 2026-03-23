@@ -1,0 +1,112 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/tenants/{{c_tenant_id}}/lock"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{c_token}}"
+scripts:
+  - type: afterResponse
+    code: "let res = {};\r
+
+      try { res = pm.response.json(); } catch (e) { res = {}; }\r
+
+      \r
+
+      const cTenantId = pm.collectionVariables.get(\"c_tenant_id\");\r
+
+      const tenantName = pm.collectionVariables.get(\"tenant_name\");\r
+
+      \r
+
+      // 1) Guard: phải có c_tenant_id trước khi lock\r
+
+      pm.test(\"c_tenant_id đã được set\", function () {\r
+
+      \  pm.expect(cTenantId).to.be.a(\"string\").and.not.empty;\r
+
+      });\r
+
+      \r
+
+      // 2) Nếu lỗi thì show rõ nguyên nhân để debug\r
+
+      if (pm.response.code >= 400) {\r
+
+      \  const errCode = res.code || res.error?.code || \"UNKNOWN_ERROR\";\r
+
+      \  const errMsg = res.description || res.error?.description || res.message
+      || \"Unknown error\";\r
+
+      \r
+
+      \  pm.collectionVariables.set(\"tenant_locked_status\", \"false\");\r
+
+      \r
+
+      \  pm.test(`Lock thất bại (${pm.response.code}) - ${errCode}`, function ()
+      {\r
+
+      \    pm.expect.fail(`${errCode}: ${errMsg} | c_tenant_id=${cTenantId}`);\r
+
+      \  });\r
+
+      \r
+
+      \  console.log(\"Lock failed:\", {\r
+
+      \    status: pm.response.code,\r
+
+      \    c_tenant_id: cTenantId,\r
+
+      \    tenant_name: tenantName,\r
+
+      \    error_code: errCode,\r
+
+      \    error_message: errMsg\r
+
+      \  });\r
+
+      } else {\r
+
+      \  // 3) Thành công\r
+
+      \  pm.test(\"Lock tenant thành công\", function () {\r
+
+      \    pm.expect([200, 204]).to.include(pm.response.code);\r
+
+      \  });\r
+
+      \r
+
+      \  // nếu backend trả Result object thì check thêm\r
+
+      \  if (Object.prototype.hasOwnProperty.call(res, \"isSuccess\")) {\r
+
+      \    pm.test(\"isSuccess = true\", function () {\r
+
+      \      pm.expect(res.isSuccess).to.eql(true);\r
+
+      \    });\r
+
+      \  }\r
+
+      \r
+
+      \  pm.collectionVariables.set(\"tenant_locked_status\", \"true\");\r
+
+      \r
+
+      \  console.log(\"Locked tenant:\", {\r
+
+      \    id: cTenantId,\r
+
+      \    name: tenantName,\r
+
+      \    status: pm.collectionVariables.get(\"tenant_locked_status\")\r
+
+      \  });\r
+
+      }"
+    language: text/javascript
+order: 3000

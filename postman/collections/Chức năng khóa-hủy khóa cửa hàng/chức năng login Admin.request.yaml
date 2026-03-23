@@ -1,0 +1,115 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/auth/login"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"email\": \"{{c_email}}\",\r
+
+    \  \"password\": \"{{c_password}}\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "let res = {};\r
+
+      try {\r
+
+      \  res = pm.response.json();\r
+
+      } catch (e) {\r
+
+      \  res = {};\r
+
+      }\r
+
+      \r
+
+      // reset biến cho flow lock cửa hàng\r
+
+      [\r
+
+      \  \"c_token\",\r
+
+      \  \"tenant_id\",\r
+
+      \  \"tenant_name\",\r
+
+      \  \"tenant_locked_status\",\r
+
+      \  \"tenant_search_keyword\",\r
+
+      \  \"tenant_search_count\",\r
+
+      \  \"tenant_search_list_json\"\r
+
+      ].forEach((k) => pm.collectionVariables.unset(k));\r
+
+      \r
+
+      // lấy token\r
+
+      const c_token =\r
+
+      \  res.accessToken ||\r
+
+      \  res.AccessToken ||\r
+
+      \  (res.value && (res.value.accessToken || res.value.AccessToken)) ||\r
+
+      \  \"\";\r
+
+      \r
+
+      pm.test(\"Login admin thành công\", function () {\r
+
+      \  pm.expect(pm.response.code).to.eql(200);\r
+
+      \  pm.expect(c_token).to.be.a(\"string\").and.not.empty;\r
+
+      });\r
+
+      \r
+
+      if (!c_token) {\r
+
+      \  pm.expect.fail(\"Không lấy được c_token\");\r
+
+      }\r
+
+      \r
+
+      // lưu token\r
+
+      pm.collectionVariables.set(\"c_token\", c_token);\r
+
+      \r
+
+      // check role nếu có\r
+
+      const roles =\r
+
+      \  (res.user && res.user.roles) ||\r
+
+      \  (res.value && res.value.user && res.value.user.roles) ||\r
+
+      \  [];\r
+
+      \r
+
+      if (Array.isArray(roles) && roles.length > 0) {\r
+
+      \  pm.test(\"Đúng role SystemAdmin\", function () {\r
+
+      \    pm.expect(roles).to.include(\"SystemAdmin\");\r
+
+      \  });\r
+
+      }\r
+
+      \r
+
+      console.log(\"Login OK, c_token ready\");"
+    language: text/javascript
+order: 1000

@@ -1,0 +1,25 @@
+$kind: http-request
+name: Đăng nhập
+url: "{{baseUrl}}/api/v1/auth/login"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "email": "staffkfc2@s2o.com",
+        "password": "Admin@123"
+    }
+scripts:
+  - type: afterResponse
+    code: >-
+      pm.test("Đăng nhập thành công", function () {
+          pm.response.to.have.status(200);
+      });
+
+
+      pm.test("Lưu Token tự động", function () {
+          var jsonData = pm.response.json();
+          pm.environment.set("token", jsonData.accessToken); // Lưu token vào biến môi trường
+      });
+    language: text/javascript
+order: 1774199389152

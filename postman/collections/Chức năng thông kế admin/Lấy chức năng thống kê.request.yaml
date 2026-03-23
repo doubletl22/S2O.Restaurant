@@ -1,0 +1,89 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/admin/stats"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{c_token}}"
+scripts:
+  - type: afterResponse
+    code: "let res = {};\r
+
+      try {\r
+
+      \  res = pm.response.json();\r
+
+      } catch (e) {\r
+
+      \  res = {};\r
+
+      }\r
+
+      \r
+
+      pm.test(\"Admin stats trả về 200\", function () {\r
+
+      \  pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      const ok = res.isSuccess === true || res.IsSuccess === true;\r
+
+      const value = res.value || res.Value || {};\r
+
+      \r
+
+      pm.test(\"Payload stats hợp lệ\", function () {\r
+
+      \  pm.expect(ok).to.eql(true);\r
+
+      \  pm.expect(value).to.be.an(\"object\");\r
+
+      });\r
+
+      \r
+
+      const totalTenants = value.totalTenants ?? value.TotalTenants ?? 0;\r
+
+      const activeTenants = value.activeTenants ?? value.ActiveTenants ?? 0;\r
+
+      const totalRevenue = value.totalRevenue ?? value.TotalRevenue ?? 0;\r
+
+      const totalUsers = value.totalUsers ?? value.TotalUsers ?? 0;\r
+
+      \r
+
+      pm.collectionVariables.set(\"stat_totalTenants\", String(totalTenants));\r
+
+      pm.collectionVariables.set(\"stat_activeTenants\",
+      String(activeTenants));\r
+
+      pm.collectionVariables.set(\"stat_totalRevenue\", String(totalRevenue));\r
+
+      pm.collectionVariables.set(\"stat_totalUsers\", String(totalUsers));\r
+
+      \r
+
+      pm.test(\"totalUsers phải lớn hơn 0\", function () {\r
+
+      \  pm.expect(Number(totalUsers)).to.be.at.least(1);\r
+
+      });\r
+
+      \r
+
+      console.log(\"Stats saved:\", {\r
+
+      \  totalTenants: pm.collectionVariables.get(\"stat_totalTenants\"),\r
+
+      \  activeTenants: pm.collectionVariables.get(\"stat_activeTenants\"),\r
+
+      \  totalRevenue: pm.collectionVariables.get(\"stat_totalRevenue\"),\r
+
+      \  totalUsers: pm.collectionVariables.get(\"stat_totalUsers\")\r
+
+      });"
+    language: text/javascript
+order: 2000

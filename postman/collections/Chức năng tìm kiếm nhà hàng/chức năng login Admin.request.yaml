@@ -1,0 +1,124 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/auth/login"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"email\": \"{{c_email}}\",\r
+
+    \  \"password\": \"{{c_password}}\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "let res = {};\r
+
+      try {\r
+
+      \  res = pm.response.json();\r
+
+      } catch (e) {\r
+
+      \  res = {};\r
+
+      }\r
+
+      \r
+
+      // ===== Chỉ reset biến liên quan auth + collection hiện tại =====\r
+
+      [\r
+
+      \  \"c_token\",\r
+
+      \  \"tenant_id\",\r
+
+      \  \"tenant_name\",\r
+
+      \  \"tenant_found_count\",\r
+
+      \  \"tenant_found_list_json\",\r
+
+      \  \"tenant_found_names_json\",\r
+
+      \  \"tenant_found_names_text\"\r
+
+      ].forEach((k) => pm.collectionVariables.unset(k));\r
+
+      \r
+
+      // ===== Lấy token từ response login =====\r
+
+      const c_token =\r
+
+      \  res.accessToken ||\r
+
+      \  res.AccessToken ||\r
+
+      \  (res.value && (res.value.accessToken || res.value.AccessToken)) ||\r
+
+      \  \"\";\r
+
+      \r
+
+      pm.test(\"Login admin thành công\", function () {\r
+
+      \  pm.expect(pm.response.code).to.eql(200);\r
+
+      \  pm.expect(c_token).to.be.a(\"string\").and.not.empty;\r
+
+      });\r
+
+      \r
+
+      if (!c_token) {\r
+
+      \  pm.expect.fail(\"Không lấy được c_token\");\r
+
+      }\r
+
+      \r
+
+      // ===== Lưu token đúng scope collection =====\r
+
+      pm.collectionVariables.set(\"c_token\", c_token);\r
+
+      \r
+
+      // ===== Lấy roles an toàn từ response =====\r
+
+      const roles =\r
+
+      \  (res.user && res.user.roles) ||\r
+
+      \  (res.value && res.value.user && res.value.user.roles) ||\r
+
+      \  [];\r
+
+      \r
+
+      // Lưu roles để debug khi cần\r
+
+      pm.collectionVariables.set(\"c_roles_json\",
+      JSON.stringify(Array.isArray(roles) ? roles : []));\r
+
+      \r
+
+      // Nếu có roles thì check SystemAdmin\r
+
+      if (Array.isArray(roles) && roles.length > 0) {\r
+
+      \  pm.test(\"Đúng role SystemAdmin\", function () {\r
+
+      \    pm.expect(roles).to.include(\"SystemAdmin\");\r
+
+      \  });\r
+
+      }\r
+
+      \r
+
+      console.log(\"Login OK | c_token saved | roles:\", roles);"
+    language: text/javascript
+order: 1000

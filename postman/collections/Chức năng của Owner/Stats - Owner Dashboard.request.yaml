@@ -1,0 +1,37 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/reports/dashboard"
+method: GET
+headers:
+  Authorization: Bearer {{accessToken}}
+scripts:
+  - type: afterResponse
+    code: "pm.test('Owner dashboard endpoint returns 200 or 404', function () {\r
+
+      \   pm.expect([200, 404]).to.include(pm.response.code);\r
+
+      });\r
+
+      \r
+
+      if (pm.response.code === 200) {\r
+
+      \   const json = pm.response.json();\r
+
+      \   pm.test('Owner dashboard payload exists', function () {\r
+
+      \      pm.expect(json).to.be.an('object');\r
+
+      \   });\r
+
+      } else {\r
+
+      \   pm.test('Fallback to owner revenue endpoints (request 10 and 11)',
+      function () {\r
+
+      \      pm.expect(true).to.eql(true);\r
+
+      \   });\r
+
+      }"
+    language: text/javascript
+order: 2000

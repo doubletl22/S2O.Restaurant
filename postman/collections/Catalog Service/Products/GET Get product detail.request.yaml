@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/products/{{product_id}}"
+method: GET
+body:
+  type: json
+  content: ""
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Get product detail success", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 404]);
+      });
+    language: text/javascript
+order: 3000

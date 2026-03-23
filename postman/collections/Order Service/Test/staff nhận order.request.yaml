@@ -1,0 +1,34 @@
+$kind: http-request
+name: staff nhận order
+url: "{{baseUrl}}/api/v1/orders/{{lastOrderId}}"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+scripts:
+  - type: afterResponse
+    code: >-
+      pm.test("Lấy chi tiết đơn hàng thành công", function () {
+          pm.response.to.have.status(200);
+      });
+
+
+      pm.test("Tự động gắp Item ID cần sửa", function () {
+          var jsonData = pm.response.json();
+          
+          // Giả sử dữ liệu trả về có chứa mảng 'items'
+          if (jsonData.items && jsonData.items.length > 0) {
+              // Lấy ID của món ăn đầu tiên trong mảng
+              var firstItemId = jsonData.items[0].id;
+              
+              // Lưu vào biến môi trường
+              pm.environment.set("itemId", firstItemId);
+              
+              console.log("Đã tìm thấy món ăn trong bill, Item ID là: " + firstItemId);
+          } else {
+              console.warn("Đơn hàng này chưa có món nào!");
+          }
+      });
+    language: text/javascript
+order: 4433858617342315

@@ -1,0 +1,69 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/products"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: Name
+      value: Tra dao
+    - type: text
+      key: Description
+      value: Tra dao mat ong
+    - type: text
+      key: Price
+      value: "29000"
+    - type: text
+      key: CategoryId
+      value: "{{category_id}}"
+    - type: text
+      key: IsActive
+      value: "true"
+    - type: file
+      key: ImageFile
+      src: ""
+scripts:
+  - type: beforeRequest
+    code: |-
+      const id = (pm.environment.get("category_id") || "").trim();
+      if (!id) throw new Error("category_id rong");
+
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(id)) throw new Error("category_id khong hop le UUID: " + id);
+      if (id === "00000000-0000-0000-0000-000000000000") throw new Error("category_id la Guid.Empty");
+
+      const body = pm.request.body;
+      if (!body || body.mode !== "formdata") {
+      throw new Error("Request nay phai dung Body form-data");
+      }
+
+      const fd = body.formdata || [];
+      const categoryField = fd.find(x => x && x.key === "CategoryId");
+      if (!categoryField) {
+      throw new Error("Thieu field CategoryId trong form-data");
+      }
+
+      categoryField.value = id;
+    language: text/javascript
+  - type: afterResponse
+    code: >-
+      pm.test("Create product success", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+      });
+
+
+      const res = pm.response.json();
+
+      const productId =
+        typeof res === "string"
+          ? res.trim()
+          : (res?.value || res?.data?.value || "").toString().trim();
+
+      if (!productId) {
+        throw new Error("Khong lay duoc product_id. Kiem tra response va map theo contract API.");
+      }
+
+
+      pm.environment.set("product_id", productId);
+    language: text/javascript
+order: 1000

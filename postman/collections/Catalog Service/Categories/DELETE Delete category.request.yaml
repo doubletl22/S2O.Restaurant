@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/categories/{{category_id}}"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Delete category success", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);
+      });
+    language: text/javascript
+order: 4000

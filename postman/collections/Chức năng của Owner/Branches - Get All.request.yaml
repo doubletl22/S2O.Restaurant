@@ -1,0 +1,49 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/branches"
+method: GET
+headers:
+  Authorization: Bearer {{accessToken}}
+scripts:
+  - type: afterResponse
+    code: "pm.test('Get branches returns 200', function () {\r
+
+      \   pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      const json = pm.response.json();\r
+
+      const list = Array.isArray(json) ? json : (Array.isArray(json.value) ?
+      json.value : (Array.isArray(json.items) ? json.items : []));\r
+
+      pm.test('Branches payload is list', function () {\r
+
+      \   pm.expect(list).to.be.an('array');\r
+
+      });\r
+
+      \r
+
+      if (list.length > 0) {\r
+
+      \   const branch = list[0];\r
+
+      \   const branchId = branch.id || branch.branchId || branch.Id ||
+      branch.BranchId;\r
+
+      \   if (branchId) pm.environment.set('branchId', branchId);\r
+
+      }\r
+
+      \r
+
+      pm.test('branchId ready for table tests', function () {\r
+
+      \   pm.expect(pm.environment.get('branchId')).to.be.a('string').and.not.e\
+      mpty;\r
+
+      });"
+    language: text/javascript
+order: 3000

@@ -1,0 +1,29 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/categories"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Mon nuoc",
+      "description": "Danh muc mon nuoc",
+      "isActive": true
+    }
+scripts:
+  - type: afterResponse
+    code: >-
+      pm.test("Create category success", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+      });
+
+
+      const data = pm.response.json();
+
+      const categoryId = data.value || data.id || data.data?.id ||
+      data.data?.value;
+
+      pm.environment.set("categoryId", categoryId);
+    language: text/javascript
+order: 1000

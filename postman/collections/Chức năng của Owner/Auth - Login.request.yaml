@@ -1,0 +1,91 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{\r
+
+    \   \"email\": \"{{email}}\",\r
+
+    \   \"password\": \"{{password}}\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test('Login status is 200', function () {\r
+
+      \   pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      const json = pm.response.json();\r
+
+      const token = json.accessToken || json.token || (json.value &&
+      json.value.accessToken);\r
+
+      pm.test('Access token exists', function () {\r
+
+      \   pm.expect(token).to.be.a('string').and.not.empty;\r
+
+      });\r
+
+      \r
+
+      pm.environment.set('token', token);\r
+
+      pm.environment.set('accessToken', token);\r
+
+      pm.environment.set('ownerToken', token);\r
+
+      \r
+
+      function parseJwt(t) {\r
+
+      \   try {\r
+
+      \      const payload = t.split('.')[1];\r
+
+      \      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');\r
+
+      \      const decoded =
+      decodeURIComponent(atob(normalized).split('').map(function(c) {\r
+
+      \         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);\r
+
+      \      }).join(''));\r
+
+      \      return JSON.parse(decoded);\r
+
+      \   } catch (e) {\r
+
+      \      return {};\r
+
+      \   }\r
+
+      }\r
+
+      \r
+
+      const payload = parseJwt(token);\r
+
+      const tenantId = payload.tenant_id || payload.tenantId ||
+      payload['tenant_id'];\r
+
+      const branchIdFromToken = payload.branch_id || payload.branchId ||
+      payload['branch_id'];\r
+
+      if (tenantId) pm.environment.set('tenantId', tenantId);\r
+
+      if (branchIdFromToken) pm.environment.set('branchId',
+      branchIdFromToken);\r
+
+      if (tenantId) pm.environment.set('tenant_id', tenantId);\r
+
+      if (branchIdFromToken) pm.environment.set('branch_id',
+      branchIdFromToken);"
+    language: text/javascript
+order: 1000

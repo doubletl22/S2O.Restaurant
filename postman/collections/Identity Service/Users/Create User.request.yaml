@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/api/users"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\": \"owner2@restaurant.com\",\r
+
+    \    \"password\": \"Owner@123\",\r
+
+    \    \"fullName\": \"Tran Van Owner\",\r
+
+    \    \"role\": \"RestaurantOwner\",\r
+
+    \    \"tenantId\": \"{{tenantId}}\"\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 2000

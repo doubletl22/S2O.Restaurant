@@ -1,0 +1,23 @@
+$kind: collection
+variables:
+  - key: base_url
+    value: ""
+    disabled: true
+  - key: tenantId
+    value: ""
+    disabled: true
+  - key: userId
+    value: ""
+    disabled: true
+  - key: staffId
+    value: ""
+    disabled: true
+  - key: branchId
+    value: ""
+    disabled: true
+  - key: token
+    value: ""
+    disabled: false
+  - key: tenantId
+    value: ""
+    disabled: false

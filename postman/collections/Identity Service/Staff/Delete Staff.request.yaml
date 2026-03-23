@@ -1,0 +1,30 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/staff/{{staffId}}"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"1. Xóa nhân viên thành công\", function () {\r
+
+      \    pm.expect(pm.response.code).to.be.oneOf([200, 204]);\r
+
+      });\r
+
+      \r
+
+      // Chỉ kiểm tra JSON nếu server trả về mã 200\r
+
+      if (pm.response.code === 200) {\r
+
+      \    pm.test(\"2. Xác nhận xóa qua isSuccess\", function () {\r
+
+      \        const res = pm.response.json();\r
+
+      \        pm.expect(res.isSuccess).to.be.true;\r
+
+      \    });\r
+
+      }\r
+
+      // pm.environment.unset(\"staffId\");"
+    language: text/javascript
+order: 4000

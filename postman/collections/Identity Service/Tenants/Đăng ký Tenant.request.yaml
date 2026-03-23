@@ -1,0 +1,243 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/tenants/registration"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+        "restaurantName": "Nhà Hàng",
+        "ownerName": "Nguyen Van Chu",
+        "email": "quantran@s525o.com",
+        "password": "Quan11209",
+        "address": "123 Nguyen Hue, Q1, TP.HCM",
+        "phoneNumber": "0909123456",
+        "planType": "Basic"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+scripts:
+  - type: afterResponse
+    code: "// ==================== HÀM HELPER ====================\r
+
+      // Hàm kiểm tra định dạng UUID\r
+
+      function isValidUUID(uuid) {\r
+
+      \    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\r
+
+      \    return uuidRegex.test(uuid);\r
+
+      }\r
+
+      \r
+
+      // ==================== KIỂM TRA MÃ TRẠNG THÁI ====================\r
+
+      // Kiểm tra mã trạng thái là 200 OK hoặc 201 Created\r
+
+      pm.test(\"Mã trạng thái là 200 (OK) hoặc 201 (Created)\", function () {\r
+
+      \    pm.expect([200, 201]).to.include(pm.response.code);\r
+
+      });\r
+
+      \r
+
+      const res = pm.response.json();\r
+
+      \r
+
+      // ==================== KIỂM TRA CẤU TRÚC RESPONSE ====================\r
+
+      // Kiểm tra response có các trường cần thiết của Tenant\r
+
+      pm.test(\"Response có đầy đủ thông tin Tenant (id, name, email)\",
+      function () {\r
+
+      \    pm.expect(res).to.have.property('id').that.is.a('string');\r
+
+      \    pm.expect(res).to.have.property('name').that.is.a('string');\r
+
+      \    pm.expect(res).to.have.property('email').that.is.a('string');\r
+
+      });\r
+
+      \r
+
+      // Kiểm tra ID Tenant có định dạng UUID hợp lệ\r
+
+      pm.test(\"ID Tenant có định dạng UUID hợp lệ\", function () {\r
+
+      \    pm.expect(isValidUUID(res.id)).to.be.true;\r
+
+      });\r
+
+      \r
+
+      // Kiểm tra tên Tenant không để trống\r
+
+      pm.test(\"Tên Tenant không để trống (tối thiểu 2 ký tự)\", function () {\r
+
+      \    pm.expect(res.name).to.not.be.empty;\r
+
+      \    pm.expect(res.name.length).to.be.at.least(2);\r
+
+      });\r
+
+      \r
+
+      // Kiểm tra email có định dạng hợp lệ\r
+
+      pm.test(\"Email Tenant có định dạng hợp lệ\", function () {\r
+
+      \    pm.expect(res.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/);\r
+
+      });\r
+
+      \r
+
+      // ==================== KIỂM TRA CÁC TRƯỜNG TÙY CHỌN
+      ====================\r
+
+      // Kiểm tra các trường tùy chọn như phone, address, city nếu có\r
+
+      pm.test(\"Các trường tùy chọn (phone, address, city) có định dạng đúng\",
+      function () {\r
+
+      \    if (res.phone) {\r
+
+      \        pm.expect(res.phone).to.be.a('string');\r
+
+      \    }\r
+
+      \    if (res.address) {\r
+
+      \        pm.expect(res.address).to.be.a('string');\r
+
+      \    }\r
+
+      \    if (res.city) {\r
+
+      \        pm.expect(res.city).to.be.a('string');\r
+
+      \    }\r
+
+      });\r
+
+      \r
+
+      // ==================== KIỂM TRA TÍNH NHẤT QUÁN DỮ LIỆU
+      ====================\r
+
+      // Kiểm tra dữ liệu trả về khớp với dữ liệu gửi đi\r
+
+      pm.test(\"Dữ liệu Tenant trả về khớp với yêu cầu gửi đi\", function () {\r
+
+      \    const requestBody = pm.request.body.raw ?
+      JSON.parse(pm.request.body.raw) : {};\r
+
+      \    \r
+
+      \    if (requestBody.name) {\r
+
+      \        pm.expect(res.name).to.equal(requestBody.name);\r
+
+      \    }\r
+
+      \    if (requestBody.email) {\r
+
+      \        pm.expect(res.email).to.equal(requestBody.email);\r
+
+      \    }\r
+
+      });\r
+
+      \r
+
+      // ==================== KIỂM TRA HIỆU NĂNG ====================\r
+
+      // Kiểm tra thời gian phản hồi không quá 2 giây\r
+
+      pm.test(\"Thời gian phản hồi chấp nhận được (< 2000ms)\", function () {\r
+
+      \    pm.expect(pm.response.responseTime).to.be.below(2000);\r
+
+      });\r
+
+      \r
+
+      // Cảnh báo nếu đăng ký phút hơn 1 giây\r
+
+      pm.test(\"Đăng ký hoàn thành nhanh chóng (< 1000ms)\", function () {\r
+
+      \    if (pm.response.responseTime > 1000) {\r
+
+      \        console.warn(\"Cảnh báo: Đăng ký Tenant mất \" +
+      pm.response.responseTime + \"ms - cần tối ưu\");\r
+
+      \    }\r
+
+      });\r
+
+      \r
+
+      // ==================== LƯU BIẾN LÀM MÔI TRƯỜNG ====================\r
+
+      // Lưu ID Tenant để dùng cho các request sau\r
+
+      if (res.id) {\r
+
+      \    pm.environment.set('tenantId', res.id);\r
+
+      \    console.log(\"Đã lưu tenantId: \" + res.id);\r
+
+      }\r
+
+      \r
+
+      // Lưu tên Tenant\r
+
+      if (res.name) {\r
+
+      \    pm.environment.set('tenantName', res.name);\r
+
+      \    console.log(\"Đã lưu tenantName: \" + res.name);\r
+
+      }\r
+
+      \r
+
+      // Lưu email Tenant\r
+
+      if (res.email) {\r
+
+      \    pm.environment.set('tenantEmail', res.email);\r
+
+      \    console.log(\"Đã lưu tenantEmail: \" + res.email);\r
+
+      }\r
+
+      \r
+
+      // ==================== TÓM TẮT KẾT QUẢ ====================\r
+
+      console.log(\"\\n===== ĐĂNG KÝ TENANT THÀNH CÔNG =====\");\r
+
+      console.log(\"ID Tenant: \" + res.id);\r
+
+      console.log(\"Tên Tenant: \" + res.name);\r
+
+      console.log(\"Email Tenant: \" + res.email);\r
+
+      if (res.phone) {\r
+
+      \    console.log(\"Điện thoại: \" + res.phone);\r
+
+      }"
+    language: text/javascript
+order: 1000

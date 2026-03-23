@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/kitchen/items/{{itemId}}/status"
+method: PUT
+body:
+  type: json
+  content: '"Cooking"'
+order: 4503599118355693

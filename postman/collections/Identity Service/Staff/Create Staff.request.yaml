@@ -1,0 +1,61 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/staff"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"fullName\": \"Nguyen Thi Nhan Vien\",\r
+
+    \    \"email\": \"staff4@phobac.com\",\r
+
+    \    \"password\": \"Staff@123\",\r
+
+    \    \"phoneNumber\": \"0901234567\",\r
+
+    \    \"branchId\": \"{{branchId}}\",\r
+
+    \    \"role\": \"Staff\"\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: "{{ownerToken}}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"1. Tạo nhân viên thành công\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      const res = pm.response.json();\r
+
+      \r
+
+      pm.test(\"2. Kiểm tra dữ liệu trả về hợp lệ\", function () {\r
+
+      \    // Kiểm tra xem có nhận được ID nhân viên trong trường value không\r
+
+      \    pm.expect(res.value).to.not.be.null;\r
+
+      \    pm.expect(res.value).to.be.a('string');\r
+
+      });\r
+
+      \r
+
+      // Tự động gán ID mới vào biến môi trường staffId\r
+
+      if (res.value) {\r
+
+      \    pm.environment.set(\"staffId\", res.value);\r
+
+      \    console.log(\"Đã bốc staffId mới: \" + res.value);\r
+
+      }"
+    language: text/javascript
+order: 2000

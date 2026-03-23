@@ -1,0 +1,39 @@
+$kind: http-request
+name: Thêm món vào order
+url: "{{baseUrl}}/api/v1/storefront/orders/{{lastOrderId}}/items"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "items": [
+            {
+                "productId": "{{productId}}",
+                "name": "{{productName}}",
+                "quantity": 2,
+                "note": "Gọi thêm 2 phần nữa, làm nhanh giúp mình nhé"
+            }
+        ]
+    }
+scripts:
+  - type: afterResponse
+    code: >-
+      // 1. Kiểm tra API gọi thành công (Status 200)
+
+      pm.test("Gọi thêm món thành công (Status 200)", function () {
+          pm.response.to.have.status(200);
+      });
+
+
+      // 2. Kiểm tra dữ liệu JSON trả về
+
+      pm.test("Hệ thống xác nhận đã thêm món (isSuccess = true)", function () {
+          var jsonData = pm.response.json();
+          
+          // Yêu cầu server phải trả về isSuccess là true
+          pm.expect(jsonData.isSuccess).to.be.true;
+          
+          console.log("Đã gọi thêm món thành công vào đơn hàng: " + pm.environment.get("orderId"));
+      });
+    language: text/javascript
+order: 4313317124838789

@@ -1,0 +1,87 @@
+name: S2O Local
+values:
+  - key: email
+    value: ""
+    enabled: true
+  - key: password
+    value: ""
+    enabled: true
+  - key: token
+    value: ""
+    enabled: true
+  - key: userId
+    value: ""
+    enabled: true
+  - key: tenantId
+    value: ""
+    enabled: true
+  - key: itemId
+    value: ""
+    enabled: true
+  - key: tableId
+    value: ""
+    enabled: true
+  - key: product_id
+    value: ""
+    enabled: true
+  - key: staffId
+    value: ""
+    enabled: true
+  - key: ownerToken
+    value: ""
+    enabled: true
+  - key: tenant_id
+    value: ""
+    enabled: true
+  - key: branch_id
+    value: ""
+    enabled: true
+  - key: categoryId
+    value: ""
+    enabled: true
+  - key: productId
+    value: ""
+    enabled: true
+  - key: category_id
+    value: ""
+    enabled: true
+  - key: ownerEmail
+    value: ""
+    enabled: true
+  - key: ownerPassword
+    value: ""
+    enabled: true
+  - key: branchName
+    value: ""
+    enabled: true
+  - key: tableName
+    value: ""
+    enabled: true
+  - key: baseUrl
+    value: ""
+    enabled: true
+  - key: itemsJson
+    value: ""
+    enabled: true
+  - key: lastOrderId
+    value: ""
+    enabled: true
+  - key: branchId
+    value: ""
+    enabled: true
+  - key: OrderItemid
+    value: ""
+    enabled: true
+  - key: tableToken
+    value: ""
+    enabled: true
+  - key: adminToken
+    value: ""
+    enabled: true
+  - key: accessToken
+    value: ""
+    enabled: true
+  - key: userEmail
+    value: ""
+    enabled: true
+color: 120

@@ -1,0 +1,45 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/staff/{{staffId}}"
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"userId\": \"{{staffId}}\",\r
+
+    \    \"fullName\": \"Nguyen Thi Updated\",\r
+
+    \    \"branchId\": \"{{branchId}}\",\r
+
+    \    \"role\": \"Staff\",\r
+
+    \    \"isActive\": true,\r
+
+    \    \"password\": null\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"1. Cập nhật thông tin nhân viên thành công\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      const res = pm.response.json();\r
+
+      \r
+
+      pm.test(\"2. Xác nhận phản hồi isSuccess\", function () {\r
+
+      \    // Kiểm tra logic thành công từ server\r
+
+      \    pm.expect(res.isSuccess).to.be.true;\r
+
+      \    pm.expect(res.error.code).to.eql(\"\");\r
+
+      });"
+    language: text/javascript
+order: 3000

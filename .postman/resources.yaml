@@ -1,0 +1,21 @@
+# Use this workspace to collaborate
+workspace:
+  id: 9b727b95-f8d5-4baf-8ca4-06ece8fa524a
+
+localResources:
+  collections:
+    - ../PRN231.postman_collection.json
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+cloudResources:
+  collections:
+    ../postman/collections/Chức năng khóa-hủy khóa cửa hàng: 53022069-0daa519d-acf2-4982-b2ad-177a89db0815
+    ../postman/collections/Chức năng tìm kiếm nhà hàng: 53022069-89418e69-2c00-44b3-b44a-dec32099acd3
+    ../postman/collections/Chức năng thông kế admin: 53022069-f1c34332-8f63-4118-99c9-b45fa4f09be0
+    ../postman/collections/Chức năng của Owner: 53022920-01c4540c-d569-4160-ae94-344944cccb13
+    ../postman/collections/Order Service: 53213085-bbd2a18f-4b0f-48eb-89d3-0f64871e8537
+    ../postman/collections/Identity Service: 53213085-adc5e788-3d78-4c73-8f51-359f61f95652
+    ../postman/collections/Catalog Service: 53213085-996f3e0c-c5cb-4dd2-8b65-861bc92be99e
+  environments:
+    ../postman/environments/S2O Local.environment.yaml: 47345850-bcf31c08-50d5-44c7-be47-329ad7dc725e
+    ../postman/environments/S2O.Local.ttl.environment.yaml: fced88e6-f90b-4a04-87ff-a395bde03154

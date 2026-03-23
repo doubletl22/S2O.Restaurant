@@ -1,0 +1,38 @@
+$kind: collection
+variables:
+  - key: "categoryName "
+    value: ""
+    disabled: false
+  - key: "categoryRenamed "
+    value: ""
+    disabled: false
+  - key: "categoryDescription "
+    value: ""
+    disabled: false
+  - key: "productName "
+    value: ""
+    disabled: false
+  - key: "productUpdatedName "
+    value: ""
+    disabled: false
+  - key: "productDescription "
+    value: ""
+    disabled: false
+  - key: "productPrice "
+    value: ""
+    disabled: false
+  - key: "productUpdatedPrice "
+    value: ""
+    disabled: true
+  - key: "tableName "
+    value: ""
+    disabled: false
+  - key: tableCapacity
+    value: ""
+    disabled: false
+auth:
+  - id: aa30036a-d496-43db-809e-bd5c75035624
+    type: bearer
+    name: bearer auth
+    credentials:
+      token: "{{token}}"

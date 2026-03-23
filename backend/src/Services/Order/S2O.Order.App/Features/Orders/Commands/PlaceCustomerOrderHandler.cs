@@ -43,23 +43,27 @@ public class PlaceCustomerOrderHandler : IRequestHandler<PlaceCustomerOrderComma
             BranchId = branchId,   
             TableId = request.TableId,
             UserId = userId,     
+            CustomerName = request.UserName,
+            OrderNumber = $"ORD-{DateTime.UtcNow:yyyyMMddHHmmss}-{Guid.NewGuid().ToString().Substring(0,4).ToUpper()}",
+            OrderDate = DateTime.UtcNow,
             Status = OrderStatus.Pending,
             CreatedAtUtc = DateTime.UtcNow,
-            Note = $"Thành viên: {request.UserName}", 
             TotalAmount = 0
         };
 
         if (request.Items != null && request.Items.Any())
         {
+            var productTasks = request.Items.Select(item => _catalogClient.GetProductAsync(item.ProductId)).ToList();
+            var products = await Task.WhenAll(productTasks);
+            var productDict = products.Where(p => p != null).ToDictionary(p => p.Id, p => p);
             foreach (var itemDto in request.Items)
             {
                 if (itemDto.Quantity <= 0)
                 {
                     return Result<Guid>.Failure(Error.Validation("Order.InvalidQuantity", "Số lượng món ăn phải lớn hơn 0"));
                 }
-                var productInfo = await _catalogClient.GetProductAsync(itemDto.ProductId);
 
-                if (productInfo == null)
+                if (!productDict.TryGetValue(itemDto.ProductId, out var productInfo))
                 {
                     return Result<Guid>.Failure(Error.NotFound("Product.NotFound", $"Product with ID {itemDto.ProductId} not found"));
                 }

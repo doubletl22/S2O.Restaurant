@@ -1,0 +1,25 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/storefront/orders/{{lastOrderId}}"
+method: GET
+body:
+  type: json
+  content: "{}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"HTTP 200\", function () {\r
+
+      \  pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      const data = pm.response.json();\r
+
+      pm.test(\"Có dữ liệu đơn hàng\", function () {\r
+
+      \  pm.expect(data).to.be.an(\"object\");\r
+
+      });"
+    language: text/javascript
+order: 1774202162226

@@ -31,7 +31,7 @@ public static class IdentityDataSeeder
 
             var adminUser = new ApplicationUser { UserName = "admin@s2o.com", Email = "admin@s2o.com", FullName = "System Admin", EmailConfirmed = true };
 
-            await userManager.CreateAsync(adminUser, "Admin@123");
+            await userManager.CreateAsync(adminUser, "admin@123");
 
             await userManager.AddToRoleAsync(adminUser, "SystemAdmin");
         }

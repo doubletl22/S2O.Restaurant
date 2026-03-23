@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/users/{{userId}}/role"
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"userId\": \"{{userId}}\",\r
+
+    \    \"newRole\": \"Staff\"\r
+
+    }"
+order: 3000

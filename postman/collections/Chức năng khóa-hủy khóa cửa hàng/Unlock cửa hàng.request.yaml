@@ -1,0 +1,50 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/tenants/{{c_tenant_id}}/unlock"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{c_token}}"
+scripts:
+  - type: afterResponse
+    code: "let res = {};\r
+
+      try { res = pm.response.json(); } catch (e) { res = {}; }\r
+
+      \r
+
+      pm.test(\"Unlock tenant thành công\", function () {\r
+
+      \  pm.expect([200, 204]).to.include(pm.response.code);\r
+
+      });\r
+
+      \r
+
+      // nếu backend trả Result object thì check thêm\r
+
+      if (Object.prototype.hasOwnProperty.call(res, \"isSuccess\")) {\r
+
+      \  pm.test(\"isSuccess = true\", function () {\r
+
+      \    pm.expect(res.isSuccess).to.eql(true);\r
+
+      \  });\r
+
+      }\r
+
+      \r
+
+      pm.collectionVariables.set(\"tenant_locked_status\", \"false\");\r
+
+      \r
+
+      console.log(\"Unlocked tenant:\", {\r
+
+      \  id: pm.collectionVariables.get(\"c_tenant_id\"),\r
+
+      \  name: pm.collectionVariables.get(\"tenant_name\")\r
+
+      });"
+    language: text/javascript
+order: 5000

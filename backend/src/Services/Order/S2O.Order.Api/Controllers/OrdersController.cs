@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // [QUAN TRỌNG] Để dùng .Include(), .ToListAsync()
+using Microsoft.EntityFrameworkCore; 
 using S2O.Order.App.Features.Orders.Commands;
 using S2O.Order.App.Features.Orders.Queries;
 using S2O.Order.Domain.Enums;
-using S2O.Order.Infra.Persistence; // [QUAN TRỌNG] Namespace chứa OrderDbContext
+using S2O.Order.Infra.Persistence; 
 
 namespace S2O.Order.Api.Controllers;
 
@@ -14,9 +14,8 @@ namespace S2O.Order.Api.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly ISender _sender;
-    private readonly OrderDbContext _context; // [FIX 1] Khai báo biến _context
+    private readonly OrderDbContext _context; 
 
-    // [FIX 1] Inject OrderDbContext vào Constructor
     public OrdersController(ISender sender, OrderDbContext context)
     {
         _sender = sender;
@@ -154,6 +153,18 @@ public class OrdersController : ControllerBase
         return Ok(result);
     }
 
+    // POST: api/v1/orders/{id}/cancel
+    [HttpPost("{id}/cancel")]
+    [Authorize(Roles = "RestaurantOwner, Staff, Manager")]
+    public async Task<IActionResult> CancelOrder(Guid id, [FromBody] CancelOrderCommand command)
+    {
+        // Đảm bảo ID trên URL khớp với ID trong Body
+        if (id != command.OrderId) return BadRequest("ID đơn hàng không khớp.");
+
+        var result = await _sender.Send(command);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
     // GET: api/v1/orders/owner/revenue-by-branch
     [HttpGet("owner/revenue-by-branch")]
     [Authorize(Roles = "RestaurantOwner")]
@@ -216,25 +227,25 @@ public class OrdersController : ControllerBase
 
     private (Guid? branchId, IActionResult? error) ResolveRequestedBranch(Guid requestedBranchId)
     {
+        var branchIdFromToken = GetBranchIdFromToken();
         if (User.IsInRole("RestaurantOwner"))
         {
+            // Owner có thể xem bất kỳ chi nhánh nào, nhưng bắt buộc phải xác định được chi nhánh cần xem
             if (requestedBranchId == Guid.Empty)
             {
-                return (null, BadRequest("BranchId là bắt buộc."));
+                return (null, BadRequest("BranchId là bắt buộc đối với Owner."));
             }
-
             return (requestedBranchId, null);
         }
 
-        var branchIdFromToken = GetBranchIdFromToken();
         if (branchIdFromToken == Guid.Empty)
         {
-            return (null, BadRequest("Không xác định được chi nhánh."));
+            return (null, BadRequest("Không xác định được chi nhánh làm việc của nhân viên."));
         }
 
         if (requestedBranchId != Guid.Empty && requestedBranchId != branchIdFromToken)
         {
-            return (null, Forbid());
+            return (null, Forbid("Bạn không có quyền truy cập dữ liệu của chi nhánh khác."));
         }
 
         return (branchIdFromToken, null);

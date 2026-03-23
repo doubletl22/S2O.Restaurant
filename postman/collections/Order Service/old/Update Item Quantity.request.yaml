@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/orders/{{lastOrderId}}/items/{{OrderItemid}}"
+method: PATCH
+body:
+  type: json
+  content: "{\r\n  \"newQuantity\": 3\r\n}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 4503599585825616

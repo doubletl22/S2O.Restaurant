@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/orders/owner/revenue-series?from=2024-03-01T00:00:00Z&\
+  to=2024-03-15T23:59:59Z&allTime=false&branchId=guid-chi-nhánh"
+method: GET
+queryParams:
+  from: 2024-03-01T00:00:00Z
+  to: 2024-03-15T23:59:59Z
+  allTime: "false"
+  branchId: guid-chi-nhánh
+order: 10000

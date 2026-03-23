@@ -1,0 +1,17 @@
+$kind: collection
+variables:
+  token: ""
+  tenantId: ""
+  branchId: ""
+  baseUrl: ""
+  ownerEmail: ""
+  ownerPassword: ""
+  branchName: ""
+  tableName: ""
+  itemsJson: ""
+  ownerAccessToken: ""
+  selectedBranchId: ""
+  selectedTableId: ""
+  requestBody: ""
+  lastOrderId: ""
+  orderItemId: ""

@@ -1,0 +1,24 @@
+name: S2O.Local.ttl
+values:
+  - key: baseUrl
+    value: ''
+    enabled: true
+  - key: token
+    value: ''
+    enabled: true
+  - key: branchId
+    value: ''
+    enabled: true
+  - key: tableId
+    value: ''
+    enabled: true
+  - key: productId
+    value: ''
+    enabled: true
+  - key: lastOrderId
+    value: ''
+    enabled: true
+  - key: productName
+    value: ''
+    enabled: true
+color: 0

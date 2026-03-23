@@ -1,0 +1,14 @@
+$kind: http-request
+name: Firebase Login
+url: "{{baseUrl}}/api/v1/auth/firebase-login"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"firebaseToken\": \"My_firebasetoken\",\r
+
+    \    \"tenantId\": \"\"\r
+
+    }"
+order: 2000

@@ -1,0 +1,133 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/tenants?keyword={{kw}}"
+method: GET
+queryParams:
+  keyword: "{{kw}}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{c_token}}"
+scripts:
+  - type: afterResponse
+    code: "let res = {};\r
+
+      try { res = pm.response.json(); } catch (e) { res = {}; }\r
+
+      \r
+
+      const items = Array.isArray(res)\r
+
+      \  ? res\r
+
+      \  : Array.isArray(res.value) ? res.value\r
+
+      \  : Array.isArray(res.Value) ? res.Value\r
+
+      \  : [];\r
+
+      \r
+
+      const kw = String(pm.collectionVariables.get(\"kw\") ||
+      \"\").trim().toLowerCase();\r
+
+      \r
+
+      const foundList = items.map((x, idx) => ({\r
+
+      \  stt: idx + 1,\r
+
+      \  id: x.id || x.Id || \"\",\r
+
+      \  name: x.name || x.Name || \"\",\r
+
+      \  plan: x.plan || x.Plan || \"\",\r
+
+      \  isLocked: x.isLocked ?? x.IsLocked ?? false,\r
+
+      \  createdAt: x.createdAt || x.CreatedAt || \"\"\r
+
+      }));\r
+
+      \r
+
+      const foundCount = foundList.length;\r
+
+      \r
+
+      // ===== Lưu biến cho collection \"tìm kiếm nhà hàng\" =====\r
+
+      [\r
+
+      \  \"tenant_found_count\",\r
+
+      \  \"tenant_found_list_json\",\r
+
+      \  \"tenant_found_names_text\",\r
+
+      \  \"tenant_found_names_json\",\r
+
+      \  \"tenant_found_keyword\"\r
+
+      ].forEach((k) => pm.collectionVariables.unset(k));\r
+
+      \r
+
+      pm.collectionVariables.set(\"tenant_found_keyword\", kw);\r
+
+      pm.collectionVariables.set(\"tenant_found_count\", String(foundCount));\r
+
+      pm.collectionVariables.set(\"tenant_found_list_json\",
+      JSON.stringify(foundList));\r
+
+      pm.collectionVariables.set(\"tenant_found_names_json\",
+      JSON.stringify(foundList.map(x => x.name)));\r
+
+      pm.collectionVariables.set(\"tenant_found_names_text\", foundList.map(x =>
+      x.name).join(\", \"));\r
+
+      \r
+
+      // ===== Assertions =====\r
+
+      pm.test(\"HTTP 200\", function () {\r
+
+      \  pm.expect(pm.response.code).to.eql(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Payload là mảng\", function () {\r
+
+      \  pm.expect(Array.isArray(items)).to.eql(true);\r
+
+      });\r
+
+      \r
+
+      if (kw) {\r
+
+      \  const invalid = foundList.filter(x =>
+      !String(x.name).toLowerCase().includes(kw));\r
+
+      \  pm.test(\"Mọi nhà hàng đều chứa keyword\", function () {\r
+
+      \    pm.expect(invalid.length).to.eql(0);\r
+
+      \  });\r
+
+      }\r
+
+      \r
+
+      // ===== Logs =====\r
+
+      console.log(\"===== KET QUA TIM KIEM NHA HANG =====\");\r
+
+      console.log(\"Keyword:\", kw || \"(rong)\");\r
+
+      console.log(\"So luong tim thay:\", foundCount);\r
+
+      console.log(\"Danh sach ten:\", foundList.map(x => x.name));"
+    language: text/javascript
+order: 2000

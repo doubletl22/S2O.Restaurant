@@ -1,0 +1,274 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/tenants"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+scripts:
+  - type: afterResponse
+    code: "// ==================== HÀM HELPER ====================\r
+
+      // Hàm kiểm tra định dạng UUID\r
+
+      function isValidUUID(uuid) {\r
+
+      \    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;\r
+
+      \    return uuidRegex.test(uuid);\r
+
+      }\r
+
+      \r
+
+      // ==================== KIỂM TRA MÃ TRẠNG THÁI ====================\r
+
+      // Kiểm tra mã trạng thái là 200 OK\r
+
+      pm.test(\"Mã trạng thái là 200 OK\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      const res = pm.response.json();\r
+
+      \r
+
+      // ==================== KIỂM TRA ĐỊNH DẠNG RESPONSE ====================\r
+
+      // Kiểm tra response là một mảng (array)\r
+
+      pm.test(\"Response là một mảng Tenant\", function () {\r
+
+      \    pm.expect(res).to.be.an('array');\r
+
+      });\r
+
+      \r
+
+      // Kiểm tra mảng có chứa các phần tử\r
+
+      pm.test(\"Danh sách Tenant không để trống\", function () {\r
+
+      \    pm.expect(res.length).to.be.greaterThan(0);\r
+
+      });\r
+
+      \r
+
+      // ==================== KIỂM TRA CẤU TRÚC CỦA TỪNG ITEM
+      ====================\r
+
+      // Kiểm tra mỗi Tenant có đầy đủ thông tin cần thiết\r
+
+      pm.test(\"Mỗi Tenant có đầy đủ thông tin: id, name\", function () {\r
+
+      \    res.forEach(function(item, index) {\r
+
+      \        pm.expect(item).to.have.property('id').that.is.a('string');\r
+
+      \        pm.expect(item).to.have.property('name').that.is.a('string');\r
+
+      \        \r
+
+      \        // Kiểm tra ID có định dạng UUID\r
+
+      \        pm.expect(isValidUUID(item.id)).to.be.true;\r
+
+      \        \r
+
+      \        // Kiểm tra tên không để trống\r
+
+      \        pm.expect(item.name).to.not.be.empty;\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // ==================== KIỂM TRA CÁC TRƯỜNG TÙY CHỌN
+      ====================\r
+
+      // Kiểm tra các trường tùy chọn có định dạng đúng\r
+
+      pm.test(\"Các trường tùy chọn (email, phone, address) có định dạng hợp
+      lệ\", function () {\r
+
+      \    res.forEach(function(item) {\r
+
+      \        // Kiểm tra email nếu có\r
+
+      \        if (item.email) {\r
+
+      \            pm.expect(item.email).to.match(/^[^\\s@]+@[^\\s@]+\\.[^\\s@]\
+      +$/);\r
+
+      \        }\r
+
+      \        // Kiểm tra phone nếu có\r
+
+      \        if (item.phone) {\r
+
+      \            pm.expect(item.phone).to.be.a('string');\r
+
+      \        }\r
+
+      \        // Kiểm tra address nếu có\r
+
+      \        if (item.address) {\r
+
+      \            pm.expect(item.address).to.be.a('string');\r
+
+      \        }\r
+
+      \        // Kiểm tra createdAt là ngày hợp lệ\r
+
+      \        if (item.createdAt) {\r
+
+      \            const date = new Date(item.createdAt);\r
+
+      \            pm.expect(date instanceof Date && !isNaN(date)).to.be.true;\r
+
+      \        }\r
+
+      \    });\r
+
+      });\r
+
+      \r
+
+      // ==================== KIỂM TRA TÍNH TOÀN VẸN DỮ LIỆU
+      ====================\r
+
+      // Kiểm tra không có ID trùng lặp trong danh sách\r
+
+      pm.test(\"Không có ID Tenant trùng lặp trong danh sách\", function () {\r
+
+      \    const ids = res.map(function(item) { return item.id; });\r
+
+      \    const uniqueIds = new Set(ids);\r
+
+      \    pm.expect(uniqueIds.size).to.equal(ids.length);\r
+
+      });\r
+
+      \r
+
+      // ==================== KIỂM TRA HIỆU NĂNG ====================\r
+
+      // Kiểm tra thời gian phản hồi không quá 2 giây\r
+
+      pm.test(\"Thời gian phản hồi chấp nhận được (< 2000ms)\", function () {\r
+
+      \    pm.expect(pm.response.responseTime).to.be.below(2000);\r
+
+      });\r
+
+      \r
+
+      // Cảnh báo nếu truy xuất chậm hơn 0.5 giây\r
+
+      pm.test(\"Truy xuất danh sách hiệu quả (< 500ms)\", function () {\r
+
+      \    if (pm.response.responseTime > 500) {\r
+
+      \        console.warn(\"Cảnh báo: Truy xuất danh sách mất \" +
+      pm.response.responseTime + \"ms cho \" + res.length + \" Tenant\");\r
+
+      \    }\r
+
+      });\r
+
+      \r
+
+      // ==================== KIỂM TRA PHÂN TRANG (NẾU CÓ)
+      ====================\r
+
+      // Nếu API hỗ trợ phân trang, kiểm tra các header\r
+
+      if (pm.response.headers.get('X-Total-Count') ||
+      pm.response.headers.get('X-Page-Number')) {\r
+
+      \    pm.test(\"Thông tin phân trang có trong header\", function () {\r
+
+      \        const totalCount = pm.response.headers.get('X-Total-Count');\r
+
+      \        const pageNumber = pm.response.headers.get('X-Page-Number');\r
+
+      \        \r
+
+      \        if (totalCount) {\r
+
+      \            pm.expect(parseInt(totalCount)).to.be.greaterThan(0);\r
+
+      \        }\r
+
+      \        if (pageNumber) {\r
+
+      \            pm.expect(parseInt(pageNumber)).to.be.greaterThan(0);\r
+
+      \        }\r
+
+      \    });\r
+
+      }\r
+
+      \r
+
+      // ==================== LƯU BIẾN LÀM MÔI TRƯỜNG ====================\r
+
+      // Lưu số lượng Tenant\r
+
+      if (res.length > 0) {\r
+
+      \    pm.environment.set('tenantListCount', res.length);\r
+
+      \    console.log(\"Đã truy xuất \" + res.length + \" Tenant\");\r
+
+      \    \r
+
+      \    // Lưu ID của Tenant đầu tiên để test các endpoint chi tiết\r
+
+      \    pm.environment.set('firstTenantId', res[0].id);\r
+
+      \    console.log(\"Đã lưu firstTenantId: \" + res[0].id);\r
+
+      \    \r
+
+      \    // Lưu ID Tenant được chọn (mặc định là Tenant đầu tiên)\r
+
+      \    if (res.length > 0) {\r
+
+      \        pm.environment.set('selectedTenantId', res[0].id);\r
+
+      \    }\r
+
+      }\r
+
+      \r
+
+      // ==================== TÓM TẮT KẾT QUẢ ====================\r
+
+      console.log(\"\\n===== DANH SÁCH TENANT =====\");\r
+
+      console.log(\"Tổng số Tenant: \" + res.length);\r
+
+      if (res.length > 0) {\r
+
+      \    console.log(\"Tenant đầu tiên: \" + res[0].name + \" (ID: \" +
+      res[0].id + \")\");\r
+
+      \    if (res.length > 1) {\r
+
+      \        console.log(\"Tenant cuối cùng: \" + res[res.length - 1].name);\r
+
+      \    }\r
+
+      }"
+    language: text/javascript
+order: 2000

@@ -1,0 +1,45 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/categories"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+body:
+  type: json
+  content: "{\r
+
+    \   \"name\": \"{{categoryName}}\",\r
+
+    \   \"description\": \"{{categoryDescription}}\",\r
+
+    \   \"isActive\": true\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test('Create category success', function () {\r
+
+      \   pm.expect([200, 201]).to.include(pm.response.code);\r
+
+      });\r
+
+      \r
+
+      let json = {};\r
+
+      try { json = pm.response.json(); } catch (e) {}\r
+
+      const categoryId = json.value || json.id || (json.value &&
+      json.value.id);\r
+
+      pm.test('categoryId captured', function () {\r
+
+      \   pm.expect(categoryId).to.be.a('string').and.not.empty;\r
+
+      });\r
+
+      pm.environment.set('categoryId', categoryId);\r
+
+      pm.environment.set('category_id', categoryId);"
+    language: text/javascript
+order: 4000

@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/orders/{{lastOrderId}}"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 4500958634538842

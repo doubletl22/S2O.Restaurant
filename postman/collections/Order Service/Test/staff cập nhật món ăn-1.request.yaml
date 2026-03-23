@@ -1,0 +1,39 @@
+$kind: http-request
+name: staff cập nhật món ăn
+url: "{{baseUrl}}/api/v1/orders/{{lastOrderId}}/status"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+        "orderId": "{{lastOrderId}}",
+        "newStatus": 1
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+scripts:
+  - type: afterResponse
+    code: >-
+      // 1. Kiểm tra API gọi thành công (Status 200)
+
+      pm.test("Cập nhật trạng thái thành công (Status 200)", function () {
+          pm.response.to.have.status(200);
+      });
+
+
+      // 2. Kiểm tra dữ liệu trả về từ server
+
+      pm.test("Hệ thống xác nhận trạng thái đã thay đổi", function () {
+          var jsonData = pm.response.json();
+          
+          // Yêu cầu server trả về isSuccess là true
+          pm.expect(jsonData.isSuccess).to.be.true;
+          
+          // Đọc trạng thái mới từ Body Request để in ra log cho đẹp
+          var requestBody = JSON.parse(pm.request.body.raw);
+          console.log("✅ Đã cập nhật đơn hàng " + pm.environment.get("orderId") + " sang trạng thái: " + requestBody.newStatus);
+      });
+    language: text/javascript
+order: 4498914257281484

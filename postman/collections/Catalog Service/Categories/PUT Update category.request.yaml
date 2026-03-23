@@ -1,0 +1,22 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/categories/{{category_id}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": "{{category_id}}",
+      "name": "Mon nuoc cap nhat",
+      "description": "Da doi ten danh muc",
+      "isActive": true
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Update category success", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 204]);
+      });
+    language: text/javascript
+order: 3000

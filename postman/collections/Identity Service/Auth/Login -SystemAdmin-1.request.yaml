@@ -1,0 +1,34 @@
+$kind: http-request
+name: Login -SystemAdmin
+url: "{{baseUrl}}/api/v1/auth/login"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\": \"admin@s2o.com\",\r
+
+    \    \"password\": \"Admin@123\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "const res = pm.response.json();\r
+
+      if (res.accessToken) {\r
+
+      \    pm.environment.set(\"token\", res.accessToken);\r
+
+      }\r
+
+      // Tự động lấy userId từ object user\r
+
+      if (res.user && res.user.id) {\r
+
+      \    pm.environment.set(\"userId\", res.user.id);\r
+
+      \    console.log(\"Đã tự động cập nhật userId: \" + res.user.id);\r
+
+      }"
+    language: text/javascript
+order: 1021

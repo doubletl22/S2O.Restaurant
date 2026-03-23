@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/kitchen?branchId=GUID_CHI_NHÁNH"
+method: GET
+queryParams:
+  branchId: GUID_CHI_NHÁNH
+order: 4503596206746292

@@ -1,0 +1,100 @@
+$kind: http-request
+name: Tạo đơn
+url: "{{baseUrl}}/api/v1/storefront/orders/guest"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+        "tenantId": "{{tenantId}}",
+        "branchId": "{{branchId}}",
+        "tableId": "{{tableId}}",
+        "tableName": "Bàn số 1",
+        "items": [
+            {
+                "productId": "{{productId}}",
+                "name": "{{productName}}",
+                "quantity": 1,
+                "note": "Ít hành, không cay"
+            }
+        ]
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"HTTP status is 2xx\", function () {\r
+
+      \  pm.expect(pm.response.code).to.be.within(200, 299);\r
+
+      });\r
+
+      \r
+
+      let json = {};\r
+
+      try { \r
+
+      \  json = pm.response.json(); \r
+
+      } catch (e) {\r
+
+      \  // Nếu không parse được JSON, json sẽ là object rỗng\r
+
+      }\r
+
+      \r
+
+      // Kiểm tra lỗi business logic (nếu API có trả về isSuccess = false)\r
+
+      pm.test(\"Business success (Không có lỗi logic)\", function () {\r
+
+      \  if (json?.isSuccess === false) {\r
+
+      \    pm.expect.fail(\"API trả lỗi: \" + JSON.stringify(json.error ||
+      json));\r
+
+      \  }\r
+
+      });\r
+
+      \r
+
+      // Kiểm tra và lưu orderId\r
+
+      pm.test(\"Đã tạo đơn mới thành công và lấy được orderId\", function () {\r
+
+      \  const orderId =\r
+
+      \    json?.value?.orderId ||\r
+
+      \    json?.value?.OrderId ||\r
+
+      \    json?.orderId ||\r
+
+      \    json?.id ||\r
+
+      \    json?.Id || // Thêm trường hợp Id viết hoa\r
+
+      \    \"\";\r
+
+      \r
+
+      \  // Kiểm tra orderId phải có giá trị\r
+
+      \  pm.expect(orderId, \"Không tìm thấy orderId trong response trả
+      về\").to.not.equal(\"\");\r
+
+      \  \r
+
+      \  // Nếu dòng trên pass (không bị văng lỗi), thì mới tiến hành lưu biến\r
+
+      \  pm.environment.set(\"lastOrderId\", String(orderId));\r
+
+      \  console.log(\"✅ Đã lưu lastOrderId thành công:\", orderId);\r
+
+      });"
+    language: text/javascript
+order: 1567469596541811

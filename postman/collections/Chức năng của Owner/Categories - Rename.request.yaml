@@ -1,0 +1,28 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/categories/{{categoryId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+body:
+  type: json
+  content: "{\r
+
+    \   \"id\": \"{{categoryId}}\",\r
+
+    \   \"name\": \"{{categoryRenamed}}\",\r
+
+    \   \"description\": \"Danh muc da doi ten qua Postman dynamic test\",\r
+
+    \   \"isActive\": true\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "pm.test('Update category success', function () {\r
+
+      \   pm.expect([200, 204]).to.include(pm.response.code);\r
+
+      });"
+    language: text/javascript
+order: 5000

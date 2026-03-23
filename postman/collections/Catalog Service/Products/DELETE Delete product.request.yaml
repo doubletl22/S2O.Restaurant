@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/products/{{product_id}}"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Delete product success", function () {
+        pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);
+      });
+    language: text/javascript
+order: 5000

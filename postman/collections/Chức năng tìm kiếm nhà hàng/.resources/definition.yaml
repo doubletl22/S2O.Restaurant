@@ -1,0 +1,12 @@
+$kind: collection
+variables:
+  c_email: ""
+  c_password: ""
+  c_token: ""
+  kw: ""
+  c_roles_json: ""
+  tenant_found_count: ""
+  tenant_found_list_json: ""
+  tenant_found_names_text: ""
+  tenant_found_names_json: ""
+  tenant_found_keyword: ""

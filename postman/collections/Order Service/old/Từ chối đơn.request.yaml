@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/orders/{{lastOrderId}}/status"
+method: PATCH
+body:
+  type: json
+  content: "{\r
+
+    \  \"orderId\": \"{{lastOrderId}}\",\r
+
+    \  \"newStatus\": 5,\r
+
+    \  \"currentBranchId\": \"{{branchId}}\"\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 4012809834031401

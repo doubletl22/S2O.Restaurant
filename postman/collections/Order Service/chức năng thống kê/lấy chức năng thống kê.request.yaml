@@ -1,0 +1,9 @@
+$kind: http-request
+name: lấy chức năng thống kê
+url: "{{baseUrl}}/api/v1/orders/statistics"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 3260323914714389

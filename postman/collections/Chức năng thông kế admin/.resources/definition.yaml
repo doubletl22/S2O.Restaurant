@@ -1,0 +1,11 @@
+$kind: collection
+variables:
+  c_email: ""
+  c_password: ""
+  loginMessage: ""
+  c_token: ""
+  roles: ""
+  stat_totalTenants: ""
+  stat_activeTenants: ""
+  stat_totalRevenue: ""
+  stat_totalUsers: ""

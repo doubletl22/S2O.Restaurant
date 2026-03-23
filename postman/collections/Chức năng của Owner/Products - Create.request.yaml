@@ -1,0 +1,51 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/products"
+method: POST
+headers:
+  Authorization: Bearer {{accessToken}}
+body:
+  type: formdata
+  content:
+    - type: text
+      key: Name
+      value: "{{productName}}"
+    - type: text
+      key: Description
+      value: "{{productDescription}}"
+    - type: text
+      key: Price
+      value: "{{productPrice}}"
+    - type: text
+      key: CategoryId
+      value: "{{categoryId}}"
+    - type: text
+      key: IsActive
+      value: "true"
+scripts:
+  - type: afterResponse
+    code: "pm.test('Create product success', function () {\r
+
+      \   pm.expect([200, 201]).to.include(pm.response.code);\r
+
+      });\r
+
+      \r
+
+      let json = {};\r
+
+      try { json = pm.response.json(); } catch (e) {}\r
+
+      const productId = json.value || json.id || (json.value &&
+      json.value.id);\r
+
+      pm.test('productId captured', function () {\r
+
+      \   pm.expect(productId).to.be.a('string').and.not.empty;\r
+
+      });\r
+
+      pm.environment.set('productId', productId);\r
+
+      pm.environment.set('product_id', productId);"
+    language: text/javascript
+order: 6000

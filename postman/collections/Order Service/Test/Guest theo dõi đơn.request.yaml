@@ -1,0 +1,33 @@
+$kind: http-request
+name: Guest theo dõi đơn
+url: "{{baseUrl}}/api/v1/storefront/orders/{{lastOrderId}}"
+method: GET
+scripts:
+  - type: afterResponse
+    code: >-
+      // 1. Kiểm tra API gọi thành công
+
+      pm.test("Lấy thông tin đơn hàng thành công (Status 200)", function () {
+          pm.response.to.have.status(200);
+      });
+
+
+      // 2. Kiểm tra dữ liệu và trạng thái
+
+      pm.test("Dữ liệu hợp lệ và có chứa trạng thái đơn hàng", function () {
+          var jsonData = pm.response.json();
+          
+          // Đảm bảo API trả về thành công
+          pm.expect(jsonData.isSuccess).to.be.true;
+          
+          // Lấy thông tin chi tiết đơn hàng (thường nằm trong object 'value')
+          var orderData = jsonData.value;
+          pm.expect(orderData).to.not.be.undefined;
+          
+          // In ra Console để theo dõi
+          console.log("Mã đơn hàng: " + orderData.id);
+          console.log("Trạng thái hiện tại: " + orderData.status); 
+          // Trạng thái (status) này sẽ khớp với số (1, 2, 3...) mà Bếp vừa cập nhật ở bước trước
+      });
+    language: text/javascript
+order: 4502890094595617

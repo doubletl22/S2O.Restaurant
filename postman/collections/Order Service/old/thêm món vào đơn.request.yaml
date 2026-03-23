@@ -1,0 +1,29 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/storefront/orders/{{lastOrderId}}/items"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{\r
+
+    \  \"tenantId\": \"{{tenantId}}\",\r
+
+    \  \"items\": [\r
+
+    \    {\r
+
+    \      \"productId\": \"e3136390-6489-4228-bea3-3c5c437d79b3\",\r
+
+    \      \"name\": \"GÀ\",\r
+
+    \      \"quantity\": 1,\r
+
+    \      \"note\": \"thêm 1 phần\"\r
+
+    \    }\r
+
+    \  ]\r
+
+    }"
+order: 4175010237078517

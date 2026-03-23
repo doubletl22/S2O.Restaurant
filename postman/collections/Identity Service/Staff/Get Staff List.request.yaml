@@ -1,0 +1,36 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/staff?branchId={{branchId}}"
+method: GET
+queryParams:
+  branchId: "{{branchId}}"
+scripts:
+  - type: afterResponse
+    code: "const res = pm.response.json();\r
+
+      \r
+
+      pm.test(\"1. Kết nối API thành công (200 OK)\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"2. Danh sách nhân viên hợp lệ\", function () {\r
+
+      \    pm.expect(res).to.be.an('array');\r
+
+      \    if (res.length > 0) {\r
+
+      \        // Tự động gán ID nhân viên đầu tiên vào biến staffId\r
+
+      \        pm.environment.set(\"staffId\", res[0].id);\r
+
+      \        console.log(\"Đã cập nhật staffId: \" + res[0].id);\r
+
+      \    }\r
+
+      });"
+    language: text/javascript
+order: 1000

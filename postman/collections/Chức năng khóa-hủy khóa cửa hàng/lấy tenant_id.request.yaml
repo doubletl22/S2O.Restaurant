@@ -1,0 +1,83 @@
+$kind: http-request
+url: "{{baseUrl}}/api/v1/tenants?keyword={{kw}}"
+method: GET
+queryParams:
+  keyword: "{{kw}}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{c_token}}"
+scripts:
+  - type: afterResponse
+    code: "let res = {};\r
+
+      try { res = pm.response.json(); } catch (e) { res = {}; }\r
+
+      \r
+
+      pm.test(\"Search tenant HTTP 200\", function () {\r
+
+      \  pm.expect(pm.response.code).to.eql(200);\r
+
+      });\r
+
+      \r
+
+      const items = Array.isArray(res.value) ? res.value : [];\r
+
+      \r
+
+      pm.test(\"Có dữ liệu tenant để thao tác\", function () {\r
+
+      \  pm.expect(Array.isArray(items)).to.eql(true);\r
+
+      \  pm.expect(items.length).to.be.above(0);\r
+
+      });\r
+
+      \r
+
+      // chọn tenant đầu tiên trong kết quả search\r
+
+      const picked = items[0];\r
+
+      \r
+
+      // lưu biến cho bước lock (đổi sang c_tenant_id)\r
+
+      pm.collectionVariables.set(\"c_tenant_id\", picked.id || \"\");\r
+
+      pm.collectionVariables.set(\"tenant_name\", picked.name || \"\");\r
+
+      pm.collectionVariables.set(\"tenant_search_keyword\",
+      String(pm.collectionVariables.get(\"kw\") || \"\"));\r
+
+      pm.collectionVariables.set(\"tenant_search_count\",
+      String(items.length));\r
+
+      pm.collectionVariables.set(\"tenant_search_list_json\",
+      JSON.stringify(items));\r
+
+      \r
+
+      pm.test(\"Đã lấy c_tenant_id\", function () {\r
+
+      \ 
+      pm.expect(pm.collectionVariables.get(\"c_tenant_id\")).to.be.a(\"string\"\
+      ).and.not.empty;\r
+
+      });\r
+
+      \r
+
+      console.log(\"Picked tenant:\", {\r
+
+      \  id: pm.collectionVariables.get(\"c_tenant_id\"),\r
+
+      \  name: pm.collectionVariables.get(\"tenant_name\"),\r
+
+      \  count: items.length\r
+
+      });"
+    language: text/javascript
+order: 2000
