@@ -1,5 +1,6 @@
 ﻿using S2O.Order.Domain.Enums;
 using S2O.Shared.Kernel.Primitives;
+using System.Text.Json.Serialization;
 namespace S2O.Order.Domain.Entities;
 
 public class OrderItem : Entity, IMustHaveTenant
@@ -13,6 +14,7 @@ public class OrderItem : Entity, IMustHaveTenant
     public decimal TotalPrice { get; set; }
     public string? Note { get; set; }
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
+    [JsonIgnore]
     public Order Order { get; set; } = null!;
     public Guid? TenantId { get; set; }
 }

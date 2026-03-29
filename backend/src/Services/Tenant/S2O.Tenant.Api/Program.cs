@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using S2O.Shared.Infra;
 using S2O.Shared.Infra.Services;
 using S2O.Shared.Kernel.Interfaces;
+using S2O.Tenant.Api.Services;
 using S2O.Tenant.App.Features.Tables;
 using S2O.Tenant.Infra;
 using System.Reflection;
@@ -35,6 +36,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTenantInfra(builder.Configuration);
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateTableCommand).Assembly));
+builder.Services.AddScoped<IAdminStatsService, AdminStatsService>();
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
