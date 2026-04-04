@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using S2O.Tenant.App.Features.Tenants.Commands;
 using S2O.Tenant.App.Features.Tenants.Queries;
+using S2O.Shared.Kernel.Results;
 
 namespace S2O.Tenant.Api.Controllers;
 
@@ -47,6 +48,20 @@ public class TenantsController : ControllerBase
     {
         var result = await _mediator.Send(new ToggleTenantLockCommand(id, false));
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
+    // Internal endpoint - for other services to check tenant lock status during login
+    [HttpGet("{id}/check-lock-status")]
+    [AllowAnonymous]
+    public async Task<IActionResult> CheckTenantLockStatus(Guid id)
+    {
+        var result = await _mediator.Send(new GetTenantStatusQuery(id));
+        if (!result.IsSuccess)
+        {
+            return NotFound(result.Error);
+        }
+
+        return Ok(result);
     }
 
     [HttpDelete("{id}")]

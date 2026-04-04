@@ -3,6 +3,7 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using S2O.Identity.App.Abstractions;
+using S2O.Identity.App.Features.Login;
 using S2O.Identity.App.Services;
 using S2O.Identity.Domain.Entities;
 using S2O.Identity.Infra.Authentication;
@@ -56,6 +57,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 
+builder.Services.AddHttpClient<LoginCommandHandler>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
