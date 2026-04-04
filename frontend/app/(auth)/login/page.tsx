@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -15,8 +15,18 @@ import { LoginRequest } from "@/lib/types"; // Đảm bảo file này tồn tạ
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const { register, handleSubmit } = useForm<LoginRequest>();
+
+  // Hiển thị thông báo đăng xuất thành công hoặc session hết hạn
+  useEffect(() => {
+    if (searchParams.get('logged_out') === 'true') {
+      toast.success('Đã đăng xuất thành công');
+    } else if (searchParams.get('session_expired') === 'true') {
+      toast.info('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại');
+    }
+  }, [searchParams]);
 
   const getErrorMessage = (error: any): string => {
     if (!error) return "Đăng nhập thất bại";

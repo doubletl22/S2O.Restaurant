@@ -65,7 +65,7 @@ http.interceptors.response.use(
         // Show toast + delay redirect để user thấy message
         toast.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.');
         setTimeout(() => {
-          window.location.href = '/login';
+          window.location.href = '/login?session_expired=true';
         }, 1000);
       }
     }
