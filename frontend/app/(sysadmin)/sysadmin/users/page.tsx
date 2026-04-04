@@ -34,6 +34,15 @@ export default function UsersPage() {
   const loadData = async () => {
     try {
       setLoading(true);
+      
+      // Check token exists
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        toast.error("Token không tồn tại, vui lòng đăng nhập lại");
+        window.location.href = '/login';
+        return;
+      }
+
       const res = await adminService.getSystemUsers({ page: 1, size: 1000 });
       
       // Kiểm tra res có dữ liệu items không (PagedResult)
@@ -42,9 +51,19 @@ export default function UsersPage() {
       } else {
         setUsers([]); 
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Lỗi tải danh sách người dùng");
+    } catch (error: any) {
+      console.error("Load data error:", error);
+      
+      // Check if 401 Unauthorized
+      if (error?.status === 401 || error?.response?.status === 401) {
+        toast.error("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
+        // HTTP interceptor đã handle redirect, nhưng confirm one more time
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
+      } else {
+        toast.error("Lỗi tải danh sách người dùng");
+      }
     } finally {
       setLoading(false);
     }

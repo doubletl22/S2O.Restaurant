@@ -20,9 +20,26 @@ export const authService = {
     return response;
   },
   
-  logout: () => {
+  logout: async () => {
+    // Gọi API logout ở server để revoke session
+    try {
+      await http.post("/api/v1/auth/logout");
+    } catch (error) {
+      // Tiếp tục logout client-side ngay cả khi server error
+      console.warn("Server logout failed:", error);
+    }
+
+    // Xóa tất cả tokens và user data từ localStorage
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT";
+    
+    // Xóa tất cả cookies liên quan
+    const cookiesToRemove = ["token", "role", "s2o_auth_token", "auth_token", "user_role"];
+    cookiesToRemove.forEach(name => {
+      document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT`;
+    });
+
+    // Redirect về login
+    window.location.href = "/login";
   }
 };

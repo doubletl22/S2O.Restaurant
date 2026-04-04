@@ -5,7 +5,8 @@ import React from "react"
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+import { authService } from '@/services/auth.service'
 import {
   LayoutDashboard,
   Store,
@@ -60,7 +61,6 @@ const menuItems: MenuSection[] = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
-  const router = useRouter()
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 
   // Check if path is active (exact match or starts with path for nested routes)
@@ -73,10 +73,7 @@ export function AdminSidebar() {
 
   const handleLogout = () => {
     if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-      document.cookie = 'role=; path=/; max-age=0'
-      document.cookie = 's2o_auth_token=; path=/; max-age=0'
-      router.push('/login')
-      router.refresh()
+      authService.logout()
     }
   }
 

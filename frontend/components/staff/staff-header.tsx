@@ -1,12 +1,11 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation"; // 1. Import Hook Router
-import { deleteCookie } from "cookies-next"; 
 import { Bell, Search, Wifi, WifiOff, LogOut } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { authService } from "@/services/auth.service";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -19,17 +18,11 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 export function StaffHeader() {
-  // 2. Khởi tạo Router (Thiếu dòng này là lỗi ngay!)
-  const router = useRouter(); 
-  
   const isOnline = true; 
 
   const handleLogout = () => {
     if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-      document.cookie = 'role=; path=/; max-age=0'
-      document.cookie = 's2o_auth_token=; path=/; max-age=0'
-      router.push('/login')
-      router.refresh()
+      authService.logout()
     }
   }
 

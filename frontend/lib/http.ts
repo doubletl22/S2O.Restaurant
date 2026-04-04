@@ -52,13 +52,21 @@ http.interceptors.response.use(
         token && 
         !window.location.pathname.includes('/login')
       ) {
-        toast.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.');
-        
-        // Xóa token cũ
+        // Xóa token ngay để tránh request lại
         localStorage.removeItem('accessToken'); 
+        localStorage.removeItem('user');
         
-        // Chuyển hướng về trang login
-        window.location.href = '/login';
+        // Xóa cookies
+        const cookiesToRemove = ['token', 'role', 's2o_auth_token', 'auth_token', 'user_role'];
+        cookiesToRemove.forEach(name => {
+          document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT`;
+        });
+
+        // Show toast + delay redirect để user thấy message
+        toast.error('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1000);
       }
     }
 

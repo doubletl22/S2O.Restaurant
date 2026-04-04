@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using S2O.Identity.App.Features.Login;
 
 namespace S2O.Identity.Api.Controllers;
@@ -29,6 +30,17 @@ public class AuthController : ControllerBase
     {
         var result = await _sender.Send(command);
         return result.IsSuccess ? Ok(new { Token = result.Value }) : BadRequest(result.Error);
+    }
+
+    // POST: api/v1/auth/logout
+    [HttpPost("logout")]
+    [Authorize]
+    public IActionResult Logout()
+    {
+        // Revoke token/session tại server nếu có (trong tương lai)
+        // Hiện tại chỉ return 200 OK
+        // Client đã xóa token ở phía client-side
+        return Ok(new { message = "Logged out successfully" });
     }
 
 }

@@ -1,11 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
 import { User, LogOut, Key, Edit, ChevronDown } from 'lucide-react'
+import { authService } from '@/services/auth.service'
 
 export function AdminHeader() {
-  const router = useRouter()
   const [showDropdown, setShowDropdown] = useState(false)
   const [greeting, setGreeting] = useState('Chào buổi sáng')
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -36,10 +35,7 @@ export function AdminHeader() {
 
   const handleLogout = () => {
     if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-      document.cookie = 'role=; path=/; max-age=0'
-      document.cookie = 's2o_auth_token=; path=/; max-age=0'
-      router.push('/login')
-      router.refresh()
+      authService.logout()
     }
   }
 
