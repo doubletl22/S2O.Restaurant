@@ -69,6 +69,10 @@ builder.Services.AddHttpClient<ITableResolverClient, TableResolverClient>(client
 {
     client.BaseAddress = new Uri(builder.Configuration["ExternalServices:TenantUrl"]!);
 });
+builder.Services.AddHttpClient<ITenantClient, TenantClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ExternalServices:TenantUrl"]!);
+});
 
 var app = builder.Build();
 

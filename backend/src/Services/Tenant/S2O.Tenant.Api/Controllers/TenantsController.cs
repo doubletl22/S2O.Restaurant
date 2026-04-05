@@ -32,6 +32,16 @@ public class TenantsController : ControllerBase
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
+    // PATCH: api/v1/tenants/{id}/toggle-lock
+    [HttpPatch("{id}/toggle-lock")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> ToggleLockPatch(Guid id, [FromQuery] bool? isLocked)
+    {
+        // If isLocked is provided, set to that value; if not provided, toggle
+        var result = await _mediator.Send(new ToggleTenantLockCommand(id, isLocked ?? false, isLocked == null));
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+    }
+
     // POST: api/v1/tenants/{id}/lock
     [HttpPost("{id}/lock")]
     [Authorize(Roles = "SystemAdmin")]

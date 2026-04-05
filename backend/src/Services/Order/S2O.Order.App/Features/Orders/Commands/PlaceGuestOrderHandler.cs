@@ -11,15 +11,18 @@ public class PlaceGuestOrderHandler : IRequestHandler<PlaceGuestOrderCommand, Re
     private readonly IOrderDbContext _context;
     private readonly ICatalogClient _catalogClient; // Service gọi sang Catalog
     private readonly ITableResolverClient _tableResolverClient;
+    private readonly ITenantClient _tenantClient; // Check tenant lock status
 
     public PlaceGuestOrderHandler(
         IOrderDbContext context,
         ICatalogClient catalogClient,
-        ITableResolverClient tableResolverClient)
+        ITableResolverClient tableResolverClient,
+        ITenantClient tenantClient)
     {
         _context = context;
         _catalogClient = catalogClient;
         _tableResolverClient = tableResolverClient;
+        _tenantClient = tenantClient;
     }
 
     public async Task<Result<Guid>> Handle(PlaceGuestOrderCommand request, CancellationToken ct)
@@ -33,6 +36,13 @@ public class PlaceGuestOrderHandler : IRequestHandler<PlaceGuestOrderCommand, Re
         if (resolvedTable.TenantId == Guid.Empty || resolvedTable.BranchId == Guid.Empty)
         {
             return Result<Guid>.Failure(new Error("Order.InvalidTable", "Thông tin tenant hoặc chi nhánh của bàn không hợp lệ."));
+        }
+
+        // ✅ Check if tenant is locked
+        var isTenantLocked = await _tenantClient.IsLockedAsync(resolvedTable.TenantId, ct);
+        if (isTenantLocked)
+        {
+            return Result<Guid>.Failure(new Error("Order.TenantLocked", "Nhà hàng này hiện đang bị khóa. Không thể tạo đơn hàng."));
         }
 
         // 1. Tạo đơn hàng (Order Header)

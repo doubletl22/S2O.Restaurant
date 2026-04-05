@@ -15,19 +15,22 @@ public class PlaceCustomerOrderHandler : IRequestHandler<PlaceCustomerOrderComma
     private readonly IUserContext _userContext;
     private readonly ITenantContext _tenantContext;
     private readonly ICatalogClient _catalogClient;
+    private readonly ITenantClient _tenantClient; // Check tenant lock status
 
     public PlaceCustomerOrderHandler(
         IOrderDbContext context,
         IOrderNotifier notifier,
         IUserContext userContext,
         ITenantContext tenantContext,
-        ICatalogClient catalogClient)
+        ICatalogClient catalogClient,
+        ITenantClient tenantClient)
     {
         _context = context;
         _notifier = notifier;
         _userContext = userContext;
         _tenantContext = tenantContext;
         _catalogClient = catalogClient;
+        _tenantClient = tenantClient;
     }
 
     public async Task<Result<Guid>> Handle(PlaceCustomerOrderCommand request, CancellationToken cancellationToken)
@@ -35,6 +38,13 @@ public class PlaceCustomerOrderHandler : IRequestHandler<PlaceCustomerOrderComma
         var userId = _userContext.UserId ?? throw new UnauthorizedAccessException("User ID is missing");
         var tenantId = _tenantContext.TenantId ?? throw new UnauthorizedAccessException("Tenant ID is missing");
         var branchId = _tenantContext.BranchId ?? throw new UnauthorizedAccessException("Branch ID is missing");
+
+        // ✅ Check if tenant is locked
+        var isTenantLocked = await _tenantClient.IsLockedAsync(tenantId, cancellationToken);
+        if (isTenantLocked)
+        {
+            return Result<Guid>.Failure(new Error("Order.TenantLocked", "Nhà hàng này hiện đang bị khóa. Không thể tạo đơn hàng."));
+        }
 
         var order = new OrderEntity
         {
