@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, Building2, Lock, Unlock, Trash2, MoreHorizontal } from "lucide-react";
+import { Plus, Search, Building2, Lock, Unlock, Trash2, MoreHorizontal, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,17 @@ import { TenantDialog } from "@/components/sysadmin/tenant-dialog";
 import { tenantService } from "@/services/tenant.service";
 import { Tenant } from "@/lib/types";
 
+// Helper: Normalize Vietnamese diacritics (ITC_4.2)
+// VD: "Phở" → "pho", "Café" → "cafe"
+function normalizeVietnamese(str: string): string {
+  if (!str) return "";
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+    .toLowerCase()
+    .trim();
+}
+
 export default function RestaurantsPage() {
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,24 +35,42 @@ export default function RestaurantsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [error, setError] = useState<string | null>(null);
   const pageSize = 10;
 
   const loadData = async (keyword?: string) => {
     try {
       setLoading(true);
+      setError(null);
       const res = await tenantService.getAll(keyword);
       
       if (res && res.isSuccess && Array.isArray(res.value)) {
         setTenants(res.value);
+        // ITC_4.3: Nếu không tìm thấy, hiển thị thông báo
+        if (keyword && res.value.length === 0) {
+          toast.info("Không tìm thấy nhà hàng phù hợp");
+        }
       } else {
-        setTenants([]); // Fallback về mảng rỗng nếu lỗi
-        if (res && !res.isSuccess) {
-            toast.error("Lỗi tải dữ liệu", { description: res.error?.message });
+        setTenants([]);
+        // ITC_4.4: Check authorization error (403)
+        if (res?.statusCode === 403) {
+          const errorMsg = "Bạn không có quyền truy cập trang này. Chỉ Admin có thể quản lý danh sách nhà hàng.";
+          setError(errorMsg);
+          toast.error("Truy cập bị từ chối", { description: errorMsg });
+        } else if (res && !res.isSuccess) {
+          toast.error("Lỗi tải dữ liệu", { description: res.error?.message });
         }
       }
     } catch (error) {
       console.error(error);
-      toast.error("Không thể tải danh sách nhà hàng");
+      // ITC_4.4: Catch authorization errors
+      if (error instanceof Error && error.message.includes("403")) {
+        const errorMsg = "Bạn không có quyền truy cập trang này.";
+        setError(errorMsg);
+        toast.error("Truy cập bị từ chối", { description: errorMsg });
+      } else {
+        toast.error("Không thể tải danh sách nhà hàng");
+      }
     } finally {
       setLoading(false);
     }
@@ -111,24 +140,47 @@ export default function RestaurantsPage() {
 
   return (
     <div className="space-y-6">
+      {/* ITC_4.4: Error banner nếu không có quyền truy cập */}
+      {error && (
+        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          <AlertTriangle className="h-5 w-5 flex-shrink-0" />
+          <div className="flex-1">
+            <h3 className="font-semibold">Truy cập bị từ chối</h3>
+            <p className="text-sm">{error}</p>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
            <h1 className="text-2xl font-bold tracking-tight">Quản lý Đối tác</h1>
            <p className="text-muted-foreground text-sm">Danh sách các nhà hàng (Tenants) trên hệ thống.</p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)}>
+        <Button onClick={() => setIsDialogOpen(true)} disabled={!!error}>
           <Plus className="mr-2 h-4 w-4" /> Đăng ký mới
         </Button>
       </div>
 
-      <div className="flex bg-card p-2 rounded-md border w-full sm:max-w-sm">
-        <Search className="h-4 w-4 text-muted-foreground ml-2 mt-3" />
+      {/* ITC_4.1, ITC_4.2: Search box với support Vietnamese diacritics */}
+      <div className="flex items-center gap-2 bg-card p-2 rounded-md border w-full sm:max-w-sm">
+        <Search className="h-4 w-4 text-muted-foreground ml-2 flex-shrink-0" />
         <Input 
-          placeholder="Tìm kiếm nhà hàng..." 
-          className="border-0 focus-visible:ring-0"
+          placeholder="Tìm theo Tên, ID... (VD: pizza, phở, 12345678)" 
+          className="border-0 focus-visible:ring-0 flex-1"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        {/* ITC_4.3: Nút xóa bộ lọc */}
+        {searchTerm && (
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setSearchTerm("")}
+            title="Xóa bộ lọc"
+          >
+            ✕
+          </Button>
+        )}
       </div>
 
       <div className="rounded-md border bg-card">
@@ -147,7 +199,28 @@ export default function RestaurantsPage() {
             {loading ? (
                <TableRow><TableCell colSpan={5} className="text-center h-24">Đang tải...</TableCell></TableRow>
             ) : tenants.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center h-32">Không có dữ liệu.</TableCell></TableRow>
+              <TableRow>
+                <TableCell colSpan={5} className="text-center h-32">
+                  <div className="flex flex-col items-center gap-2">
+                    {/* ITC_4.3: Empty state message */}
+                    <Building2 className="h-8 w-8 text-muted-foreground opacity-50" />
+                    <p className="text-muted-foreground">
+                      {searchTerm 
+                        ? "Không tìm thấy nhà hàng phù hợp với từ khóa." 
+                        : "Không có nhà hàng nào trong hệ thống."}
+                    </p>
+                    {searchTerm && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setSearchTerm("")}
+                      >
+                        Xóa bộ lọc
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
             ) : (
               pagedTenants.map((tenant) => (
                 <TableRow key={tenant.id}>

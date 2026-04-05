@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using S2O.Tenant.App.Abstractions;
 using S2O.Shared.Kernel.Results;
+using System.Globalization;
+using System.Text;
 
 namespace S2O.Tenant.App.Features.Tenants.Queries;
 
@@ -19,23 +21,76 @@ public class GetAllTenantsHandler : IRequestHandler<GetAllTenantsQuery, Result<L
         _context = context;
     }
 
+    /// <summary>
+    /// Chuẩn hóa string: Xóa diacritics (dấu tiếng Việt), chuyển thường, loại khoảng trắng thừa
+    /// VD: "Nhà Hàng PHỞ" → "nha hang pho"
+    /// </summary>
+    private string NormalizeString(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return string.Empty;
+
+        // Normalize Unicode (NFD) + loại bỏ diacritics
+        var normalizedString = input.Normalize(NormalizationForm.FormD);
+        var stringBuilder = new StringBuilder();
+
+        foreach (var c in normalizedString)
+        {
+            var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+            if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+            {
+                stringBuilder.Append(c);
+            }
+        }
+
+        // Loại bỏ khoảng trắng thừa + chuyển thường
+        return stringBuilder.ToString()
+            .Normalize(NormalizationForm.FormC)
+            .ToLowerInvariant()
+            .Trim();
+    }
+
     public async Task<Result<List<TenantDto>>> Handle(GetAllTenantsQuery request, CancellationToken ct)
     {
-        // Super Admin được quyền xem hết, không lọc theo TenantId
+        // ITC_4.4: Super Admin được quyền xem hết
         var query = _context.Tenants
             .AsNoTracking()
             .AsQueryable();
 
+        // ITC_4.1: Tìm kiếm đa mục tiêu (Name, ID)
         if (!string.IsNullOrWhiteSpace(request.Keyword))
         {
-            var keyword = request.Keyword.Trim().ToLower();
-            query = query.Where(t => t.Name.ToLower().Contains(keyword));
+            var normalizedKeyword = NormalizeString(request.Keyword);
+            var keywordLower = request.Keyword.Trim().ToLower();
+            
+            // First 8 chars of GUID (ITC_4.1 test case: 8 ký tự đầu của ID)
+            var idStartsWith = keywordLower;
+
+            // Load all tenants and filter in-memory with diacritics normalization
+            // (ITC_4.2: Vietnamese diacritics support)
+            var allTenants = await query.ToListAsync(ct);
+            
+            allTenants = allTenants.Where(t =>
+                // ITC_4.2: Diacritics-insensitive search (normalize both sides)
+                NormalizeString(t.Name).Contains(normalizedKeyword) ||
+                // ITC_4.1: Search bằng ID (GUID) - so sánh đầu tiên 8 ký tự hoặc full ID
+                t.Id.ToString().ToLower().StartsWith(idStartsWith) ||
+                t.Id.ToString().ToLower() == idStartsWith
+            ).ToList();
+
+            var tenants = allTenants
+                .Select(t => new TenantDto(t.Id, t.Name, t.SubscriptionPlan, t.IsLocked, t.CreatedAt))
+                .ToList();
+
+            /* ITC_4.3: Nếu không tìm thấy, return empty list
+               Frontend sẽ hiển thị "Không có dữ liệu" */
+            return Result<List<TenantDto>>.Success(tenants);
         }
 
-        var tenants = await query
+        var allTenantsNoFilter = await query
             .Select(t => new TenantDto(t.Id, t.Name, t.SubscriptionPlan, t.IsLocked, t.CreatedAt))
             .ToListAsync(ct);
 
-        return Result<List<TenantDto>>.Success(tenants);
+        return Result<List<TenantDto>>.Success(allTenantsNoFilter);
     }
 }

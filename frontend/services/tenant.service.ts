@@ -4,11 +4,26 @@ import { Result, Tenant, RegisterTenantRequest } from "@/lib/types";
 const ENDPOINT = "/api/v1/tenants";
 
 export const tenantService = {
-  // GET All
+  // GET All - ITC_4.1: Tìm kiếm đa mục tiêu, ITC_4.4: Authorization check
   getAll: async (keyword?: string): Promise<Result<Tenant[]>> => {
-    // Interceptor đã trả về data (Result object), ta chỉ cần ép kiểu về Result<Tenant[]>
-    const response = await http.get<Result<Tenant[]>>(ENDPOINT, { params: { keyword } });
-    return response as unknown as Result<Tenant[]>;
+    try {
+      const response = await http.get<Result<Tenant[]>>(ENDPOINT, { params: { keyword } });
+      return response as unknown as Result<Tenant[]>;
+    } catch (error: any) {
+      // ITC_4.4: Handle 403 Forbidden for authorization error
+      if (error?.status === 403 || error?.response?.status === 403) {
+        return {
+          isSuccess: false,
+          statusCode: 403,
+          error: {
+            code: "FORBIDDEN",
+            message: "Bạn không có quyền truy cập trang này. Chỉ Admin có thể quản lý danh sách nhà hàng."
+          },
+          value: []
+        } as unknown as Result<Tenant[]>;
+      }
+      throw error;
+    }
   },
 
   // Create
@@ -17,7 +32,7 @@ export const tenantService = {
     return response as unknown as Result<string>;
   },
 
-  // Lock/Unlock
+  // Lock/Unlock - ITC_6
   toggleLock: async (id: string, isLocked: boolean): Promise<Result<void>> => {
     const action = isLocked ? "lock" : "unlock";
     const response = await http.post<Result<void>>(`${ENDPOINT}/${id}/${action}`, {});
