@@ -22,5 +22,15 @@ public class TenantDbContext : BaseDbContext, ITenantDbContext
         modelBuilder.Entity<Table>().HasKey(x => x.Id);
         modelBuilder.Entity<Domain.Entities.Tenant>().HasKey(x => x.Id);
         modelBuilder.Entity<Branch>().HasKey(x => x.Id);
+        
+        // ✅ Global query filters for soft-delete
+        modelBuilder.Entity<Domain.Entities.Tenant>()
+            .HasQueryFilter(t => !t.IsDeleted);
+        
+        modelBuilder.Entity<Branch>()
+            .HasQueryFilter(b => !b.IsDeleted);
+        
+        modelBuilder.Entity<Table>()
+            .HasQueryFilter(t => !t.IsDeleted);
     }
 }

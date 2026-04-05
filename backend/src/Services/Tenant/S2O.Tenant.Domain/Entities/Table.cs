@@ -11,4 +11,8 @@ public class Table : Entity, IMustHaveTenant
     public string? QrCodeUrl { get; set; } 
     public bool IsOccupied { get; set; } = false;
     public bool IsActive { get; set; } = true;
+    
+    // Soft Delete
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? DeletedAtUtc { get; set; }
 }

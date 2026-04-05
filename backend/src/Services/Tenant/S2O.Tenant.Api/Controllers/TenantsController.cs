@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
 using S2O.Tenant.App.Features.Tenants.Commands;
 using S2O.Tenant.App.Features.Tenants.Queries;
@@ -72,6 +73,75 @@ public class TenantsController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    // DEBUG endpoint - verify soft-delete (ignore query filters)
+    [HttpGet("{id}/verify-delete")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> VerifyTenantDelete(Guid id)
+    {
+        var context = HttpContext.RequestServices.GetRequiredService<S2O.Tenant.Infra.Persistence.TenantDbContext>();
+        var tenant = context.Tenants.IgnoreQueryFilters().FirstOrDefault(t => t.Id == id);
+        
+        if (tenant == null)
+            return NotFound(new { Error = "Tenant not found in database" });
+        
+        return Ok(new
+        {
+            Value = new
+            {
+                Id = tenant.Id,
+                Name = tenant.Name,
+                IsDeleted = tenant.IsDeleted,
+                DeletedAtUtc = tenant.DeletedAtUtc,
+                IsLocked = tenant.IsLocked,
+                CreatedAt = tenant.CreatedAt
+            }
+        });
+    }
+
+    // DEBUG endpoint - verify cascade deleted branches
+    [HttpGet("{tenantId}/verify-branches-deleted")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> VerifyBranchesDeleted(Guid tenantId)
+    {
+        var context = HttpContext.RequestServices.GetRequiredService<S2O.Tenant.Infra.Persistence.TenantDbContext>();
+        var branches = context.Branches
+            .IgnoreQueryFilters()
+            .Where(b => b.TenantId == tenantId)
+            .Select(b => new
+            {
+                Id = b.Id,
+                Name = b.Name,
+                TenantId = b.TenantId,
+                IsDeleted = b.IsDeleted,
+                DeletedAtUtc = b.DeletedAtUtc
+            })
+            .ToList();
+        
+        return Ok(new { Value = branches });
+    }
+
+    // DEBUG endpoint - verify cascade deleted tables
+    [HttpGet("{tenantId}/verify-tables-deleted")]
+    [Authorize(Roles = "SystemAdmin")]
+    public async Task<IActionResult> VerifyTablesDeleted(Guid tenantId)
+    {
+        var context = HttpContext.RequestServices.GetRequiredService<S2O.Tenant.Infra.Persistence.TenantDbContext>();
+        var tables = context.Tables
+            .IgnoreQueryFilters()
+            .Where(t => t.TenantId == tenantId)
+            .Select(t => new
+            {
+                Id = t.Id,
+                Name = t.Name,
+                TenantId = t.TenantId,
+                IsDeleted = t.IsDeleted,
+                DeletedAtUtc = t.DeletedAtUtc
+            })
+            .ToList();
+        
+        return Ok(new { Value = tables });
     }
 
     [HttpDelete("{id}")]

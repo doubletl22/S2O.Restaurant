@@ -9,5 +9,8 @@ public class Branch : Entity, IMustHaveTenant
     public string? Address { get; set; }
     public string? PhoneNumber { get; set; }
     public bool IsActive { get; set; } = true;
-
+    
+    // Soft Delete
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? DeletedAtUtc { get; set; }
 }

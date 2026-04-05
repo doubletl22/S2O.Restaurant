@@ -15,4 +15,8 @@ public class Tenant : Entity
     public DateTime SubscriptionExpiry { get; set; }
     public bool IsLocked { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
+    // Soft Delete
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? DeletedAtUtc { get; set; }
 }
