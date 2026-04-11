@@ -1,0 +1,2 @@
+ALTER TABLE "Products" ALTER COLUMN "IsAvailable" SET DEFAULT true;
+ALTER TABLE "Products" ALTER COLUMN "IsActive" SET DEFAULT true;

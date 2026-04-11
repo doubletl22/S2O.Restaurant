@@ -190,6 +190,18 @@
       "DownstreamHostAndPorts": [ { "Host": "order-api", "Port": 8080 } ],
       "UpstreamPathTemplate": "/api/v1/kitchen/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+    },
+
+    // ==================================================================================
+    // 5. REPORTS (Dashboard Stats)
+    // ==================================================================================
+    {
+      "DownstreamPathTemplate": "/api/v1/reports/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [ { "Host": "tenant-api", "Port": 8080 } ],
+      "UpstreamPathTemplate": "/api/v1/reports/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] }
     }
   ],
   "GlobalConfiguration": {
