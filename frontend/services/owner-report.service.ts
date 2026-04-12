@@ -216,12 +216,17 @@ export const ownerReportService = {
   getDashboardStats: async (): Promise<Result<DashboardStats>> => {
     try {
       const direct = await http.get(`${ENDPOINT}/dashboard`) as any;
-      if (direct?.isSuccess && direct?.value) return direct;
-      if (direct && typeof direct === "object" && "totalRevenue" in direct) {
+      // Direct endpoint may return 204 NoContent or empty response
+      // In those cases, fall back to local aggregation
+      if (!direct) {
+        // Empty response - proceed to fallback
+      } else if (direct?.isSuccess && direct?.value) {
+        return direct;
+      } else if (direct && typeof direct === "object" && "totalRevenue" in direct) {
         return { isSuccess: true, value: direct as DashboardStats };
       }
     } catch {
-      // Fall back to local aggregation below.
+      // Fall back to local aggregation below (covers any network errors)
     }
 
     const [ordersRes, productsRes, staffRes] = await Promise.allSettled([
