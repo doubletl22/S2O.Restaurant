@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import { Users, Building2, DollarSign, Activity, Server, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { adminService } from "@/services/admin.service";
 import { tenantService } from "@/services/tenant.service";
 import { SysAdminStats, Tenant } from "@/lib/types";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { toast } from "sonner";
 
 function normalizeTenantList(payload: any): Tenant[] {
   if (Array.isArray(payload?.value)) return payload.value;
@@ -65,6 +68,10 @@ export default function SysAdminDashboard() {
   const [stats, setStats] = useState<SysAdminStats | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+  const [appliedFilter, setAppliedFilter] = useState<{ from?: string; to?: string }>({});
+  const [filterError, setFilterError] = useState<string>("");
 
   useEffect(() => {
     const loadStats = async (showLoading = false) => {
@@ -72,7 +79,7 @@ export default function SysAdminDashboard() {
         if (showLoading) setLoading(true);
 
         const [statsRes, tenantsRes, usersRes] = await Promise.allSettled([
-          adminService.getStats(),
+          adminService.getStats(appliedFilter),
           tenantService.getAll(),
           adminService.getSystemUsers(),
         ]);
@@ -92,12 +99,13 @@ export default function SysAdminDashboard() {
         const apiPlanCounts = normalizePlanTenantCounts(apiStats);
         const apiRevenueTrend = normalizeRevenueTrend(apiStats);
         const fallbackPlanCounts = buildPlanCountsFromTenants(tenants);
+        const hasFilter = Boolean(appliedFilter.from || appliedFilter.to);
         const computedStats: SysAdminStats = {
-          totalTenants: apiStats?.totalTenants ?? computedTotalTenants,
-          activeTenants: apiStats?.activeTenants ?? activeTenants,
+          totalTenants: apiStats?.totalTenants ?? (hasFilter ? 0 : computedTotalTenants),
+          activeTenants: apiStats?.activeTenants ?? (hasFilter ? 0 : activeTenants),
           totalRevenue: apiStats?.totalRevenue ?? 0,
           totalUsers: apiStats?.totalUsers && apiStats.totalUsers > 0 ? apiStats.totalUsers : usersCount,
-          planTenantCounts: apiPlanCounts.length > 0 ? apiPlanCounts : fallbackPlanCounts,
+          planTenantCounts: apiPlanCounts.length > 0 ? apiPlanCounts : (hasFilter ? [] : fallbackPlanCounts),
           revenueTrend: apiRevenueTrend,
         };
 
@@ -105,6 +113,7 @@ export default function SysAdminDashboard() {
         setLastUpdated(new Date().toLocaleTimeString("vi-VN"));
       } catch (e) {
         console.error("Lỗi tải dashboard stats:", e);
+        toast.error("Không tải được dữ liệu thống kê. Vui lòng thử lại.");
       } finally {
         if (showLoading) setLoading(false);
       }
@@ -114,7 +123,29 @@ export default function SysAdminDashboard() {
     const timer = setInterval(() => loadStats(false), 30000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [appliedFilter]);
+
+  const handleApplyFilter = () => {
+    if (fromDate && toDate && fromDate > toDate) {
+      const message = "Ngày bắt đầu không được lớn hơn ngày kết thúc.";
+      setFilterError(message);
+      toast.warning(message);
+      return;
+    }
+
+    setFilterError("");
+    setAppliedFilter({
+      from: fromDate || undefined,
+      to: toDate || undefined,
+    });
+  };
+
+  const handleResetFilter = () => {
+    setFromDate("");
+    setToDate("");
+    setFilterError("");
+    setAppliedFilter({});
+  };
 
   const formatMoney = (v: number) => 
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v);
@@ -126,8 +157,37 @@ export default function SysAdminDashboard() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Tổng quan Hệ thống</h1>
         <p className="text-muted-foreground">Theo dõi hoạt động của nền tảng S2O Restaurant SaaS.</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Khoảng lọc: {appliedFilter.from || "--/--/----"} đến {appliedFilter.to || "--/--/----"}
+        </p>
         <p className="text-xs text-muted-foreground mt-1">Cập nhật lúc: {lastUpdated || "--:--:--"}</p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Lọc thống kê theo thời gian</CardTitle>
+          <CardDescription>Chọn khoảng ngày và áp dụng để cập nhật số liệu, biểu đồ.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-4">
+            <div className="space-y-1">
+              <p className="text-sm font-medium">Từ ngày</p>
+              <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium">Đến ngày</p>
+              <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+            </div>
+            <div className="flex items-end">
+              <Button onClick={handleApplyFilter} className="w-full">Áp dụng lọc</Button>
+            </div>
+            <div className="flex items-end">
+              <Button variant="outline" onClick={handleResetFilter} className="w-full">Xóa lọc</Button>
+            </div>
+          </div>
+          {filterError ? <p className="mt-2 text-sm text-red-600">{filterError}</p> : null}
+        </CardContent>
+      </Card>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>

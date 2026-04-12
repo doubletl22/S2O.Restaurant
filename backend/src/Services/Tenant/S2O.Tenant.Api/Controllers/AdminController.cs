@@ -22,9 +22,26 @@ public class AdminController : ControllerBase
     // GET: api/v1/admin/stats
     [HttpGet("stats")]
     [Authorize(Roles = "SystemAdmin")]
-    public async Task<IActionResult> GetStats()
+    public async Task<IActionResult> GetStats([FromQuery] DateOnly? from = null, [FromQuery] DateOnly? to = null)
     {
-        var stats = await _adminStatsService.GetStatsAsync(Request.Headers.Authorization.ToString(), HttpContext.RequestAborted);
+        if (from.HasValue && to.HasValue && from.Value > to.Value)
+        {
+            return BadRequest(new
+            {
+                IsSuccess = false,
+                Error = new
+                {
+                    Code = "INVALID_DATE_RANGE",
+                    Description = "Ngày bắt đầu không được lớn hơn ngày kết thúc."
+                }
+            });
+        }
+
+        var stats = await _adminStatsService.GetStatsAsync(
+            Request.Headers.Authorization.ToString(),
+            from,
+            to,
+            HttpContext.RequestAborted);
         return Ok(new { IsSuccess = true, Value = stats });
     }
 

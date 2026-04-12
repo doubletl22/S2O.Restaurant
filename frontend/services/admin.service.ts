@@ -2,8 +2,8 @@ import http from "@/lib/http";
 import { PagedResult, User, Result, SysAdminStats } from "@/lib/types";
 
 export const adminService = {
-  getStats: async (): Promise<Result<SysAdminStats>> => {
-    const res = await http.get<Result<SysAdminStats>>("/api/v1/admin/stats");
+  getStats: async (params?: { from?: string; to?: string }): Promise<Result<SysAdminStats>> => {
+    const res = await http.get<Result<SysAdminStats>>("/api/v1/admin/stats", { params });
     return res as unknown as Result<SysAdminStats>;
   },
   

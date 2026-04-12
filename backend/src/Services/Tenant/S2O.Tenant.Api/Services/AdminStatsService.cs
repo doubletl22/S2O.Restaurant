@@ -8,7 +8,7 @@ namespace S2O.Tenant.Api.Services;
 
 public interface IAdminStatsService
 {
-    Task<AdminStatsDto> GetStatsAsync(string authorizationHeader, CancellationToken cancellationToken = default);
+    Task<AdminStatsDto> GetStatsAsync(string authorizationHeader, DateOnly? from, DateOnly? to, CancellationToken cancellationToken = default);
 }
 
 public sealed class AdminStatsService : IAdminStatsService
@@ -30,23 +30,39 @@ public sealed class AdminStatsService : IAdminStatsService
         _logger = logger;
     }
 
-    public async Task<AdminStatsDto> GetStatsAsync(string authorizationHeader, CancellationToken cancellationToken = default)
+    public async Task<AdminStatsDto> GetStatsAsync(string authorizationHeader, DateOnly? from, DateOnly? to, CancellationToken cancellationToken = default)
     {
-        var totalTenants = await _context.Tenants.CountAsync(cancellationToken);
-        var activeTenants = await _context.Tenants.CountAsync(t => t.IsActive && !t.IsLocked, cancellationToken);
-        var tenantSubscriptions = await _context.Tenants
+        var fromDateTime = from?.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+        var toExclusiveDateTime = to?.AddDays(1).ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+
+        var tenantsQuery = _context.Tenants.AsNoTracking();
+        if (fromDateTime.HasValue)
+        {
+            var start = fromDateTime.Value;
+            tenantsQuery = tenantsQuery.Where(t => t.CreatedAt >= start);
+        }
+
+        if (toExclusiveDateTime.HasValue)
+        {
+            var endExclusive = toExclusiveDateTime.Value;
+            tenantsQuery = tenantsQuery.Where(t => t.CreatedAt < endExclusive);
+        }
+
+        var totalTenants = await tenantsQuery.CountAsync(cancellationToken);
+        var activeTenants = await tenantsQuery.CountAsync(t => t.IsActive && !t.IsLocked, cancellationToken);
+        var tenantSubscriptions = await tenantsQuery
             .AsNoTracking()
             .Select(t => new TenantSubscriptionRevenueModel(t.SubscriptionPlan, t.CreatedAt, t.SubscriptionExpiry))
             .ToListAsync(cancellationToken);
         var planTenantCounts = BuildPlanTenantCounts(tenantSubscriptions);
-        var revenueTrend = BuildRevenueTrend(tenantSubscriptions, 6);
+        var revenueTrend = BuildRevenueTrend(tenantSubscriptions, fromDateTime, toExclusiveDateTime, 6);
         var usersResult = await GetTotalUsersSafeAsync(authorizationHeader, cancellationToken);
 
         return new AdminStatsDto
         {
             TotalTenants = totalTenants,
             ActiveTenants = activeTenants,
-            TotalRevenue = tenantSubscriptions.Sum(CalculateAccumulatedRevenue),
+            TotalRevenue = tenantSubscriptions.Sum(t => CalculateRevenueInPeriod(t, fromDateTime, toExclusiveDateTime)),
             PlanTenantCounts = planTenantCounts,
             RevenueTrend = revenueTrend,
             TotalUsers = usersResult.TotalUsers,
@@ -68,14 +84,31 @@ public sealed class AdminStatsService : IAdminStatsService
         };
     }
 
-    private static List<RevenuePointDto> BuildRevenueTrend(IEnumerable<TenantSubscriptionRevenueModel> tenantSubscriptions, int months)
+    private static List<RevenuePointDto> BuildRevenueTrend(
+        IEnumerable<TenantSubscriptionRevenueModel> tenantSubscriptions,
+        DateTime? from,
+        DateTime? toExclusive,
+        int defaultMonths)
     {
-        var cursorMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1).AddMonths(-(months - 1));
+        var startMonth = from.HasValue
+            ? new DateTime(from.Value.Year, from.Value.Month, 1)
+            : new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1).AddMonths(-(defaultMonths - 1));
+        var endMonth = toExclusive.HasValue
+            ? new DateTime(toExclusive.Value.AddDays(-1).Year, toExclusive.Value.AddDays(-1).Month, 1)
+            : new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+
+        if (endMonth < startMonth)
+        {
+            return new List<RevenuePointDto>();
+        }
+
         var monthRevenue = new Dictionary<DateTime, decimal>();
 
-        for (var i = 0; i < months; i++)
+        var monthCursor = startMonth;
+        while (monthCursor <= endMonth)
         {
-            monthRevenue[cursorMonth.AddMonths(i)] = 0;
+            monthRevenue[monthCursor] = 0;
+            monthCursor = monthCursor.AddMonths(1);
         }
 
         foreach (var subscription in tenantSubscriptions)
@@ -106,7 +139,7 @@ public sealed class AdminStatsService : IAdminStatsService
             .ToList();
     }
 
-    private static decimal CalculateAccumulatedRevenue(TenantSubscriptionRevenueModel tenant)
+    private static decimal CalculateRevenueInPeriod(TenantSubscriptionRevenueModel tenant, DateTime? from, DateTime? toExclusive)
     {
         var monthlyPrice = PlanPolicy.GetMonthlyPrice(tenant.SubscriptionPlan);
         if (monthlyPrice <= 0)
@@ -114,7 +147,14 @@ public sealed class AdminStatsService : IAdminStatsService
             return 0;
         }
 
-        var billedMonths = CountBilledMonths(tenant.CreatedAt, tenant.SubscriptionExpiry);
+        var start = from.HasValue && from.Value > tenant.CreatedAt
+            ? from.Value
+            : tenant.CreatedAt;
+        var end = toExclusive.HasValue && toExclusive.Value < tenant.SubscriptionExpiry
+            ? toExclusive.Value
+            : tenant.SubscriptionExpiry;
+
+        var billedMonths = CountBilledMonths(start, end);
 
         return billedMonths * monthlyPrice;
     }
