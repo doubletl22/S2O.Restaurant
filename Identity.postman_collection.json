@@ -1,0 +1,296 @@
+{
+  "info": {
+    "_postman_id": "s2o-restaurant-identity-collection",
+    "name": "Identity - S2O Restaurant",
+    "description": "Collection test API Identity Service (7 API)\n\n1. Auth: Login, Firebase Login\n2. CRUD Users: Create, Read, Update Role, Reset Password, Delete\n\nBase URL: http://localhost:5000 (qua API Gateway)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "user_id", "value": "", "type": "string" },
+    { "key": "tenant_id", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "01 - Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Đăng nhập thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response có accessToken', function () {",
+                  "    pm.expect(pm.response.json()).to.have.property('accessToken');",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('token', json.accessToken);",
+                  "    console.log('Token đã lưu tự động!');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@s2o.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Đăng nhập bằng email/password.\nToken JWT tự động lưu vào {{token}} sau khi thành công."
+          }
+        },
+        {
+          "name": "02 - Firebase Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Firebase Login thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    const token = json.token || json.Token || json.accessToken;",
+                  "    if (token) {",
+                  "        pm.collectionVariables.set('token', token);",
+                  "        console.log('Firebase token đã lưu!');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firebaseToken\": \"FIREBASE_ID_TOKEN_HERE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/firebase-login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "firebase-login"]
+            },
+            "description": "Đăng nhập bằng Firebase ID Token.\nThay FIREBASE_ID_TOKEN_HERE bằng token từ Firebase Authentication."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. CRUD Users",
+      "item": [
+        {
+          "name": "03 - Tạo User (Create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Tạo user thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response chứa UserId', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('UserId');",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.UserId) {",
+                  "        pm.collectionVariables.set('user_id', json.UserId);",
+                  "        console.log('user_id đã lưu:', json.UserId);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"owner.new@nhahangnew.com\",\n  \"password\": \"Owner@123\",\n  \"fullName\": \"Chủ nhà hàng Mới\",\n  \"role\": \"RestaurantOwner\",\n  \"tenantId\": \"{{tenant_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Tạo tài khoản mới (chỉ SystemAdmin hoặc RestaurantOwner).\n\n- SystemAdmin tạo RestaurantOwner: cần tenantId\n- SystemAdmin tạo SystemAdmin: tenantId = null\n\n⚠️ Lưu ý: Đang có bug ClaimTypes.Role trong backend - cần coder sửa."
+          }
+        },
+        {
+          "name": "04 - Danh sách Users (Read)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Lấy danh sách thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response có phân trang', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('items');",
+                  "    pm.expect(json).to.have.property('totalCount');",
+                  "    pm.expect(json).to.have.property('totalPages');",
+                  "});",
+                  "// Tự động lưu user_id đầu tiên",
+                  "const json = pm.response.json();",
+                  "const items = json.items || json.Items || [];",
+                  "if (items.length > 0) {",
+                  "    pm.collectionVariables.set('user_id', items[0].id || items[0].Id);",
+                  "    console.log('user_id đã lưu:', items[0].id || items[0].Id);",
+                  "}",
+                  "// Visualizer - Bảng danh sách",
+                  "const data = pm.response.json();",
+                  "const users = data.items || data.Items || [];",
+                  "const total = data.totalCount || data.TotalCount || 0;",
+                  "const totalPages = data.totalPages || data.TotalPages || 1;",
+                  "let rows = users.map(u => `<tr>",
+                  "    <td style='font-size:11px;color:#999'>${(u.id||u.Id||'').substring(0,8)}...</td>",
+                  "    <td><strong>${u.fullName||u.FullName||''}</strong></td>",
+                  "    <td>${u.email||u.Email||''}</td>",
+                  "    <td>${(u.roles||u.Roles||[]).join(', ')}</td>",
+                  "    <td style='color:${(u.isLocked||u.IsLocked)?'#e74c3c':'#2ecc71'}'>${(u.isLocked||u.IsLocked)?'🔒 Bị khóa':'✅ Hoạt động'}</td>",
+                  "</tr>`).join('');",
+                  "pm.visualizer.set(`<style>body{font-family:Arial;padding:16px}p{color:#666}.meta{margin-bottom:12px}table{width:100%;border-collapse:collapse}th{background:#4361ee;color:white;padding:10px;text-align:left}td{padding:8px 10px;border-bottom:1px solid #eee;font-size:13px}tr:hover{background:#f0f4ff}</style><h3>👥 Danh sách Users</h3><p class='meta'>Tổng: <strong>${total}</strong> người | <strong>${totalPages}</strong> trang</p><table><thead><tr><th>ID</th><th>Họ tên</th><th>Email</th><th>Role</th><th>Trạng thái</th></tr></thead><tbody>${rows}</tbody></table>`);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/users?page=1&size=20&keyword=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"],
+              "query": [
+                { "key": "page", "value": "1", "description": "Số trang" },
+                { "key": "size", "value": "20", "description": "Số item mỗi trang" },
+                { "key": "keyword", "value": "", "description": "Tìm theo tên hoặc email" }
+              ]
+            },
+            "description": "Lấy danh sách tất cả users có phân trang (chỉ SystemAdmin).\nTab Visualize hiển thị bảng danh sách."
+          }
+        },
+        {
+          "name": "05 - Cập nhật Role User (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Cập nhật role thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"newRole\": \"Manager\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}/role",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}", "role"]
+            },
+            "description": "Cập nhật role của user (SystemAdmin hoặc RestaurantOwner).\n\nCác role hợp lệ:\n- SystemAdmin\n- RestaurantOwner\n- Manager\n- Chef\n- Waiter"
+          }
+        },
+        {
+          "name": "06 - Đổi mật khẩu User (Update)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Đổi mật khẩu thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "\"NewPassword@123\""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}", "reset-password"]
+            },
+            "description": "Admin reset mật khẩu cho bất kỳ user nào.\n\nBody: chuỗi mật khẩu mới (có dấu ngoặc kép vì là raw JSON string)."
+          }
+        },
+        {
+          "name": "07 - Xóa User (Delete)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204 - Xóa user thành công', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "console.log('⚠️ User đã bị xóa vĩnh viễn!');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}"]
+            },
+            "description": "Xóa vĩnh viễn tài khoản user (SystemAdmin hoặc RestaurantOwner).\n\n⚠️ CẢNH BÁO: Không thể hoàn tác!"
+          }
+        }
+      ]
+    }
+  ]
+}

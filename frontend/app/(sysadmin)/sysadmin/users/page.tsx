@@ -10,8 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Cần import Select để chọn Role
-
 import { adminService } from "@/services/admin.service";
 import { User } from "@/lib/types";
 
@@ -20,36 +18,37 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const pageSize = 10;
-  
-  // Create User State
+
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newUser, setNewUser] = useState({ fullName: "", email: "", password: "", role: "SystemAdmin" });
 
-  // Reset Password State
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [newPassword, setNewPassword] = useState("");
 
-  const loadData = async () => {
+  const loadData = async (page = 1, keyword = "") => {
     try {
       setLoading(true);
-      
-      // Check token exists
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        toast.error("Token không tồn tại, vui lòng đăng nhập lại");
-        window.location.href = '/login';
-        return;
+
+      const params: Record<string, string | number> = {
+        page,
+        size: pageSize,
+      };
+
+      if (keyword.trim()) {
+        params.keyword = keyword.trim();
       }
 
-      const res = await adminService.getSystemUsers({ page: 1, size: 1000 });
-      
-      // Kiểm tra res có dữ liệu items không (PagedResult)
+      const res = await adminService.getSystemUsers(params);
+
       if (res && Array.isArray(res.items)) {
         setUsers(res.items);
+        setTotalCount(typeof res.totalCount === "number" ? res.totalCount : res.items.length);
       } else {
-        setUsers([]); 
+        setUsers([]);
+        setTotalCount(0);
       }
     } catch (error: any) {
       console.error("Load data error:", error);
@@ -69,37 +68,44 @@ export default function UsersPage() {
     }
   };
 
-  useEffect(() => { loadData(); }, []);
-  useEffect(() => { setCurrentPage(1); }, [searchTerm]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void loadData(currentPage, searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [currentPage, searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleCreateUser = async () => {
-      try {
-          // System Admin chỉ tạo System Admin khác. Nếu muốn tạo Owner thì phải có TenantId (như logic backend đã viết)
-          // Ở đây demo tạo System Admin đơn giản
-          await adminService.createUser(newUser);
-          toast.success("Tạo tài khoản thành công");
-          setCreateDialogOpen(false);
-          setNewUser({ fullName: "", email: "", password: "", role: "SystemAdmin" });
-          loadData();
-      } catch (e: any) {
-          toast.error("Tạo thất bại", { description: e?.response?.data || "Lỗi không xác định" });
-      }
-  }
+    try {
+      await adminService.createUser(newUser);
+      toast.success("Tạo tài khoản thành công");
+      setCreateDialogOpen(false);
+      setNewUser({ fullName: "", email: "", password: "", role: "SystemAdmin" });
+      await loadData(currentPage, searchTerm);
+    } catch (e: any) {
+      toast.error("Tạo thất bại", {
+        description: e?.response?.data || e?.description || e?.message || "Lỗi không xác định",
+      });
+    }
+  };
 
   const handleToggleLock = async (user: User) => {
-    // User interface cần bổ sung field IsLocked từ backend trả về
-    // Ép kiểu tạm thời để TS không báo lỗi: (user as any).isLocked
-    const isLocked = (user as any).isLocked; 
+    const isLocked = (user as any).isLocked;
     const action = isLocked ? "mở khóa" : "khóa";
-    
+
     if (!confirm(`Bạn có muốn ${action} tài khoản ${user.email}?`)) return;
 
     try {
       if (isLocked) await adminService.unlockUser(user.id);
       else await adminService.lockUser(user.id);
-      
+
       toast.success("Thao tác thành công");
-      loadData();
+      await loadData(currentPage, searchTerm);
     } catch (e) {
       toast.error("Lỗi kết nối");
     }
@@ -107,10 +113,11 @@ export default function UsersPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Cảnh báo: Xóa vĩnh viễn người dùng này?")) return;
+
     try {
       await adminService.deleteUser(id);
       toast.success("Đã xóa người dùng");
-      loadData();
+      await loadData(currentPage, searchTerm);
     } catch (e) {
       toast.error("Lỗi khi xóa");
     }
@@ -118,6 +125,7 @@ export default function UsersPage() {
 
   const handleResetPassword = async () => {
     if (!selectedUser || !newPassword) return;
+
     try {
       await adminService.resetPassword(selectedUser.id, newPassword);
       toast.success(`Đã đổi mật khẩu cho ${selectedUser.fullName}`);
@@ -129,13 +137,7 @@ export default function UsersPage() {
     }
   };
 
-  const filteredUsers = users.filter(u => 
-    (u.email?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-    (u.fullName?.toLowerCase() || "").includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / pageSize));
-  const pagedUsers = filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -147,8 +149,8 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-           <h1 className="text-2xl font-bold">Tài khoản Hệ thống</h1>
-           <p className="text-muted-foreground text-sm">Quản lý toàn bộ người dùng trong AspNetUsers.</p>
+          <h1 className="text-2xl font-bold">Tài khoản Hệ thống</h1>
+          <p className="text-muted-foreground text-sm">Quản lý toàn bộ người dùng trong AspNetUsers.</p>
         </div>
         <Button onClick={() => setCreateDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" /> Thêm Admin
@@ -157,8 +159,8 @@ export default function UsersPage() {
 
       <div className="flex bg-card p-2 rounded-md border w-full sm:max-w-sm">
         <Search className="h-4 w-4 text-muted-foreground ml-2 mt-3" />
-        <Input 
-          placeholder="Tìm user..." 
+        <Input
+          placeholder="Tìm user..."
           className="border-0 focus-visible:ring-0"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -176,8 +178,20 @@ export default function UsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {loading ? <TableRow><TableCell colSpan={4} className="text-center h-24">Đang tải...</TableCell></TableRow> : 
-            pagedUsers.map((user) => (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center h-24">
+                  Đang tải...
+                </TableCell>
+              </TableRow>
+            ) : users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center h-24 text-muted-foreground">
+                  Không có dữ liệu.
+                </TableCell>
+              </TableRow>
+            ) : (
+              users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -191,28 +205,43 @@ export default function UsersPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {/* Roles là mảng string */}
-                    {user.roles && user.roles.map(r => (
-                        <Badge key={r} variant="outline" className="mr-1">{r}</Badge>
+                    {user.roles?.map((role) => (
+                      <Badge key={role} variant="outline" className="mr-1">
+                        {role}
+                      </Badge>
                     ))}
                   </TableCell>
                   <TableCell>
-                     {(user as any).isLocked ? 
-                        <Badge variant="destructive">Locked</Badge> : 
-                        <Badge variant="secondary" className="text-green-600 bg-green-50">Active</Badge>
-                     }
+                    {(user as any).isLocked ? (
+                      <Badge variant="destructive">Locked</Badge>
+                    ) : (
+                      <Badge variant="secondary" className="text-green-600 bg-green-50">
+                        Active
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Quản trị</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => { setSelectedUser(user); setResetDialogOpen(true); }}>
                           <KeyRound className="mr-2 h-4 w-4" /> Đổi mật khẩu
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleToggleLock(user)}>
-                           {(user as any).isLocked ? <><Unlock className="mr-2 h-4 w-4" /> Mở khóa</> : <><Lock className="mr-2 h-4 w-4" /> Khóa</>}
+                          {(user as any).isLocked ? (
+                            <>
+                              <Unlock className="mr-2 h-4 w-4" /> Mở khóa
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="mr-2 h-4 w-4" /> Khóa
+                            </>
+                          )}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(user.id)}>
@@ -222,19 +251,18 @@ export default function UsersPage() {
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-            ))}
+              ))
+            )}
           </TableBody>
         </Table>
         <div className="flex items-center justify-between border-t px-4 py-3 text-sm">
-          <div className="text-muted-foreground">
-            Hiển thị {pagedUsers.length} / {filteredUsers.length} người dùng
-          </div>
+          <div className="text-muted-foreground">Hiển thị {users.length} / {totalCount} người dùng</div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={currentPage === 1 || loading}
             >
               Trước
             </Button>
@@ -242,8 +270,8 @@ export default function UsersPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              disabled={currentPage === totalPages || loading}
             >
               Sau
             </Button>
@@ -251,33 +279,50 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Dialog Create Admin */}
       <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
         <DialogContent>
-            <DialogHeader><DialogTitle>Thêm System Admin mới</DialogTitle></DialogHeader>
-            <div className="space-y-3 py-2">
-                <div><Label>Email</Label><Input value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} /></div>
-                <div><Label>Họ tên</Label><Input value={newUser.fullName} onChange={e => setNewUser({...newUser, fullName: e.target.value})} /></div>
-                <div><Label>Mật khẩu</Label><Input type="password" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} /></div>
-                <div>
-                    <Label>Vai trò</Label>
-                    <Input disabled value="SystemAdmin" />
-                    <p className="text-xs text-muted-foreground mt-1">Để tạo Chủ nhà hàng, vui lòng vào trang Quản lý Đối tác.</p>
-                </div>
+          <DialogHeader>
+            <DialogTitle>Thêm System Admin mới</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div>
+              <Label>Email</Label>
+              <Input value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} />
             </div>
-            <DialogFooter>
-                <Button onClick={handleCreateUser}>Tạo tài khoản</Button>
-            </DialogFooter>
+            <div>
+              <Label>Họ tên</Label>
+              <Input value={newUser.fullName} onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })} />
+            </div>
+            <div>
+              <Label>Mật khẩu</Label>
+              <Input type="password" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} />
+            </div>
+            <div>
+              <Label>Vai trò</Label>
+              <Input disabled value="SystemAdmin" />
+              <p className="text-xs text-muted-foreground mt-1">Để tạo Chủ nhà hàng, vui lòng vào trang Quản lý Đối tác.</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleCreateUser}>Tạo tài khoản</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-      
-      {/* Dialog Reset Password (Giữ nguyên như cũ) */}
+
       <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Đặt lại mật khẩu</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Đặt lại mật khẩu</DialogTitle>
+          </DialogHeader>
           <div className="space-y-4 py-4">
-            <div><Label>Tài khoản</Label><Input value={selectedUser?.email || ""} disabled className="bg-muted" /></div>
-            <div><Label>Mật khẩu mới</Label><Input type="text" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></div>
+            <div>
+              <Label>Tài khoản</Label>
+              <Input value={selectedUser?.email || ""} disabled className="bg-muted" />
+            </div>
+            <div>
+              <Label>Mật khẩu mới</Label>
+              <Input type="text" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+            </div>
           </div>
           <DialogFooter>
             <Button onClick={handleResetPassword}>Xác nhận</Button>

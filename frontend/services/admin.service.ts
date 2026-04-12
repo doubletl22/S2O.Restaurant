@@ -24,6 +24,6 @@ export const adminService = {
   
   unlockUser: async (id: string) => (await http.post(`/api/users/${id}/unlock`, {})) as unknown,
   
-  resetPassword: async (userId: string, newPassword: string) => 
-    (await http.put(`/api/users/${userId}/reset-password`, { newPassword })) as unknown
+  resetPassword: async (userId: string, newPassword: string) =>
+    (await http.put(`/api/users/${userId}/reset-password`, JSON.stringify(newPassword))) as unknown
 };

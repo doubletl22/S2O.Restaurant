@@ -66,7 +66,9 @@ export const useCreateStaff = (onSuccess?: () => void) => {
     mutationFn: staffService.create,
     onSuccess: () => {
       toast.success("Thêm nhân viên thành công");
-      queryClient.invalidateQueries({ queryKey: ["staffs"] });
+      queryClient.invalidateQueries({
+        predicate: (query) => Array.isArray(query.queryKey) && query.queryKey[0] === "staffs",
+      });
       onSuccess?.();
     },
     onError: (err: any) => {
@@ -82,7 +84,9 @@ export const useUpdateStaff = (onSuccess?: () => void) => {
     mutationFn: ({ id, data }: { id: string; data: any }) => staffService.update(id, data),
     onSuccess: () => {
       toast.success("Cập nhật thành công");
-      queryClient.invalidateQueries({ queryKey: ["staffs"] });
+      queryClient.invalidateQueries({
+        predicate: (query) => Array.isArray(query.queryKey) && query.queryKey[0] === "staffs",
+      });
       onSuccess?.();
     },
     onError: (err: any) => {
