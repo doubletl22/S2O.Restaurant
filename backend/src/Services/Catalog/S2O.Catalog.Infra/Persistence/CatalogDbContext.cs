@@ -27,12 +27,12 @@ public class CatalogDbContext : BaseDbContext, ICatalogDbContext
         builder.Entity<Product>()
             .Property(p => p.IsAvailable)
             .IsRequired()
-            .HasDefaultValue(true);
+            .ValueGeneratedNever();
             
         // ✅ IsActive: Required với default value
         builder.Entity<Product>()
             .Property(p => p.IsActive)
             .IsRequired()
-            .HasDefaultValue(true);
+            .ValueGeneratedNever();
     }
 }

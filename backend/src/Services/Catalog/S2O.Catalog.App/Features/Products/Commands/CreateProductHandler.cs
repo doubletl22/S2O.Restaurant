@@ -59,12 +59,19 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
         }
 
         // ✅ Upload Image
-        string imageUrl = "https://placehold.co/600x400";
+        string imageUrl = string.Empty;
 
         if (request.ImageFile != null && request.ImageFile.Length > 0)
         {
-            using var stream = request.ImageFile.OpenReadStream();
-            imageUrl = await _fileStorage.UploadFileAsync(stream, request.ImageFile.FileName);
+            try
+            {
+                using var stream = request.ImageFile.OpenReadStream();
+                imageUrl = await _fileStorage.UploadFileAsync(stream, request.ImageFile.FileName);
+            }
+            catch
+            {
+                imageUrl = string.Empty;
+            }
         }
         
         // ✅ Tạo Entity với đầy đủ required fields

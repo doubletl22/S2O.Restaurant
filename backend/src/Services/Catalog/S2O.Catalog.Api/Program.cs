@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using System.Text.Json; // ✅ add
 using S2O.Catalog.App.Abstractions;
 using S2O.Catalog.App.Features.Plans;
@@ -81,6 +82,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+var uploadRoot = Path.Combine(Path.GetTempPath(), "s2o-uploads");
+Directory.CreateDirectory(uploadRoot);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadRoot),
+    RequestPath = "/uploads"
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
