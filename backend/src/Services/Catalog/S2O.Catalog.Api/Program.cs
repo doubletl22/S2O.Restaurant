@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Text.Json; // ✅ add
 using S2O.Catalog.App.Abstractions;
+using S2O.Catalog.App.Features.Plans;
 using S2O.Catalog.App.Features.Products.Commands;
 using S2O.Catalog.Infra.Persistence;
 using S2O.Infra.Services;
@@ -23,6 +24,8 @@ builder.Services.AddDbContext<CatalogDbContext>((sp, options) => {
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<ICatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<ITenantSubscriptionReader, TenantSubscriptionReader>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateProductCommand).Assembly));
 
 /* =========================

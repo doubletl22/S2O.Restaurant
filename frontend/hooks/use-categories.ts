@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { categoryService } from "@/services/category.service";
 import { toast } from "sonner";
+import { getApiNotificationMessage } from "@/lib/api-error";
 
 // 1. Lấy danh sách
 export const useCategories = () => {
@@ -31,7 +32,7 @@ export const useCreateCategory = (onSuccess?: () => void) => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       onSuccess?.();
     },
-    onError: (err: any) => toast.error(err?.response?.data?.detail || "Lỗi tạo danh mục"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể thêm danh mục này.")),
   });
 };
 
@@ -45,7 +46,7 @@ export const useUpdateCategory = (onSuccess?: () => void) => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       onSuccess?.();
     },
-    onError: (err: any) => toast.error("Lỗi cập nhật danh mục"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể cập nhật danh mục này.")),
   });
 };
 
@@ -58,7 +59,7 @@ export const useDeleteCategory = () => {
       toast.success("Đã xóa danh mục");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
-    onError: (err: any) => toast.error("Không thể xóa danh mục này"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể xóa danh mục này.")),
   });
 };
 

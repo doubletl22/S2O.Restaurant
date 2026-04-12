@@ -3,6 +3,7 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using S2O.Identity.App.Abstractions;
+using S2O.Identity.App.Features.Plans;
 using S2O.Identity.App.Features.Login;
 using S2O.Identity.App.Services;
 using S2O.Identity.Domain.Entities;
@@ -58,9 +59,11 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 
 builder.Services.AddHttpClient<LoginCommandHandler>();
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
+builder.Services.AddScoped<ITenantSubscriptionReader, TenantSubscriptionReader>();
 
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(S2O.Identity.App.Features.Login.LoginCommand).Assembly));

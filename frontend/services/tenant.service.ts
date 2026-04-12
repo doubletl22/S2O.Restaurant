@@ -43,5 +43,13 @@ export const tenantService = {
   delete: async (id: string): Promise<Result<void>> => {
     const response = await http.delete<Result<void>>(`${ENDPOINT}/${id}`);
     return response as unknown as Result<void>;
+  },
+
+  // Renew subscription (SystemAdmin)
+  renewSubscription: async (id: string, months = 1): Promise<Result<void>> => {
+    const response = await http.post<Result<void>>(`/api/v1/admin/tenants/${id}/renew`, null, {
+      params: { months }
+    });
+    return response as unknown as Result<void>;
   }
 };

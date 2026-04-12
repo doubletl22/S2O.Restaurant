@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { productService } from "@/services/product.service";
 import { CreateProductRequest, Product } from "@/lib/types";
 import { toast } from "sonner";
+import { getApiNotificationMessage } from "@/lib/api-error";
 
 export const useProducts = (params?: { keyword?: string; categoryId?: string }) => {
   return useQuery({
@@ -34,7 +35,7 @@ export const useCreateProduct = (onSuccess?: () => void) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       onSuccess?.();
     },
-    onError: (err: any) => toast.error("Lỗi khi thêm món"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể thêm món này.")),
   });
 };
 
@@ -47,7 +48,7 @@ export const useUpdateProduct = (onSuccess?: () => void) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       onSuccess?.();
     },
-    onError: (err: any) => toast.error("Lỗi cập nhật món"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể cập nhật món này.")),
   });
 };
 
@@ -60,6 +61,6 @@ export const useDeleteProduct = () => {
       toast.success("Đã xóa món ăn");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
-    onError: (err: any) => toast.error("Không thể xóa món này"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể xóa món này.")),
   });
 };

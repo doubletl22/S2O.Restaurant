@@ -1,7 +1,9 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using S2O.Shared.Kernel.Results;
 using S2O.Tenant.Domain.Entities;
 using S2O.Tenant.App.Abstractions;
+using S2O.Tenant.App.Features.Plans;
 using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.IntegrationEvents;
 using System.Net.Http.Json;
@@ -39,6 +41,31 @@ public class CreateTableHandler : IRequestHandler<CreateTableCommand, Result<Gui
         if (_tenantContext.TenantId == null)
             return Result<Guid>.Failure(new Error("Auth.NoTenant", "Bạn chưa đăng nhập."));
 
+        var tenantId = _tenantContext.TenantId.Value;
+        var tenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Id == tenantId, ct);
+        if (tenant == null)
+            return Result<Guid>.Failure(new Error("Tenant.NotFound", "Không tìm thấy nhà hàng."));
+
+        if (tenant.IsLocked)
+            return Result<Guid>.Failure(new Error("Tenant.Locked", "Nhà hàng đã bị khóa."));
+
+        if (tenant.SubscriptionExpiry != default && tenant.SubscriptionExpiry < DateTime.UtcNow)
+        {
+            tenant.IsLocked = true;
+            await _context.SaveChangesAsync(ct);
+            return Result<Guid>.Failure(new Error("Tenant.SubscriptionExpired", "Gói dịch vụ đã hết hạn. Vui lòng gia hạn."));
+        }
+
+        if (!PlanPolicy.IsUnlimited(tenant.SubscriptionPlan))
+        {
+            var currentTables = await _context.Tables.CountAsync(t => t.TenantId == tenantId, ct);
+            var maxTables = PlanPolicy.GetTablesQuota(tenant.SubscriptionPlan);
+            if (currentTables >= maxTables)
+            {
+                return Result<Guid>.Failure(new Error("Quota.TablesExceeded", $"Gói {PlanPolicy.Normalize(tenant.SubscriptionPlan)} cho phép tối đa {maxTables} bàn."));
+            }
+        }
+
         // Validate BranchId
         if (request.BranchId == Guid.Empty)
             return Result<Guid>.Failure(new Error("Table.BranchRequired", "Vui lòng chọn chi nhánh."));
@@ -50,7 +77,7 @@ public class CreateTableHandler : IRequestHandler<CreateTableCommand, Result<Gui
             Id = tableId,
             Name = request.Name,
             Capacity = request.Capacity, // Gán Capacity
-            TenantId = _tenantContext.TenantId.Value,
+            TenantId = tenantId,
             BranchId = request.BranchId, // [QUAN TRỌNG] Gán BranchId để không bị null
             QrCodeUrl = tableId.ToString()
         };

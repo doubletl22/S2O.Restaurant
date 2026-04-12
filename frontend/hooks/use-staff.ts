@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import http from "@/lib/http";
 import { toast } from "sonner";
+import { getApiNotificationMessage } from "@/lib/api-error";
 
 // Service gọi API
 const staffService = {
@@ -71,10 +72,7 @@ export const useCreateStaff = (onSuccess?: () => void) => {
       });
       onSuccess?.();
     },
-    onError: (err: any) => {
-      const msg = err?.response?.data?.detail || err?.message || "Lỗi thêm nhân viên";
-      toast.error(msg);
-    },
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể thêm nhân viên này.")),
   });
 };
 
@@ -89,10 +87,7 @@ export const useUpdateStaff = (onSuccess?: () => void) => {
       });
       onSuccess?.();
     },
-    onError: (err: any) => {
-      const msg = err?.response?.data?.detail || err?.message || "Lỗi cập nhật";
-      toast.error(msg);
-    },
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể cập nhật nhân viên này.")),
   });
 };
 
@@ -105,9 +100,6 @@ export const useDeleteStaff = () => {
       toast.success("Đã xóa nhân viên");
       queryClient.invalidateQueries({ queryKey: ["staffs"] });
     },
-    onError: (err: any) => {
-      const msg = err?.response?.data?.detail || err?.message || "Lỗi xóa nhân viên";
-      toast.error(msg);
-    },
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể xóa nhân viên này.")),
   });
 };

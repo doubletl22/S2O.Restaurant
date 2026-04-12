@@ -8,21 +8,48 @@ import { adminService } from "@/services/admin.service";
 import { tenantService } from "@/services/tenant.service";
 import { SysAdminStats, Tenant } from "@/lib/types";
 
-function toDateValue(v?: string) {
-  if (!v) return 0;
-  const t = new Date(v).getTime();
-  return Number.isNaN(t) ? 0 : t;
-}
-
 function normalizeTenantList(payload: any): Tenant[] {
   if (Array.isArray(payload?.value)) return payload.value;
   if (Array.isArray(payload)) return payload;
   return [];
 }
 
+function normalizePlan(raw?: string) {
+  const plan = String(raw || "").trim().toLowerCase();
+  if (plan === "premium") return "Premium";
+  if (plan === "enterprise") return "Enterprise";
+  return "Free";
+}
+
+function buildPlanCountsFromTenants(tenants: Tenant[]) {
+  const counts = new Map<string, number>([
+    ["Free", 0],
+    ["Premium", 0],
+    ["Enterprise", 0],
+  ]);
+
+  for (const tenant of tenants) {
+    const plan = normalizePlan(tenant.planType || tenant.subscriptionPlan || tenant.plan);
+    counts.set(plan, (counts.get(plan) || 0) + 1);
+  }
+
+  return Array.from(counts, ([plan, tenantCount]) => ({ plan, tenantCount }));
+}
+
+function normalizePlanTenantCounts(payload: any) {
+  const source = payload?.planTenantCounts || payload?.PlanTenantCounts;
+  if (!Array.isArray(source)) {
+    return [];
+  }
+
+  return source.map((item: any) => ({
+    plan: normalizePlan(item?.plan || item?.Plan),
+    tenantCount: Number(item?.tenantCount ?? item?.TenantCount ?? 0),
+  }));
+}
+
 export default function SysAdminDashboard() {
   const [stats, setStats] = useState<SysAdminStats | null>(null);
-  const [recentTenants, setRecentTenants] = useState<Tenant[]>([]);
   const [lastUpdated, setLastUpdated] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
@@ -49,19 +76,17 @@ export default function SysAdminDashboard() {
 
         const activeTenants = tenants.filter((t) => t.isActive && !t.isLocked).length;
         const computedTotalTenants = tenants.length;
+        const apiPlanCounts = normalizePlanTenantCounts(apiStats);
+        const fallbackPlanCounts = buildPlanCountsFromTenants(tenants);
         const computedStats: SysAdminStats = {
           totalTenants: apiStats?.totalTenants ?? computedTotalTenants,
           activeTenants: apiStats?.activeTenants ?? activeTenants,
           totalRevenue: apiStats?.totalRevenue ?? 0,
           totalUsers: apiStats?.totalUsers && apiStats.totalUsers > 0 ? apiStats.totalUsers : usersCount,
-          recentTenants: tenants
-            .slice()
-            .sort((a, b) => toDateValue(b.createdAt || b.createdOn) - toDateValue(a.createdAt || a.createdOn))
-            .slice(0, 5),
+          planTenantCounts: apiPlanCounts.length > 0 ? apiPlanCounts : fallbackPlanCounts,
         };
 
         setStats(computedStats);
-        setRecentTenants((computedStats.recentTenants as Tenant[]) || []);
         setLastUpdated(new Date().toLocaleTimeString("vi-VN"));
       } catch (e) {
         console.error("Lỗi tải dashboard stats:", e);
@@ -117,12 +142,12 @@ export default function SysAdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Doanh thu (Platform)</CardTitle>
+            <CardTitle className="text-sm font-medium">Doanh thu (Platform lũy kế)</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatMoney(stats?.totalRevenue || 0)}</div>
-            <p className="text-xs text-muted-foreground">Phí thuê bao tháng này</p>
+            <p className="text-xs text-muted-foreground">Tổng phí thuê bao đã thu</p>
           </CardContent>
         </Card>
 
@@ -163,23 +188,18 @@ export default function SysAdminDashboard() {
 
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>Nhà hàng mới đăng ký</CardTitle>
-            <CardDescription>Top 5 tenant gần nhất</CardDescription>
+            <CardTitle>Số cửa hàng theo gói</CardTitle>
+            <CardDescription>Phân bổ tenant theo từng gói dịch vụ</CardDescription>
           </CardHeader>
           <CardContent>
-            {recentTenants.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Chưa có dữ liệu gần đây.</p>
+            {(stats?.planTenantCounts?.length || 0) === 0 ? (
+              <p className="text-sm text-muted-foreground">Chưa có dữ liệu gói dịch vụ.</p>
             ) : (
               <div className="space-y-3">
-                {recentTenants.map((tenant) => (
-                  <div key={tenant.id} className="flex items-center justify-between border-b pb-2 last:border-0">
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{tenant.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{tenant.ownerEmail || tenant.email || "--"}</p>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(tenant.createdAt || tenant.createdOn || Date.now()).toLocaleDateString("vi-VN")}
-                    </p>
+                {stats?.planTenantCounts?.map((planItem) => (
+                  <div key={planItem.plan} className="flex items-center justify-between border-b pb-2 last:border-0">
+                    <p className="text-sm font-medium">Gói {planItem.plan}</p>
+                    <p className="text-sm text-muted-foreground">{planItem.tenantCount} cửa hàng</p>
                   </div>
                 ))}
               </div>

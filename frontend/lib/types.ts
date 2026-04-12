@@ -56,9 +56,12 @@ export interface Tenant {
   isLocked: boolean;
   createdOn?: string;
   ownerEmail?: string;      
+  plan?: string;
   planType?: string;        
   subscriptionPlan?: string; 
-  createdAt?: string;       
+  createdAt?: string;
+  subscriptionExpiry?: string;
+  isSubscriptionExpired?: boolean;
 }
 
 export interface Branch {
@@ -217,6 +220,6 @@ export interface SysAdminStats {
   activeTenants: number;
   totalRevenue: number;
   totalUsers: number;
-  recentTenants?: any[];
+  planTenantCounts?: { plan: string; tenantCount: number }[];
 }
 

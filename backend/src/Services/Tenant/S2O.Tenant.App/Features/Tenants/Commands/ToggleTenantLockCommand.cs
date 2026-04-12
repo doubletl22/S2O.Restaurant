@@ -20,8 +20,16 @@ public class ToggleTenantLockHandler : IRequestHandler<ToggleTenantLockCommand, 
         var tenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Id == request.TenantId, ct);
         if (tenant == null) return Result.Failure(new Error("Tenant.NotFound", "Không tìm thấy nhà hàng"));
 
+        var targetIsLocked = request.IsToggle.HasValue && request.IsToggle.Value ? !tenant.IsLocked : request.IsLocked;
+        var isExpired = tenant.SubscriptionExpiry != default && tenant.SubscriptionExpiry < DateTime.UtcNow;
+
+        if (!targetIsLocked && isExpired)
+        {
+            return Result.Failure(new Error("Tenant.SubscriptionExpired", "Gói dịch vụ đã hết hạn. Vui lòng gia hạn trước khi mở khóa."));
+        }
+
         // If IsToggle is true, toggle the state; otherwise set to IsLocked value
-        tenant.IsLocked = request.IsToggle.HasValue && request.IsToggle.Value ? !tenant.IsLocked : request.IsLocked;
+        tenant.IsLocked = targetIsLocked;
         await _context.SaveChangesAsync(ct);
 
         return Result.Success();

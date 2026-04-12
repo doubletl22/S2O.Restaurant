@@ -8,7 +8,14 @@ using System.Text;
 namespace S2O.Tenant.App.Features.Tenants.Queries;
 
 // DTO trả về
-public record TenantDto(Guid Id, string Name, string Plan, bool IsLocked, DateTime CreatedAt);
+public record TenantDto(
+    Guid Id,
+    string Name,
+    string Plan,
+    bool IsLocked,
+    DateTime CreatedAt,
+    DateTime SubscriptionExpiry,
+    bool IsSubscriptionExpired);
 
 public record GetAllTenantsQuery(string? Keyword = null) : IRequest<Result<List<TenantDto>>>;
 
@@ -52,6 +59,21 @@ public class GetAllTenantsHandler : IRequestHandler<GetAllTenantsQuery, Result<L
 
     public async Task<Result<List<TenantDto>>> Handle(GetAllTenantsQuery request, CancellationToken ct)
     {
+        var utcNow = DateTime.UtcNow;
+        var expiredUnlockedTenants = await _context.Tenants
+            .Where(t => !t.IsLocked && t.SubscriptionExpiry != default && t.SubscriptionExpiry < utcNow)
+            .ToListAsync(ct);
+
+        if (expiredUnlockedTenants.Count > 0)
+        {
+            foreach (var tenant in expiredUnlockedTenants)
+            {
+                tenant.IsLocked = true;
+            }
+
+            await _context.SaveChangesAsync(ct);
+        }
+
         // ITC_4.4: Super Admin được quyền xem hết
         var query = _context.Tenants
             .AsNoTracking()
@@ -79,7 +101,14 @@ public class GetAllTenantsHandler : IRequestHandler<GetAllTenantsQuery, Result<L
             ).ToList();
 
             var tenants = allTenants
-                .Select(t => new TenantDto(t.Id, t.Name, t.SubscriptionPlan, t.IsLocked, t.CreatedAt))
+                .Select(t => new TenantDto(
+                    t.Id,
+                    t.Name,
+                    t.SubscriptionPlan,
+                    t.IsLocked,
+                    t.CreatedAt,
+                    t.SubscriptionExpiry,
+                    t.SubscriptionExpiry != default && t.SubscriptionExpiry < utcNow))
                 .ToList();
 
             /* ITC_4.3: Nếu không tìm thấy, return empty list
@@ -88,7 +117,14 @@ public class GetAllTenantsHandler : IRequestHandler<GetAllTenantsQuery, Result<L
         }
 
         var allTenantsNoFilter = await query
-            .Select(t => new TenantDto(t.Id, t.Name, t.SubscriptionPlan, t.IsLocked, t.CreatedAt))
+            .Select(t => new TenantDto(
+                t.Id,
+                t.Name,
+                t.SubscriptionPlan,
+                t.IsLocked,
+                t.CreatedAt,
+                t.SubscriptionExpiry,
+                t.SubscriptionExpiry != default && t.SubscriptionExpiry < utcNow))
             .ToListAsync(ct);
 
         return Result<List<TenantDto>>.Success(allTenantsNoFilter);

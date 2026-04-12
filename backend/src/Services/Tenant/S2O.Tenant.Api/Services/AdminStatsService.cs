@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using S2O.Tenant.App.Abstractions;
+using S2O.Tenant.App.Features.Plans;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -33,17 +34,70 @@ public sealed class AdminStatsService : IAdminStatsService
     {
         var totalTenants = await _context.Tenants.CountAsync(cancellationToken);
         var activeTenants = await _context.Tenants.CountAsync(t => t.IsActive && !t.IsLocked, cancellationToken);
+        var tenantSubscriptions = await _context.Tenants
+            .AsNoTracking()
+            .Select(t => new TenantSubscriptionRevenueModel(t.SubscriptionPlan, t.CreatedAt, t.SubscriptionExpiry))
+            .ToListAsync(cancellationToken);
+        var planTenantCounts = BuildPlanTenantCounts(tenantSubscriptions);
         var usersResult = await GetTotalUsersSafeAsync(authorizationHeader, cancellationToken);
 
         return new AdminStatsDto
         {
             TotalTenants = totalTenants,
             ActiveTenants = activeTenants,
-            TotalRevenue = 0,
+            TotalRevenue = tenantSubscriptions.Sum(CalculateAccumulatedRevenue),
+            PlanTenantCounts = planTenantCounts,
             TotalUsers = usersResult.TotalUsers,
             IsIdentityAvailable = usersResult.IsIdentityAvailable
         };
     }
+
+    private static List<PlanTenantCountDto> BuildPlanTenantCounts(IEnumerable<TenantSubscriptionRevenueModel> tenantSubscriptions)
+    {
+        var grouped = tenantSubscriptions
+            .GroupBy(t => PlanPolicy.Normalize(t.SubscriptionPlan))
+            .ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+
+        return new List<PlanTenantCountDto>
+        {
+            new(PlanPolicy.Free, grouped.GetValueOrDefault(PlanPolicy.Free, 0)),
+            new(PlanPolicy.Premium, grouped.GetValueOrDefault(PlanPolicy.Premium, 0)),
+            new(PlanPolicy.Enterprise, grouped.GetValueOrDefault(PlanPolicy.Enterprise, 0)),
+        };
+    }
+
+    private static decimal CalculateAccumulatedRevenue(TenantSubscriptionRevenueModel tenant)
+    {
+        var monthlyPrice = PlanPolicy.GetMonthlyPrice(tenant.SubscriptionPlan);
+        if (monthlyPrice <= 0)
+        {
+            return 0;
+        }
+
+        var billedMonths = CountBilledMonths(tenant.CreatedAt, tenant.SubscriptionExpiry);
+
+        return billedMonths * monthlyPrice;
+    }
+
+    private static int CountBilledMonths(DateTime start, DateTime end)
+    {
+        if (end <= start)
+        {
+            return 0;
+        }
+
+        var months = 0;
+        var cursor = start;
+        while (cursor < end)
+        {
+            months++;
+            cursor = cursor.AddMonths(1);
+        }
+
+        return months;
+    }
+
+    private sealed record TenantSubscriptionRevenueModel(string SubscriptionPlan, DateTime CreatedAt, DateTime SubscriptionExpiry);
 
     private async Task<TotalUsersResult> GetTotalUsersSafeAsync(string authorizationHeader, CancellationToken cancellationToken)
     {
@@ -104,7 +158,10 @@ public sealed class AdminStatsDto
 {
     public int TotalTenants { get; set; }
     public int ActiveTenants { get; set; }
-    public int TotalRevenue { get; set; }
+    public decimal TotalRevenue { get; set; }
+    public List<PlanTenantCountDto> PlanTenantCounts { get; set; } = new();
     public int TotalUsers { get; set; }
     public bool IsIdentityAvailable { get; set; }
 }
+
+public sealed record PlanTenantCountDto(string Plan, int TenantCount);

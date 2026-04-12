@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, Building2, Lock, Unlock, Trash2, MoreHorizontal, AlertTriangle } from "lucide-react";
+import { Plus, Search, Building2, Lock, Unlock, Trash2, MoreHorizontal, AlertTriangle, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,6 +89,11 @@ export default function RestaurantsPage() {
   }, [searchTerm]);
 
   const handleToggleLock = async (tenant: Tenant) => {
+    if (isExpiredTenant(tenant) && tenant.isLocked) {
+      toast.info("Nhà hàng đã hết hạn. Vui lòng gia hạn trước khi mở khóa.");
+      return;
+    }
+
     // Nếu đang khóa (isLocked=true) -> Cần mở (isLocked mới = false)
     // Nếu đang mở (isLocked=false) -> Cần khóa (isLocked mới = true)
     const newStatusIsLocked = !tenant.isLocked;
@@ -126,6 +131,33 @@ export default function RestaurantsPage() {
       toast.error("Lỗi khi xóa nhà hàng");
     } finally {
       setTenantToDelete(null);
+    }
+  };
+
+  const isExpiredTenant = (tenant: Tenant) => {
+    if (tenant.isSubscriptionExpired) return true;
+    if (!tenant.subscriptionExpiry) return false;
+    const expiry = Date.parse(tenant.subscriptionExpiry);
+    return !Number.isNaN(expiry) && expiry < Date.now();
+  };
+
+  const getPlanLabel = (tenant: Tenant) =>
+    (tenant.planType || tenant.subscriptionPlan || tenant.plan || "Free").toUpperCase();
+
+  const handleRenew = async (tenant: Tenant) => {
+    if (!confirm(`Gia hạn thêm 1 tháng cho ${tenant.name}?`)) return;
+
+    try {
+      const res = await tenantService.renewSubscription(tenant.id, 1);
+      if (res?.isSuccess) {
+        toast.success("Gia hạn thành công và đã mở khóa nhà hàng.");
+        loadData(searchTerm);
+      } else {
+        toast.error("Gia hạn thất bại", { description: res?.error?.message });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Không thể gia hạn gói dịch vụ.");
     }
   };
 
@@ -238,15 +270,20 @@ export default function RestaurantsPage() {
 
                   <TableCell>
                     <Badge variant="outline" className="uppercase text-xs">
-                      {tenant.planType || tenant.subscriptionPlan || "Standard"}
+                      {getPlanLabel(tenant)}
                     </Badge>
                   </TableCell>
 
                   <TableCell>
-                    {tenant.isLocked ? (
+                    {tenant.isLocked || isExpiredTenant(tenant) ? (
                       <Badge variant="destructive">Locked</Badge>
                     ) : (
                       <Badge variant="secondary" className="text-green-600 bg-green-50">Active</Badge>
+                    )}
+                    {tenant.subscriptionExpiry && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Hạn: {new Date(tenant.subscriptionExpiry).toLocaleDateString("vi-VN")}
+                      </p>
                     )}
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
@@ -261,9 +298,16 @@ export default function RestaurantsPage() {
 
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Quản trị</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => handleToggleLock(tenant)}>
-                          {tenant.isLocked ? <><Unlock className="mr-2 h-4 w-4" /> Mở khóa</> : <><Lock className="mr-2 h-4 w-4" /> Khóa</>}
-                        </DropdownMenuItem>
+                        {(tenant.isLocked || isExpiredTenant(tenant)) && (
+                          <DropdownMenuItem onClick={() => handleRenew(tenant)}>
+                            <RotateCcw className="mr-2 h-4 w-4" /> Gia hạn 1 tháng
+                          </DropdownMenuItem>
+                        )}
+                        {!isExpiredTenant(tenant) && (
+                          <DropdownMenuItem onClick={() => handleToggleLock(tenant)}>
+                            {tenant.isLocked ? <><Unlock className="mr-2 h-4 w-4" /> Mở khóa</> : <><Lock className="mr-2 h-4 w-4" /> Khóa</>}
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem className="text-red-600" onClick={() => setTenantToDelete(tenant.id)}>
                           <Trash2 className="mr-2 h-4 w-4" /> Xóa dữ liệu
                         </DropdownMenuItem>
