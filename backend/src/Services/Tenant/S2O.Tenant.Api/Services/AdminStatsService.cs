@@ -39,6 +39,7 @@ public sealed class AdminStatsService : IAdminStatsService
             .Select(t => new TenantSubscriptionRevenueModel(t.SubscriptionPlan, t.CreatedAt, t.SubscriptionExpiry))
             .ToListAsync(cancellationToken);
         var planTenantCounts = BuildPlanTenantCounts(tenantSubscriptions);
+        var revenueTrend = BuildRevenueTrend(tenantSubscriptions, 6);
         var usersResult = await GetTotalUsersSafeAsync(authorizationHeader, cancellationToken);
 
         return new AdminStatsDto
@@ -47,6 +48,7 @@ public sealed class AdminStatsService : IAdminStatsService
             ActiveTenants = activeTenants,
             TotalRevenue = tenantSubscriptions.Sum(CalculateAccumulatedRevenue),
             PlanTenantCounts = planTenantCounts,
+            RevenueTrend = revenueTrend,
             TotalUsers = usersResult.TotalUsers,
             IsIdentityAvailable = usersResult.IsIdentityAvailable
         };
@@ -64,6 +66,44 @@ public sealed class AdminStatsService : IAdminStatsService
             new(PlanPolicy.Premium, grouped.GetValueOrDefault(PlanPolicy.Premium, 0)),
             new(PlanPolicy.Enterprise, grouped.GetValueOrDefault(PlanPolicy.Enterprise, 0)),
         };
+    }
+
+    private static List<RevenuePointDto> BuildRevenueTrend(IEnumerable<TenantSubscriptionRevenueModel> tenantSubscriptions, int months)
+    {
+        var cursorMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1).AddMonths(-(months - 1));
+        var monthRevenue = new Dictionary<DateTime, decimal>();
+
+        for (var i = 0; i < months; i++)
+        {
+            monthRevenue[cursorMonth.AddMonths(i)] = 0;
+        }
+
+        foreach (var subscription in tenantSubscriptions)
+        {
+            var monthlyPrice = PlanPolicy.GetMonthlyPrice(subscription.SubscriptionPlan);
+            if (monthlyPrice <= 0)
+            {
+                continue;
+            }
+
+            var billingCursor = new DateTime(subscription.CreatedAt.Year, subscription.CreatedAt.Month, 1);
+            var billingEnd = subscription.SubscriptionExpiry;
+
+            while (billingCursor < billingEnd)
+            {
+                if (monthRevenue.ContainsKey(billingCursor))
+                {
+                    monthRevenue[billingCursor] += monthlyPrice;
+                }
+
+                billingCursor = billingCursor.AddMonths(1);
+            }
+        }
+
+        return monthRevenue
+            .OrderBy(x => x.Key)
+            .Select(x => new RevenuePointDto(x.Key.ToString("MM/yyyy"), x.Value))
+            .ToList();
     }
 
     private static decimal CalculateAccumulatedRevenue(TenantSubscriptionRevenueModel tenant)
@@ -160,8 +200,10 @@ public sealed class AdminStatsDto
     public int ActiveTenants { get; set; }
     public decimal TotalRevenue { get; set; }
     public List<PlanTenantCountDto> PlanTenantCounts { get; set; } = new();
+    public List<RevenuePointDto> RevenueTrend { get; set; } = new();
     public int TotalUsers { get; set; }
     public bool IsIdentityAvailable { get; set; }
 }
 
 public sealed record PlanTenantCountDto(string Plan, int TenantCount);
+public sealed record RevenuePointDto(string Month, decimal Revenue);

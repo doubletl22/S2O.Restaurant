@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { adminService } from "@/services/admin.service";
 import { tenantService } from "@/services/tenant.service";
 import { SysAdminStats, Tenant } from "@/lib/types";
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 function normalizeTenantList(payload: any): Tenant[] {
   if (Array.isArray(payload?.value)) return payload.value;
@@ -48,6 +49,18 @@ function normalizePlanTenantCounts(payload: any) {
   }));
 }
 
+function normalizeRevenueTrend(payload: any) {
+  const source = payload?.revenueTrend || payload?.RevenueTrend;
+  if (!Array.isArray(source)) {
+    return [];
+  }
+
+  return source.map((item: any) => ({
+    month: String(item?.month ?? item?.Month ?? ""),
+    revenue: Number(item?.revenue ?? item?.Revenue ?? 0),
+  }));
+}
+
 export default function SysAdminDashboard() {
   const [stats, setStats] = useState<SysAdminStats | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>("");
@@ -77,6 +90,7 @@ export default function SysAdminDashboard() {
         const activeTenants = tenants.filter((t) => t.isActive && !t.isLocked).length;
         const computedTotalTenants = tenants.length;
         const apiPlanCounts = normalizePlanTenantCounts(apiStats);
+        const apiRevenueTrend = normalizeRevenueTrend(apiStats);
         const fallbackPlanCounts = buildPlanCountsFromTenants(tenants);
         const computedStats: SysAdminStats = {
           totalTenants: apiStats?.totalTenants ?? computedTotalTenants,
@@ -84,6 +98,7 @@ export default function SysAdminDashboard() {
           totalRevenue: apiStats?.totalRevenue ?? 0,
           totalUsers: apiStats?.totalUsers && apiStats.totalUsers > 0 ? apiStats.totalUsers : usersCount,
           planTenantCounts: apiPlanCounts.length > 0 ? apiPlanCounts : fallbackPlanCounts,
+          revenueTrend: apiRevenueTrend,
         };
 
         setStats(computedStats);
@@ -162,6 +177,50 @@ export default function SysAdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Biểu đồ doanh thu nền tảng</CardTitle>
+          <CardDescription>Doanh thu thuê bao theo 6 tháng gần nhất</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {(stats?.revenueTrend?.length || 0) === 0 ? (
+            <p className="text-sm text-muted-foreground">Chưa có dữ liệu doanh thu theo thời gian.</p>
+          ) : (
+            <div className="h-[320px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={stats?.revenueTrend} margin={{ left: 12, right: 12, top: 12, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="platformRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#16a34a" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#16a34a" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `${Math.round(Number(value) / 1000)}k`}
+                  />
+                  <Tooltip
+                    formatter={(value) => formatMoney(Number(value || 0))}
+                    labelFormatter={(label) => `Tháng ${label}`}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#16a34a"
+                    fill="url(#platformRevenue)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* ... Phần server status giữ nguyên */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">

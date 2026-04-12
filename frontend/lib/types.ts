@@ -221,5 +221,6 @@ export interface SysAdminStats {
   totalRevenue: number;
   totalUsers: number;
   planTenantCounts?: { plan: string; tenantCount: number }[];
+  revenueTrend?: { month: string; revenue: number }[];
 }
 
