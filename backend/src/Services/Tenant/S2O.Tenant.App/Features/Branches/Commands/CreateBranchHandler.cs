@@ -23,12 +23,24 @@ public class CreateBranchHandler : IRequestHandler<CreateBranchCommand, Result<G
         {
             return Result<Guid>.Failure(Error.Failure("Auth.NoTenant", "Không xác định được Tenant (Vui lòng đăng nhập lại)."));
         }
+
+        var normalizedName = request.Name?.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedName))
+        {
+            return Result<Guid>.Failure(Error.Failure("Branch.NameRequired", "Tên chi nhánh là bắt buộc."));
+        }
+
+        if (normalizedName.Length > 255)
+        {
+            return Result<Guid>.Failure(Error.Failure("Branch.NameTooLong", "Tên chi nhánh chỉ được tối đa 255 ký tự."));
+        }
+
         // 1. Tạo Entity Branch mới
         var branch = new Branch
         {
             Id = Guid.NewGuid(),
             TenantId = _tenantContext.TenantId,
-            Name = request.Name,
+            Name = normalizedName,
             Address = request.Address,
             PhoneNumber = request.Phone,
             IsActive = true,
