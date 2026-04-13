@@ -75,7 +75,8 @@ public class RegisterTenantHandler : IRequestHandler<RegisterTenantCommand, Resu
         defaultBranchId,
         request.RestaurantName,
         request.Address,
-        request.PhoneNumber), cancellationToken);
+        request.PhoneNumber,
+        request.PlanType), cancellationToken);
 
         return Result<Guid>.Success(newTenantId);
     }

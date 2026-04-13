@@ -4,15 +4,13 @@ import { useEffect, useState } from "react";
 import { Users, Building2, DollarSign, Activity, Server, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { adminService } from "@/services/admin.service";
 import { tenantService } from "@/services/tenant.service";
 import { SysAdminStats, Tenant } from "@/lib/types";
-
-function toDateValue(v?: string) {
-  if (!v) return 0;
-  const t = new Date(v).getTime();
-  return Number.isNaN(t) ? 0 : t;
-}
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { toast } from "sonner";
 
 function normalizeTenantList(payload: any): Tenant[] {
   if (Array.isArray(payload?.value)) return payload.value;
@@ -20,11 +18,60 @@ function normalizeTenantList(payload: any): Tenant[] {
   return [];
 }
 
+function normalizePlan(raw?: string) {
+  const plan = String(raw || "").trim().toLowerCase();
+  if (plan === "premium") return "Premium";
+  if (plan === "enterprise") return "Enterprise";
+  return "Free";
+}
+
+function buildPlanCountsFromTenants(tenants: Tenant[]) {
+  const counts = new Map<string, number>([
+    ["Free", 0],
+    ["Premium", 0],
+    ["Enterprise", 0],
+  ]);
+
+  for (const tenant of tenants) {
+    const plan = normalizePlan(tenant.planType || tenant.subscriptionPlan || tenant.plan);
+    counts.set(plan, (counts.get(plan) || 0) + 1);
+  }
+
+  return Array.from(counts, ([plan, tenantCount]) => ({ plan, tenantCount }));
+}
+
+function normalizePlanTenantCounts(payload: any) {
+  const source = payload?.planTenantCounts || payload?.PlanTenantCounts;
+  if (!Array.isArray(source)) {
+    return [];
+  }
+
+  return source.map((item: any) => ({
+    plan: normalizePlan(item?.plan || item?.Plan),
+    tenantCount: Number(item?.tenantCount ?? item?.TenantCount ?? 0),
+  }));
+}
+
+function normalizeRevenueTrend(payload: any) {
+  const source = payload?.revenueTrend || payload?.RevenueTrend;
+  if (!Array.isArray(source)) {
+    return [];
+  }
+
+  return source.map((item: any) => ({
+    month: String(item?.month ?? item?.Month ?? ""),
+    revenue: Number(item?.revenue ?? item?.Revenue ?? 0),
+  }));
+}
+
 export default function SysAdminDashboard() {
   const [stats, setStats] = useState<SysAdminStats | null>(null);
-  const [recentTenants, setRecentTenants] = useState<Tenant[]>([]);
   const [lastUpdated, setLastUpdated] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [fromDate, setFromDate] = useState<string>("");
+  const [toDate, setToDate] = useState<string>("");
+  const [appliedFilter, setAppliedFilter] = useState<{ from?: string; to?: string }>({});
+  const [filterError, setFilterError] = useState<string>("");
 
   useEffect(() => {
     const loadStats = async (showLoading = false) => {
@@ -32,7 +79,7 @@ export default function SysAdminDashboard() {
         if (showLoading) setLoading(true);
 
         const [statsRes, tenantsRes, usersRes] = await Promise.allSettled([
-          adminService.getStats(),
+          adminService.getStats(appliedFilter),
           tenantService.getAll(),
           adminService.getSystemUsers(),
         ]);
@@ -49,22 +96,24 @@ export default function SysAdminDashboard() {
 
         const activeTenants = tenants.filter((t) => t.isActive && !t.isLocked).length;
         const computedTotalTenants = tenants.length;
+        const apiPlanCounts = normalizePlanTenantCounts(apiStats);
+        const apiRevenueTrend = normalizeRevenueTrend(apiStats);
+        const fallbackPlanCounts = buildPlanCountsFromTenants(tenants);
+        const hasFilter = Boolean(appliedFilter.from || appliedFilter.to);
         const computedStats: SysAdminStats = {
-          totalTenants: apiStats?.totalTenants ?? computedTotalTenants,
-          activeTenants: apiStats?.activeTenants ?? activeTenants,
+          totalTenants: apiStats?.totalTenants ?? (hasFilter ? 0 : computedTotalTenants),
+          activeTenants: apiStats?.activeTenants ?? (hasFilter ? 0 : activeTenants),
           totalRevenue: apiStats?.totalRevenue ?? 0,
           totalUsers: apiStats?.totalUsers && apiStats.totalUsers > 0 ? apiStats.totalUsers : usersCount,
-          recentTenants: tenants
-            .slice()
-            .sort((a, b) => toDateValue(b.createdAt || b.createdOn) - toDateValue(a.createdAt || a.createdOn))
-            .slice(0, 5),
+          planTenantCounts: apiPlanCounts.length > 0 ? apiPlanCounts : (hasFilter ? [] : fallbackPlanCounts),
+          revenueTrend: apiRevenueTrend,
         };
 
         setStats(computedStats);
-        setRecentTenants((computedStats.recentTenants as Tenant[]) || []);
         setLastUpdated(new Date().toLocaleTimeString("vi-VN"));
       } catch (e) {
         console.error("Lỗi tải dashboard stats:", e);
+        toast.error("Không tải được dữ liệu thống kê. Vui lòng thử lại.");
       } finally {
         if (showLoading) setLoading(false);
       }
@@ -74,7 +123,29 @@ export default function SysAdminDashboard() {
     const timer = setInterval(() => loadStats(false), 30000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [appliedFilter]);
+
+  const handleApplyFilter = () => {
+    if (fromDate && toDate && fromDate > toDate) {
+      const message = "Ngày bắt đầu không được lớn hơn ngày kết thúc.";
+      setFilterError(message);
+      toast.warning(message);
+      return;
+    }
+
+    setFilterError("");
+    setAppliedFilter({
+      from: fromDate || undefined,
+      to: toDate || undefined,
+    });
+  };
+
+  const handleResetFilter = () => {
+    setFromDate("");
+    setToDate("");
+    setFilterError("");
+    setAppliedFilter({});
+  };
 
   const formatMoney = (v: number) => 
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v);
@@ -86,8 +157,37 @@ export default function SysAdminDashboard() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Tổng quan Hệ thống</h1>
         <p className="text-muted-foreground">Theo dõi hoạt động của nền tảng S2O Restaurant SaaS.</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Khoảng lọc: {appliedFilter.from || "--/--/----"} đến {appliedFilter.to || "--/--/----"}
+        </p>
         <p className="text-xs text-muted-foreground mt-1">Cập nhật lúc: {lastUpdated || "--:--:--"}</p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Lọc thống kê theo thời gian</CardTitle>
+          <CardDescription>Chọn khoảng ngày và áp dụng để cập nhật số liệu, biểu đồ.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-4">
+            <div className="space-y-1">
+              <p className="text-sm font-medium">Từ ngày</p>
+              <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium">Đến ngày</p>
+              <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+            </div>
+            <div className="flex items-end">
+              <Button onClick={handleApplyFilter} className="w-full">Áp dụng lọc</Button>
+            </div>
+            <div className="flex items-end">
+              <Button variant="outline" onClick={handleResetFilter} className="w-full">Xóa lọc</Button>
+            </div>
+          </div>
+          {filterError ? <p className="mt-2 text-sm text-red-600">{filterError}</p> : null}
+        </CardContent>
+      </Card>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -117,12 +217,12 @@ export default function SysAdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Doanh thu (Platform)</CardTitle>
+            <CardTitle className="text-sm font-medium">Doanh thu (Platform lũy kế)</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatMoney(stats?.totalRevenue || 0)}</div>
-            <p className="text-xs text-muted-foreground">Phí thuê bao tháng này</p>
+            <p className="text-xs text-muted-foreground">Tổng phí thuê bao đã thu</p>
           </CardContent>
         </Card>
 
@@ -137,6 +237,50 @@ export default function SysAdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Biểu đồ doanh thu nền tảng</CardTitle>
+          <CardDescription>Doanh thu thuê bao theo 6 tháng gần nhất</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {(stats?.revenueTrend?.length || 0) === 0 ? (
+            <p className="text-sm text-muted-foreground">Chưa có dữ liệu doanh thu theo thời gian.</p>
+          ) : (
+            <div className="h-[320px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={stats?.revenueTrend} margin={{ left: 12, right: 12, top: 12, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="platformRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#16a34a" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#16a34a" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `${Math.round(Number(value) / 1000)}k`}
+                  />
+                  <Tooltip
+                    formatter={(value) => formatMoney(Number(value || 0))}
+                    labelFormatter={(label) => `Tháng ${label}`}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#16a34a"
+                    fill="url(#platformRevenue)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* ... Phần server status giữ nguyên */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
@@ -163,23 +307,18 @@ export default function SysAdminDashboard() {
 
         <Card className="col-span-3">
           <CardHeader>
-            <CardTitle>Nhà hàng mới đăng ký</CardTitle>
-            <CardDescription>Top 5 tenant gần nhất</CardDescription>
+            <CardTitle>Số cửa hàng theo gói</CardTitle>
+            <CardDescription>Phân bổ tenant theo từng gói dịch vụ</CardDescription>
           </CardHeader>
           <CardContent>
-            {recentTenants.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Chưa có dữ liệu gần đây.</p>
+            {(stats?.planTenantCounts?.length || 0) === 0 ? (
+              <p className="text-sm text-muted-foreground">Chưa có dữ liệu gói dịch vụ.</p>
             ) : (
               <div className="space-y-3">
-                {recentTenants.map((tenant) => (
-                  <div key={tenant.id} className="flex items-center justify-between border-b pb-2 last:border-0">
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium truncate">{tenant.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{tenant.ownerEmail || tenant.email || "--"}</p>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(tenant.createdAt || tenant.createdOn || Date.now()).toLocaleDateString("vi-VN")}
-                    </p>
+                {stats?.planTenantCounts?.map((planItem) => (
+                  <div key={planItem.plan} className="flex items-center justify-between border-b pb-2 last:border-0">
+                    <p className="text-sm font-medium">Gói {planItem.plan}</p>
+                    <p className="text-sm text-muted-foreground">{planItem.tenantCount} cửa hàng</p>
                   </div>
                 ))}
               </div>

@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import http from "@/lib/http";
 import { toast } from "sonner";
+import { getApiNotificationMessage } from "@/lib/api-error";
 
 // Service gọi API
 const staffService = {
@@ -66,13 +67,12 @@ export const useCreateStaff = (onSuccess?: () => void) => {
     mutationFn: staffService.create,
     onSuccess: () => {
       toast.success("Thêm nhân viên thành công");
-      queryClient.invalidateQueries({ queryKey: ["staffs"] });
+      queryClient.invalidateQueries({
+        predicate: (query) => Array.isArray(query.queryKey) && query.queryKey[0] === "staffs",
+      });
       onSuccess?.();
     },
-    onError: (err: any) => {
-      const msg = err?.response?.data?.detail || err?.message || "Lỗi thêm nhân viên";
-      toast.error(msg);
-    },
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể thêm nhân viên này.")),
   });
 };
 
@@ -82,13 +82,12 @@ export const useUpdateStaff = (onSuccess?: () => void) => {
     mutationFn: ({ id, data }: { id: string; data: any }) => staffService.update(id, data),
     onSuccess: () => {
       toast.success("Cập nhật thành công");
-      queryClient.invalidateQueries({ queryKey: ["staffs"] });
+      queryClient.invalidateQueries({
+        predicate: (query) => Array.isArray(query.queryKey) && query.queryKey[0] === "staffs",
+      });
       onSuccess?.();
     },
-    onError: (err: any) => {
-      const msg = err?.response?.data?.detail || err?.message || "Lỗi cập nhật";
-      toast.error(msg);
-    },
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể cập nhật nhân viên này.")),
   });
 };
 
@@ -101,9 +100,6 @@ export const useDeleteStaff = () => {
       toast.success("Đã xóa nhân viên");
       queryClient.invalidateQueries({ queryKey: ["staffs"] });
     },
-    onError: (err: any) => {
-      const msg = err?.response?.data?.detail || err?.message || "Lỗi xóa nhân viên";
-      toast.error(msg);
-    },
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể xóa nhân viên này.")),
   });
 };

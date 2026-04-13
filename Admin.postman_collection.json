@@ -1,0 +1,809 @@
+{
+  "info": {
+    "_postman_id": "s2o-restaurant-admin-collection",
+    "name": "Admin - S2O Restaurant",
+    "description": "Collection test API Admin cho hệ thống S2O Restaurant\n\nBase URL: http://localhost:5000 (qua API Gateway)\n\nHướng dẫn sử dụng:\n1. Chạy request Login trước để tự động lưu token\n2. Các request còn lại sẽ tự dùng token đó",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string",
+      "description": "URL của API Gateway (Ocelot)"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT Token - tự động lưu sau khi Login"
+    },
+    {
+      "key": "tenant_id",
+      "value": "",
+      "type": "string",
+      "description": "ID nhà hàng - cập nhật khi cần"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string",
+      "description": "ID người dùng - cập nhật khi cần"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Auth - Xác thực",
+      "item": [
+        {
+          "name": "Login (Đăng nhập)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Kiểm tra response",
+                  "pm.test('Status 200 - Đăng nhập thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response có token', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('token');",
+                  "});",
+                  "",
+                  "// Tự động lưu token vào biến collection",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    const token = json.accessToken || json.token || json.Token;",
+                  "    if (token) {",
+                  "        pm.collectionVariables.set('token', token);",
+                  "        console.log('Token đã được lưu tự động!');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@s2o.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Đăng nhập với tài khoản SystemAdmin.\n\nSau khi gọi thành công, token JWT sẽ tự động được lưu vào biến {{token}}."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Thống kê hệ thống",
+      "item": [
+        {
+          "name": "Lấy thống kê hệ thống",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Lấy thống kê thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response có dữ liệu thống kê', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('value');",
+                  "    const stats = json.value || json.Value;",
+                  "    pm.expect(stats).to.have.property('totalTenants');",
+                  "    pm.expect(stats).to.have.property('activeTenants');",
+                  "});",
+                  "",
+                  "// ===== VISUALIZER - Hiển thị biểu đồ =====",
+                  "const json = pm.response.json();",
+                  "const stats = json.value || json.Value || json;",
+                  "",
+                  "const totalTenants = stats.totalTenants || stats.TotalTenants || 0;",
+                  "const activeTenants = stats.activeTenants || stats.ActiveTenants || 0;",
+                  "const lockedTenants = totalTenants - activeTenants;",
+                  "const totalRevenue = stats.totalRevenue || stats.TotalRevenue || 0;",
+                  "const totalUsers = stats.totalUsers || stats.TotalUsers || 0;",
+                  "",
+                  "const template = `",
+                  "<!DOCTYPE html>",
+                  "<html>",
+                  "<head>",
+                  "  <script src='https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js'><\\/script>",
+                  "  <style>",
+                  "    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }",
+                  "    h2 { color: #333; text-align: center; }",
+                  "    .cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; }",
+                  "    .card { background: white; border-radius: 12px; padding: 20px 30px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); min-width: 150px; }",
+                  "    .card .number { font-size: 2.5em; font-weight: bold; color: #4361ee; }",
+                  "    .card .label { font-size: 0.9em; color: #666; margin-top: 5px; }",
+                  "    .chart-container { background: white; border-radius: 12px; padding: 20px; max-width: 500px; margin: 0 auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }",
+                  "  <\\/style>",
+                  "</head>",
+                  "<body>",
+                  "  <h2>📊 Thống kê hệ thống S2O Restaurant</h2>",
+                  "  <div class='cards'>",
+                  "    <div class='card'><div class='number'>${totalTenants}<\\/div><div class='label'>Tổng nhà hàng<\\/div><\\/div>",
+                  "    <div class='card'><div class='number' style='color:#2ecc71'>${activeTenants}<\\/div><div class='label'>Đang hoạt động<\\/div><\\/div>",
+                  "    <div class='card'><div class='number' style='color:#e74c3c'>${lockedTenants}<\\/div><div class='label'>Đã khóa<\\/div><\\/div>",
+                  "    <div class='card'><div class='number' style='color:#f39c12'>${totalUsers}<\\/div><div class='label'>Tổng người dùng<\\/div><\\/div>",
+                  "  <\\/div>",
+                  "  <div class='chart-container'>",
+                  "    <canvas id='statsChart'><\\/canvas>",
+                  "  <\\/div>",
+                  "  <script>",
+                  "    const ctx = document.getElementById('statsChart').getContext('2d');",
+                  "    new Chart(ctx, {",
+                  "      type: 'doughnut',",
+                  "      data: {",
+                  "        labels: ['Đang hoạt động', 'Đã khóa'],",
+                  "        datasets: [{",
+                  "          data: [${activeTenants}, ${lockedTenants}],",
+                  "          backgroundColor: ['#2ecc71', '#e74c3c'],",
+                  "          borderWidth: 2",
+                  "        }]",
+                  "      },",
+                  "      options: {",
+                  "        responsive: true,",
+                  "        plugins: {",
+                  "          legend: { position: 'bottom' },",
+                  "          title: { display: true, text: 'Tỷ lệ nhà hàng hoạt động / bị khóa' }",
+                  "        }",
+                  "      }",
+                  "    });",
+                  "  <\\/script>",
+                  "<\\/body>",
+                  "<\\/html>",
+                  "`;",
+                  "",
+                  "pm.visualizer.set(template);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "admin", "stats"]
+            },
+            "description": "Lấy thống kê hệ thống (chỉ SystemAdmin).\n\nKết quả:\n- TotalTenants: Tổng số nhà hàng\n- ActiveTenants: Nhà hàng đang hoạt động\n- TotalRevenue: Tổng doanh thu\n- TotalUsers: Tổng người dùng\n\nTab Visualize sẽ hiện biểu đồ."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Quản lý Nhà hàng",
+      "item": [
+        {
+          "name": "Danh sách tất cả nhà hàng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Lấy danh sách nhà hàng thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response là mảng hoặc có thuộc tính value', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "});",
+                  "",
+                  "// Tự động lưu ID nhà hàng đầu tiên để dùng cho các test khác",
+                  "const json = pm.response.json();",
+                  "const items = json.value || json.Value || json.items || json;",
+                  "if (Array.isArray(items) && items.length > 0) {",
+                  "    pm.collectionVariables.set('tenant_id', items[0].id || items[0].Id);",
+                  "    console.log('Đã lưu tenant_id:', items[0].id || items[0].Id);",
+                  "}",
+                  "",
+                  "// ===== VISUALIZER - Bảng danh sách nhà hàng =====",
+                  "const data = pm.response.json();",
+                  "const tenants = data.value || data.Value || data.items || (Array.isArray(data) ? data : []);",
+                  "",
+                  "if (Array.isArray(tenants) && tenants.length > 0) {",
+                  "    let rows = tenants.map(t => `",
+                  "        <tr>",
+                  "            <td>${t.id || t.Id || ''}</td>",
+                  "            <td>${t.name || t.Name || t.restaurantName || ''}</td>",
+                  "            <td>${t.address || t.Address || ''}</td>",
+                  "            <td style='color:${(t.isActive || t.IsActive) ? '#2ecc71' : '#e74c3c'}'>",
+                  "                ${(t.isActive || t.IsActive) ? '✅ Hoạt động' : '❌ Dừng'}",
+                  "            </td>",
+                  "            <td style='color:${(t.isLocked || t.IsLocked) ? '#e74c3c' : '#2ecc71'}'>",
+                  "                ${(t.isLocked || t.IsLocked) ? '🔒 Bị khóa' : '🔓 Bình thường'}",
+                  "            </td>",
+                  "        </tr>`,",
+                  "    ).join('');",
+                  "",
+                  "    const template = `",
+                  "        <style>",
+                  "            body { font-family: Arial; padding: 16px; }",
+                  "            table { width: 100%; border-collapse: collapse; }",
+                  "            th { background: #4361ee; color: white; padding: 10px; text-align: left; }",
+                  "            td { padding: 8px 10px; border-bottom: 1px solid #eee; font-size: 13px; }",
+                  "            tr:hover { background: #f0f4ff; }",
+                  "        </style>",
+                  "        <h3>🏪 Danh sách nhà hàng (${tenants.length} nhà hàng)</h3>",
+                  "        <table>",
+                  "            <thead><tr>",
+                  "                <th>ID</th><th>Tên nhà hàng</th><th>Địa chỉ</th><th>Trạng thái</th><th>Khóa</th>",
+                  "            </tr></thead>",
+                  "            <tbody>${rows}</tbody>",
+                  "        </table>`;",
+                  "    pm.visualizer.set(template);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tenants",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tenants"]
+            },
+            "description": "Lấy danh sách tất cả nhà hàng trong hệ thống (chỉ SystemAdmin).\n\nScript tự động lưu tenant_id đầu tiên vào biến collection."
+          }
+        },
+        {
+          "name": "Đăng ký nhà hàng mới",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Đăng ký nhà hàng thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Lưu tenant_id mới tạo",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    const newId = json.value || json.Value || json.id || json.Id;",
+                  "    if (newId) {",
+                  "        pm.collectionVariables.set('tenant_id', newId);",
+                  "        console.log('Nhà hàng mới được tạo với ID:', newId);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"restaurantName\": \"Nhà hàng ABC\",\n  \"ownerName\": \"Nguyễn Văn A\",\n  \"email\": \"owner.abc@gmail.com\",\n  \"password\": \"Owner@123\",\n  \"address\": \"123 Đường Lê Lợi, TP.HCM\",\n  \"phoneNumber\": \"0901234567\",\n  \"planType\": \"Basic\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/tenants/registration",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tenants", "registration"]
+            },
+            "description": "Đăng ký nhà hàng mới trong hệ thống.\n\nEndpoint này không yêu cầu xác thực (public).\n\nCác trường bắt buộc:\n- restaurantName: Tên nhà hàng\n- ownerName: Tên chủ nhà hàng\n- email: Email đăng nhập\n- password: Mật khẩu\n- address: Địa chỉ\n- phoneNumber: Số điện thoại\n- planType: Basic / Premium"
+          }
+        },
+        {
+          "name": "Khóa nhà hàng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Khóa nhà hàng thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response xác nhận đã khóa', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.be.an('object');",
+                  "    console.log('Kết quả khóa nhà hàng:', JSON.stringify(json));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tenants/{{tenant_id}}/lock",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tenants", "{{tenant_id}}", "lock"]
+            },
+            "description": "Khóa nhà hàng (chỉ SystemAdmin).\n\nThay {{tenant_id}} bằng ID thực của nhà hàng cần khóa.\nHoặc đặt giá trị tenant_id trong Collection Variables."
+          }
+        },
+        {
+          "name": "Mở khóa nhà hàng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Mở khóa nhà hàng thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tenants/{{tenant_id}}/unlock",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tenants", "{{tenant_id}}", "unlock"]
+            },
+            "description": "Mở khóa nhà hàng đã bị khóa (chỉ SystemAdmin)."
+          }
+        },
+        {
+          "name": "Xóa nhà hàng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Xóa nhà hàng thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "console.log('⚠️ Nhà hàng đã bị xóa vĩnh viễn!');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/tenants/{{tenant_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "tenants", "{{tenant_id}}"]
+            },
+            "description": "Xóa vĩnh viễn nhà hàng khỏi hệ thống (chỉ SystemAdmin).\n\n⚠️ CẢNH BÁO: Hành động này không thể hoàn tác!"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Quản lý Người dùng",
+      "item": [
+        {
+          "name": "Tìm kiếm người dùng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Tìm kiếm thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response có dữ liệu phân trang', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('Items');",
+                  "    pm.expect(json).to.have.property('TotalCount');",
+                  "    pm.expect(json).to.have.property('TotalPages');",
+                  "});",
+                  "",
+                  "// Lưu ID user đầu tiên",
+                  "const json = pm.response.json();",
+                  "const items = json.Items || json.items || [];",
+                  "if (items.length > 0) {",
+                  "    pm.collectionVariables.set('user_id', items[0].Id || items[0].id);",
+                  "    console.log('Đã lưu user_id:', items[0].Id || items[0].id);",
+                  "}",
+                  "",
+                  "// ===== VISUALIZER - Bảng người dùng =====",
+                  "const data = pm.response.json();",
+                  "const users = data.Items || data.items || [];",
+                  "const totalCount = data.TotalCount || 0;",
+                  "const totalPages = data.TotalPages || 1;",
+                  "",
+                  "let rows = users.map(u => `",
+                  "    <tr>",
+                  "        <td style='font-size:11px;color:#666'>${(u.Id||u.id||'').substring(0,8)}...</td>",
+                  "        <td><strong>${u.FullName||u.fullName||''}</strong></td>",
+                  "        <td>${u.Email||u.email||''}</td>",
+                  "        <td>${(u.Roles||u.roles||[]).join(', ')}</td>",
+                  "        <td style='color:${(u.IsLocked||u.isLocked)?'#e74c3c':'#2ecc71'}'>",
+                  "            ${(u.IsLocked||u.isLocked)?'🔒 Bị khóa':'✅ Hoạt động'}",
+                  "        </td>",
+                  "    </tr>`,",
+                  ").join('');",
+                  "",
+                  "const template = `",
+                  "    <style>",
+                  "        body { font-family: Arial; padding: 16px; }",
+                  "        .meta { color: #666; margin-bottom: 12px; }",
+                  "        table { width: 100%; border-collapse: collapse; }",
+                  "        th { background: #4361ee; color: white; padding: 10px; text-align: left; }",
+                  "        td { padding: 8px 10px; border-bottom: 1px solid #eee; font-size: 13px; }",
+                  "        tr:hover { background: #f0f4ff; }",
+                  "    </style>",
+                  "    <h3>👥 Danh sách người dùng</h3>",
+                  "    <p class='meta'>Tổng: <strong>${totalCount}</strong> người dùng | <strong>${totalPages}</strong> trang</p>",
+                  "    <table>",
+                  "        <thead><tr>",
+                  "            <th>ID</th><th>Họ tên</th><th>Email</th><th>Role</th><th>Trạng thái</th>",
+                  "        </tr></thead>",
+                  "        <tbody>${rows}</tbody>",
+                  "    </table>`;",
+                  "pm.visualizer.set(template);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users?page=1&size=20&keyword=",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Số trang (bắt đầu từ 1)"
+                },
+                {
+                  "key": "size",
+                  "value": "20",
+                  "description": "Số item mỗi trang"
+                },
+                {
+                  "key": "keyword",
+                  "value": "",
+                  "description": "Từ khóa tìm kiếm (tên hoặc email)"
+                }
+              ]
+            },
+            "description": "Tìm kiếm người dùng với phân trang (chỉ SystemAdmin).\n\nQuery parameters:\n- page: Số trang (mặc định 1)\n- size: Số item mỗi trang (mặc định 20)\n- keyword: Tìm theo tên hoặc email (để trống = lấy tất cả)\n\nTab Visualize sẽ hiển thị bảng danh sách."
+          }
+        },
+        {
+          "name": "Thêm Admin mới",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Tạo Admin thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response chứa UserId', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('UserId');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('user_id', json.UserId);",
+                  "    console.log('Admin mới tạo với ID:', json.UserId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin2@s2o.com\",\n  \"password\": \"Admin@123\",\n  \"fullName\": \"Admin Phụ 02\",\n  \"role\": \"SystemAdmin\",\n  \"tenantId\": null\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Tạo tài khoản SystemAdmin mới (chỉ SystemAdmin).\n\nLưu ý:\n- role phải là 'SystemAdmin'\n- tenantId để null vì Admin không thuộc nhà hàng nào"
+          }
+        },
+        {
+          "name": "Thêm Restaurant Owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Tạo RestaurantOwner thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('user_id', json.UserId);",
+                  "    console.log('RestaurantOwner tạo với ID:', json.UserId, '| TenantId:', json.TenantId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"owner@nhahangang.com\",\n  \"password\": \"Owner@123\",\n  \"fullName\": \"Trần Thị B\",\n  \"role\": \"RestaurantOwner\",\n  \"tenantId\": \"{{tenant_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Tạo tài khoản chủ nhà hàng (RestaurantOwner).\n\nLưu ý quan trọng:\n- role phải là 'RestaurantOwner'\n- tenantId BẮT BUỘC phải có (ID của nhà hàng đã đăng ký)"
+          }
+        },
+        {
+          "name": "Khóa người dùng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Khóa tài khoản thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response xác nhận đã khóa', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.Message).to.include('khóa');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}/lock",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}", "lock"]
+            },
+            "description": "Khóa tài khoản người dùng (chỉ SystemAdmin).\n\nTài khoản bị khóa đến năm 9999 (thực tế là vĩnh viễn)."
+          }
+        },
+        {
+          "name": "Mở khóa người dùng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Mở khóa tài khoản thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}/unlock",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}", "unlock"]
+            },
+            "description": "Mở khóa tài khoản người dùng đã bị khóa (chỉ SystemAdmin)."
+          }
+        },
+        {
+          "name": "Đổi mật khẩu người dùng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Đổi mật khẩu thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "\"NewPassword@123\""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}", "reset-password"]
+            },
+            "description": "Admin reset/đổi mật khẩu cho người dùng bất kỳ.\n\nBody: chuỗi mật khẩu mới (phải có dấu ngoặc kép vì là raw string JSON).\n\nYêu cầu mật khẩu: ít nhất 8 ký tự, có chữ hoa, số, ký tự đặc biệt."
+          }
+        },
+        {
+          "name": "Cập nhật Role người dùng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 - Cập nhật role thành công', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"newRole\": \"RestaurantOwner\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}/role",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}", "role"]
+            },
+            "description": "Thay đổi role/vai trò của người dùng.\n\nCác role hợp lệ:\n- SystemAdmin\n- RestaurantOwner\n- Manager\n- Chef\n- Waiter"
+          }
+        },
+        {
+          "name": "Xóa người dùng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204 - Xóa người dùng thành công', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "console.log('⚠️ Người dùng đã bị xóa vĩnh viễn!');"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{user_id}}"]
+            },
+            "description": "Xóa vĩnh viễn tài khoản người dùng khỏi hệ thống.\n\n⚠️ CẢNH BÁO: Hành động này không thể hoàn tác!\nNên dùng 'Khóa người dùng' thay vì xóa nếu chỉ muốn vô hiệu hóa."
+          }
+        }
+      ]
+    }
+  ]
+}

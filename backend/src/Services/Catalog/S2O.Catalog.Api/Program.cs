@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using System.Text.Json; // ✅ add
 using S2O.Catalog.App.Abstractions;
+using S2O.Catalog.App.Features.Plans;
 using S2O.Catalog.App.Features.Products.Commands;
 using S2O.Catalog.Infra.Persistence;
 using S2O.Infra.Services;
@@ -23,6 +25,8 @@ builder.Services.AddDbContext<CatalogDbContext>((sp, options) => {
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<ICatalogDbContext>(sp => sp.GetRequiredService<CatalogDbContext>());
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<ITenantSubscriptionReader, TenantSubscriptionReader>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateProductCommand).Assembly));
 
 /* =========================
@@ -78,6 +82,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+var uploadRoot = Path.Combine(Path.GetTempPath(), "s2o-uploads");
+Directory.CreateDirectory(uploadRoot);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadRoot),
+    RequestPath = "/uploads"
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

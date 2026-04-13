@@ -4,6 +4,7 @@ import { branchService} from "@/services/branch.service";
 import { tableService } from "@/services/table.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { getApiNotificationMessage } from "@/lib/api-error";
 
 
 export const useBranches = () => {
@@ -25,7 +26,7 @@ export const useCreateBranch = (onSuccess?: () => void) => {
       queryClient.invalidateQueries({ queryKey: ["branches"] });
       onSuccess?.();
     },
-    onError: (err: any) => toast.error(err?.message || "Lỗi thêm chi nhánh"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể thêm chi nhánh này.")),
   });
 };
 
@@ -38,7 +39,7 @@ export const useUpdateBranch = (onSuccess?: () => void) => {
       queryClient.invalidateQueries({ queryKey: ["branches"] });
       onSuccess?.();
     },
-    onError: (err: any) => toast.error(err?.message || "Lỗi cập nhật"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể cập nhật chi nhánh này.")),
   });
 };
 
@@ -50,7 +51,7 @@ export const useDeleteBranch = () => {
       toast.success("Đã xóa chi nhánh");
       queryClient.invalidateQueries({ queryKey: ["branches"] });
     },
-    onError: () => toast.error("Lỗi khi xóa chi nhánh"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể xóa chi nhánh này.")),
   });
 };
 
@@ -76,7 +77,7 @@ export const useCreateTable = (branchId: string, onSuccess?: () => void) => {
       queryClient.invalidateQueries({ queryKey: ["tables", branchId] });
       onSuccess?.();
     },
-    onError: (err: any) => toast.error(err?.message || "Lỗi thêm bàn"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể thêm bàn này.")),
   });
 };
 
@@ -89,7 +90,7 @@ export const useUpdateTable = (branchId: string, onSuccess?: () => void) => {
       queryClient.invalidateQueries({ queryKey: ["tables", branchId] });
       onSuccess?.();
     },
-    onError: (err: any) => toast.error(err?.message || "Lỗi cập nhật"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể cập nhật bàn này.")),
   });
 };
 
@@ -102,6 +103,6 @@ export const useDeleteTable = () => {
        // Invalidate tất cả query tables (hoặc tìm cách lấy branchId để tối ưu)
        queryClient.invalidateQueries({ queryKey: ["tables"] });
     },
-    onError: () => toast.error("Lỗi khi xóa bàn"),
+    onError: (err: any) => toast.warning(getApiNotificationMessage(err, "Không thể xóa bàn này.")),
   });
 };
