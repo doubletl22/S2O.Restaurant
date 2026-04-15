@@ -38,6 +38,42 @@ public class CreateBranchHandler : IRequestHandler<CreateBranchCommand, Result<G
             return Result<Guid>.Failure(Error.Failure("Branch.NameTooLong", "Tên chi nhánh chỉ được tối đa 255 ký tự."));
         }
 
+        // Validate address
+        var normalizedAddress = request.Address?.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedAddress))
+        {
+            return Result<Guid>.Failure(Error.Failure("Branch.AddressRequired", "Địa chỉ chi nhánh là bắt buộc."));
+        }
+
+        if (normalizedAddress.Length > 500)
+        {
+            return Result<Guid>.Failure(Error.Failure("Branch.AddressTooLong", "Địa chỉ chi nhánh chỉ được tối đa 500 ký tự."));
+        }
+
+        // Validate phone
+        var normalizedPhone = request.Phone?.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedPhone))
+        {
+            return Result<Guid>.Failure(Error.Failure("Branch.PhoneRequired", "Số điện thoại chi nhánh là bắt buộc."));
+        }
+
+        // Phone chỉ được chứa số (0-9)
+        if (!System.Text.RegularExpressions.Regex.IsMatch(normalizedPhone, @"^[0-9]+$"))
+        {
+            return Result<Guid>.Failure(Error.Failure("Branch.PhoneInvalid", "Số điện thoại chỉ được chứa số."));
+        }
+
+        // Kiểm tra độ dài số điện thoại (9-11 chữ số)
+        if (normalizedPhone.Length < 9)
+        {
+            return Result<Guid>.Failure(Error.Failure("Branch.PhoneTooShort", "Số điện thoại phải có tối thiểu 9 chữ số."));
+        }
+
+        if (normalizedPhone.Length > 11)
+        {
+            return Result<Guid>.Failure(Error.Failure("Branch.PhoneTooLong", "Số điện thoại chỉ được có tối đa 11 chữ số."));
+        }
+
         // Check tenant status
         var tenantId = _tenantContext.TenantId.Value;
         var tenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Id == tenantId, cancellationToken);
@@ -74,8 +110,8 @@ public class CreateBranchHandler : IRequestHandler<CreateBranchCommand, Result<G
             Id = Guid.NewGuid(),
             TenantId = tenantId,
             Name = normalizedName,
-            Address = request.Address,
-            PhoneNumber = request.Phone,
+            Address = normalizedAddress,
+            PhoneNumber = normalizedPhone,
             IsActive = true,
             CreatedAtUtc = DateTime.UtcNow
         };

@@ -45,20 +45,61 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
+// Migrate database with retry logic
+int maxRetries = 5;
+int delayMs = 3000;
+
+for (int attempt = 1; attempt <= maxRetries; attempt++)
 {
-    var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<S2O.Tenant.Infra.Persistence.TenantDbContext>();
-        if (context.Database.GetPendingMigrations().Any())
+        using (var scope = app.Services.CreateScope())
         {
-            context.Database.Migrate();
+            var services = scope.ServiceProvider;
+            var context = services.GetRequiredService<S2O.Tenant.Infra.Persistence.TenantDbContext>();
+            
+            // Wait for database to be ready
+            int dbRetries = 10;
+            while (dbRetries > 0)
+            {
+                try
+                {
+                    context.Database.OpenConnection();
+                    context.Database.CloseConnection();
+                    break;
+                }
+                catch
+                {
+                    dbRetries--;
+                    if (dbRetries == 0) throw;
+                    System.Threading.Thread.Sleep(500);
+                }
+            }
+            
+            if (context.Database.GetPendingMigrations().Any())
+            {
+                Console.WriteLine("Executing migrations...");
+                context.Database.Migrate();
+                Console.WriteLine("✅ Migrations completed successfully");
+            }
+            else
+            {
+                Console.WriteLine("✅ Database is up to date");
+            }
         }
+        break; // Success, exit retry loop
     }
     catch (Exception ex)
     {
-        Console.WriteLine("Lỗi Migration Tenant: " + ex.Message);
+        Console.WriteLine($"❌ Migration attempt {attempt}/{maxRetries} failed: {ex.Message}");
+        if (attempt == maxRetries)
+        {
+            Console.WriteLine("⚠️ Migration failed after all retries, continuing anyway...");
+        }
+        else
+        {
+            System.Threading.Thread.Sleep(delayMs);
+        }
     }
 }
 
