@@ -14,6 +14,9 @@ public class Tenant : Entity
     public string SubscriptionPlan { get; set; } = "Free";
     public DateTime SubscriptionExpiry { get; set; }
     public bool IsLocked { get; set; } = false;
+    public string? LockReason { get; set; }
+    public DateTime? LockedAtUtc { get; set; }
+    public DateTime? LockedUntilUtc { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
     // Soft Delete

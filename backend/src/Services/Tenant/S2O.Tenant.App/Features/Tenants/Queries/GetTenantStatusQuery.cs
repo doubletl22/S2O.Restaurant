@@ -13,7 +13,10 @@ public record TenantStatusDto(
     string Name,
     string SubscriptionPlan,
     DateTime SubscriptionExpiry,
-    bool IsSubscriptionExpired);
+    bool IsSubscriptionExpired,
+    string? LockReason,
+    DateTime? LockedAtUtc,
+    DateTime? LockedUntilUtc);
 
 public record GetTenantStatusQuery(Guid TenantId) : IRequest<Result<TenantStatusDto>>;
 
@@ -49,7 +52,10 @@ public class GetTenantStatusHandler : IRequestHandler<GetTenantStatusQuery, Resu
             tenant.Name,
             PlanPolicy.Normalize(tenant.SubscriptionPlan),
             tenant.SubscriptionExpiry,
-            isExpired);
+            isExpired,
+            tenant.LockReason,
+            tenant.LockedAtUtc,
+            tenant.LockedUntilUtc);
         return Result<TenantStatusDto>.Success(statusDto);
     }
 }

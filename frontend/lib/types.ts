@@ -62,6 +62,9 @@ export interface Tenant {
   createdAt?: string;
   subscriptionExpiry?: string;
   isSubscriptionExpired?: boolean;
+  lockReason?: string;
+  lockedAtUtc?: string;
+  lockedUntilUtc?: string;
 }
 
 export interface Branch {

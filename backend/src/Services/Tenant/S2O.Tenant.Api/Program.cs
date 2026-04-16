@@ -38,6 +38,7 @@ builder.Services.AddTenantInfra(builder.Configuration);
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateTableCommand).Assembly));
 builder.Services.AddScoped<IAdminStatsService, AdminStatsService>();
 builder.Services.AddSharedInfrastructure(builder.Configuration);
+builder.Services.AddHostedService<AutoLockExpiredSubscriptionsService>();
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {

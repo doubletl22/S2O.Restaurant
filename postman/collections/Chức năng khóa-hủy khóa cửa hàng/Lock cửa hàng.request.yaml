@@ -1,6 +1,9 @@
 $kind: http-request
 url: "{{baseUrl}}/api/v1/tenants/{{c_tenant_id}}/lock"
 method: POST
+body:
+  type: json
+  content: "{\r\n\r\n    \  \"reason\": \"{{c_lock_reason}}\",\r\n\r\n    \  \"lockDurationDays\": {{c_lock_duration_days}}\r\n\r\n    }"
 auth:
   type: bearer
   credentials:

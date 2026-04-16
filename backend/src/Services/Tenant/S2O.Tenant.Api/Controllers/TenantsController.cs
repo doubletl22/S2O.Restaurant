@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
+using S2O.Tenant.Api.Contracts;
 using S2O.Tenant.App.Features.Tenants.Commands;
 using S2O.Tenant.App.Features.Tenants.Queries;
 using S2O.Shared.Kernel.Results;
@@ -36,19 +37,30 @@ public class TenantsController : ControllerBase
     // PATCH: api/v1/tenants/{id}/toggle-lock
     [HttpPatch("{id}/toggle-lock")]
     [Authorize(Roles = "SystemAdmin")]
-    public async Task<IActionResult> ToggleLockPatch(Guid id, [FromQuery] bool? isLocked)
+    public async Task<IActionResult> ToggleLockPatch(Guid id, [FromQuery] bool? isLocked, [FromQuery] string? reason, [FromQuery] int? lockDurationDays)
     {
         // If isLocked is provided, set to that value; if not provided, toggle
-        var result = await _mediator.Send(new ToggleTenantLockCommand(id, isLocked ?? false, isLocked == null));
+        var result = await _mediator.Send(new ToggleTenantLockCommand(
+            id,
+            isLocked ?? false,
+            isLocked == null,
+            reason,
+            lockDurationDays));
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
     // POST: api/v1/tenants/{id}/lock
     [HttpPost("{id}/lock")]
     [Authorize(Roles = "SystemAdmin")]
-    public async Task<IActionResult> ToggleLock(Guid id)
+    public async Task<IActionResult> ToggleLock(Guid id, [FromBody] LockTenantRequest request)
     {
-        var result = await _mediator.Send(new ToggleTenantLockCommand(id, true));
+        var result = await _mediator.Send(new ToggleTenantLockCommand(
+            id,
+            true,
+            null,
+            request.Reason,
+            request.LockDurationDays,
+            request.IsPermanent));
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
@@ -95,6 +107,9 @@ public class TenantsController : ControllerBase
                 IsDeleted = tenant.IsDeleted,
                 DeletedAtUtc = tenant.DeletedAtUtc,
                 IsLocked = tenant.IsLocked,
+                LockReason = tenant.LockReason,
+                LockedAtUtc = tenant.LockedAtUtc,
+                LockedUntilUtc = tenant.LockedUntilUtc,
                 CreatedAt = tenant.CreatedAt
             }
         });

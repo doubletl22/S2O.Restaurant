@@ -22,6 +22,10 @@ public class TenantDbContext : BaseDbContext, ITenantDbContext
         modelBuilder.Entity<Table>().HasKey(x => x.Id);
         modelBuilder.Entity<Domain.Entities.Tenant>().HasKey(x => x.Id);
         modelBuilder.Entity<Branch>().HasKey(x => x.Id);
+
+        modelBuilder.Entity<Domain.Entities.Tenant>()
+            .Property(t => t.LockReason)
+            .HasMaxLength(500);
         
         // ✅ Global query filters for soft-delete
         modelBuilder.Entity<Domain.Entities.Tenant>()

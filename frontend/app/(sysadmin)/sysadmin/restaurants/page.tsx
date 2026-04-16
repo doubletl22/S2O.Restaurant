@@ -5,8 +5,17 @@ import { Plus, Search, Building2, Lock, Unlock, Trash2, MoreHorizontal, AlertTri
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -34,6 +43,11 @@ export default function RestaurantsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState<string | null>(null);
+  const [tenantToLock, setTenantToLock] = useState<Tenant | null>(null);
+  const [lockReason, setLockReason] = useState("");
+  const [lockDurationDays, setLockDurationDays] = useState("7");
+  const [isLockPermanent, setIsLockPermanent] = useState(false);
+  const [isSubmittingLock, setIsSubmittingLock] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const pageSize = 10;
@@ -99,6 +113,14 @@ export default function RestaurantsPage() {
     const newStatusIsLocked = !tenant.isLocked;
     const actionText = newStatusIsLocked ? "khóa" : "mở khóa";
 
+    if (newStatusIsLocked) {
+      setTenantToLock(tenant);
+      setLockReason("");
+      setLockDurationDays("7");
+      setIsLockPermanent(false);
+      return;
+    }
+
     if (!confirm(`Bạn có chắc muốn ${actionText} nhà hàng ${tenant.name}?`)) return;
 
     try {
@@ -111,6 +133,53 @@ export default function RestaurantsPage() {
       }
     } catch (e) {
       toast.error("Lỗi kết nối");
+    }
+  };
+
+  const submitLockTenant = async () => {
+    if (!tenantToLock) return;
+
+    const reason = lockReason.trim();
+
+    if (!reason) {
+      toast.error("Lý do khóa là bắt buộc");
+      return;
+    }
+
+    let duration: number | undefined;
+    if (!isLockPermanent) {
+      duration = Number(lockDurationDays);
+      if (!Number.isInteger(duration) || duration < 1 || duration > 365) {
+        toast.error("Thời hạn khóa phải trong khoảng 1 - 365 ngày");
+        return;
+      }
+    }
+
+    setIsSubmittingLock(true);
+    try {
+      const res = await tenantService.toggleLock(tenantToLock.id, true, {
+        reason,
+        lockDurationDays: duration,
+        isPermanent: isLockPermanent,
+      });
+
+      if (res.isSuccess) {
+        toast.success("Đã khóa nhà hàng thành công");
+        setTenantToLock(null);
+        setLockReason("");
+        setLockDurationDays("7");
+        setIsLockPermanent(false);
+        loadData(searchTerm);
+        return;
+      }
+
+      toast.error("Khóa nhà hàng thất bại", {
+        description: res.error?.message || res.error?.description,
+      });
+    } catch {
+      toast.error("Lỗi kết nối");
+    } finally {
+      setIsSubmittingLock(false);
     }
   };
 
@@ -359,6 +428,68 @@ export default function RestaurantsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!tenantToLock} onOpenChange={(open) => !open && setTenantToLock(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Khóa nhà hàng</DialogTitle>
+            <DialogDescription>
+              Nhập lý do và thời hạn khóa cho {tenantToLock?.name}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="lock-reason">Lý do khóa</Label>
+              <Input
+                id="lock-reason"
+                placeholder="Ví dụ: Vi phạm chính sách vận hành"
+                value={lockReason}
+                onChange={(e) => setLockReason(e.target.value)}
+                maxLength={500}
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="lock-permanent"
+                checked={isLockPermanent}
+                onChange={(e) => setIsLockPermanent(e.target.checked)}
+              />
+              <Label htmlFor="lock-permanent" className="text-sm font-normal cursor-pointer">✓ Khóa mãi mãi cho đến khi Admin mở</Label>
+            </div>
+
+            {!isLockPermanent && (
+              <div className="space-y-2">
+                <Label htmlFor="lock-duration">Thời hạn khóa (ngày)</Label>
+                <Input
+                  id="lock-duration"
+                  type="number"
+                  min={1}
+                  max={365}
+                  value={lockDurationDays}
+                  onChange={(e) => setLockDurationDays(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">Giá trị hợp lệ từ 1 đến 365 ngày.</p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setTenantToLock(null)}
+              disabled={isSubmittingLock}
+            >
+              Hủy
+            </Button>
+            <Button onClick={submitLockTenant} disabled={isSubmittingLock}>
+              {isSubmittingLock ? "Đang xử lý..." : "Xác nhận khóa"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

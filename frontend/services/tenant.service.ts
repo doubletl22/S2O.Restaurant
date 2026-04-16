@@ -33,9 +33,20 @@ export const tenantService = {
   },
 
   // Lock/Unlock - ITC_6
-  toggleLock: async (id: string, isLocked: boolean): Promise<Result<void>> => {
+  toggleLock: async (
+    id: string,
+    isLocked: boolean,
+    payload?: { reason: string; lockDurationDays?: number; isPermanent?: boolean }
+  ): Promise<Result<void>> => {
     const action = isLocked ? "lock" : "unlock";
-    const response = await http.post<Result<void>>(`${ENDPOINT}/${id}/${action}`, {});
+    const requestBody = isLocked
+      ? {
+          reason: payload?.reason ?? "",
+          lockDurationDays: payload?.lockDurationDays ?? 0,
+          isPermanent: payload?.isPermanent ?? false,
+        }
+      : {};
+    const response = await http.post<Result<void>>(`${ENDPOINT}/${id}/${action}`, requestBody);
     return response as unknown as Result<void>;
   },
 
