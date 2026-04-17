@@ -36,12 +36,13 @@ export interface UserProfile {
 }
 
 export interface RegisterTenantRequest {
-  name: string;
+  restaurantName: string;
+  ownerName: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   address: string;
-  password?: string;
-  subscriptionPlanId?: string;
+  password: string;
+  planType: string;
 }
 export type RegisterTenantBody = RegisterTenantRequest;
 

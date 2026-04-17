@@ -7,8 +7,22 @@ export const tenantService = {
   // GET All - ITC_4.1: Tìm kiếm đa mục tiêu, ITC_4.4: Authorization check
   getAll: async (keyword?: string): Promise<Result<Tenant[]>> => {
     try {
-      const response = await http.get<Result<Tenant[]>>(ENDPOINT, { params: { keyword } });
-      return response as unknown as Result<Tenant[]>;
+      const response = await http.get<any>(ENDPOINT, { params: { keyword, page: 1, pageSize: 100 } });
+
+      // Backward compatible: support both
+      // 1) { isSuccess, value: Tenant[] }
+      // 2) { isSuccess, value: { data: Tenant[], ...pagination } }
+      const rawValue = response?.value;
+      const normalizedTenants = Array.isArray(rawValue)
+        ? rawValue
+        : Array.isArray(rawValue?.data)
+          ? rawValue.data
+          : [];
+
+      return {
+        ...response,
+        value: normalizedTenants,
+      } as Result<Tenant[]>;
     } catch (error: any) {
       // ITC_4.4: Handle 403 Forbidden for authorization error
       if (error?.status === 403 || error?.response?.status === 403) {

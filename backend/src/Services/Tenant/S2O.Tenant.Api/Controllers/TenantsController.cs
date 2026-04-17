@@ -25,12 +25,15 @@ public class TenantsController : ControllerBase
         _configuration = configuration;
     }
 
-    // GET: api/v1/tenants
+    // GET: api/v1/tenants?page=1&pageSize=10&keyword=pizza
     [HttpGet]
     [Authorize(Roles = "SystemAdmin")]
-    public async Task<IActionResult> GetAll([FromQuery] string? keyword)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? keyword = null)
     {
-        var result = await _mediator.Send(new GetAllTenantsQuery(keyword));
+        var result = await _mediator.Send(new SearchTenantsQuery(page, pageSize, keyword));
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 

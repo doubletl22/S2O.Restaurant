@@ -45,6 +45,13 @@ export function TenantDialog({ open, onOpenChange, onSuccess }: TenantDialogProp
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const buildUniqueEmail = (currentEmail: string) => {
+    const [localPart, domain = "example.com"] = currentEmail.split("@");
+    const safeLocal = (localPart || "owner").replace(/\s+/g, "").toLowerCase();
+    const suffix = Date.now().toString().slice(-6);
+    return `${safeLocal}+${suffix}@${domain}`;
+  };
+
   // Setup form đúng với Interface mới
   const form = useForm<RegisterTenantRequest>({
     defaultValues: {
@@ -78,6 +85,28 @@ export function TenantDialog({ open, onOpenChange, onSuccess }: TenantDialogProp
       }
     } catch (error) {
       console.error(error);
+      const apiError = error as { code?: string; description?: string; message?: string };
+      const duplicateEmail = apiError?.code === "Identity.DuplicateEmail";
+
+      if (duplicateEmail) {
+        form.setError("email", {
+          type: "server",
+          message: apiError?.description || "Email này đã được sử dụng.",
+        });
+
+        const currentEmail = form.getValues("email");
+        const suggestedEmail = buildUniqueEmail(currentEmail);
+        form.setValue("email", suggestedEmail, { shouldDirty: true, shouldValidate: true });
+
+        toast.error("Email đã tồn tại", {
+          description: `Đã gợi ý email mới: ${suggestedEmail}`,
+        });
+        return;
+      }
+
+      toast.error("Tạo nhà hàng thất bại", {
+        description: apiError?.description || apiError?.message || "Vui lòng thử lại.",
+      });
     } finally {
       setIsLoading(false);
     }
