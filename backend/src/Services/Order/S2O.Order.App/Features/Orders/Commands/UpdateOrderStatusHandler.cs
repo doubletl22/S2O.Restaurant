@@ -33,6 +33,13 @@ public class UpdateOrderStatusHandler : IRequestHandler<UpdateOrderStatusCommand
             return Result.Failure(new Error("Security.InvalidBranch", "Bạn không có quyền xử lý đơn hàng của chi nhánh khác."));
         }
 
+        // Business rule: khong cho xac nhan thanh toan lai hoa don da thanh toan/da dong.
+        if (request.NewStatus == OrderStatus.Paid
+            && (order.Status == OrderStatus.Paid || order.Status == OrderStatus.Completed))
+        {
+            return Result.Failure(new Error("Order.AlreadyPaid", "Hóa đơn đã được thanh toán hoặc đã đóng, không thể xử lý lại."));
+        }
+
         // Cập nhật trạng thái
         order.Status = request.NewStatus;
 
