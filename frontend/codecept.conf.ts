@@ -5,7 +5,7 @@ import { setHeadlessWhen } from "@codeceptjs/configure";
 setHeadlessWhen(process.env.HEADLESS === "true");
 
 export const config: CodeceptJS.MainConfig = {
-  tests: "./test/identity/**/*_test.ts",
+  tests: "./test/**/*_test.ts",
   output: "./output",
   helpers: {
     Playwright: {

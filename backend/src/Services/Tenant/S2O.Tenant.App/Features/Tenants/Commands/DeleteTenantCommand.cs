@@ -25,38 +25,26 @@ public class DeleteTenantHandler : IRequestHandler<DeleteTenantCommand, Result<b
         if (tenant == null) 
             return Result<bool>.Failure(new Error("Tenant.NotFound", "Không tìm thấy nhà hàng"));
 
-        // ✅ Soft-delete: Mark tenant as deleted instead of physically removing
-        tenant.IsDeleted = true;
-        tenant.DeletedAtUtc = DateTime.UtcNow;
-        _context.Tenants.Update(tenant);
+        // Use ExecuteUpdate to avoid re-saving tracked DateTime properties that may have incompatible Kind.
+        // We only flip IsDeleted to keep this path resilient against DateTime column type mismatches.
+        await _context.Tenants
+            .IgnoreQueryFilters()
+            .Where(t => t.Id == request.Id)
+            .ExecuteUpdateAsync(setters => setters
+            .SetProperty(t => t.IsDeleted, true), ct);
 
-        // ✅ Cascade soft-delete: Mark all branches as deleted
-        var branches = await _context.Branches
+        await _context.Branches
             .IgnoreQueryFilters()
             .Where(b => b.TenantId == request.Id)
-            .ToListAsync(ct);
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(b => b.IsDeleted, true), ct);
 
-        foreach (var branch in branches)
-        {
-            branch.IsDeleted = true;
-            branch.DeletedAtUtc = DateTime.UtcNow;
-            _context.Branches.Update(branch);
-        }
-
-        // ✅ Cascade soft-delete: Mark all tables as deleted
-        var tables = await _context.Tables
+        await _context.Tables
             .IgnoreQueryFilters()
             .Where(t => t.TenantId == request.Id)
-            .ToListAsync(ct);
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(t => t.IsDeleted, true), ct);
 
-        foreach (var table in tables)
-        {
-            table.IsDeleted = true;
-            table.DeletedAtUtc = DateTime.UtcNow;
-            _context.Tables.Update(table);
-        }
-
-        await _context.SaveChangesAsync(ct);
         return Result<bool>.Success(true);
     }
 }

@@ -122,6 +122,9 @@ public class OrdersController : ControllerBase
         var tenantId = GetTenantIdFromToken();
         if (tenantId == Guid.Empty) return BadRequest("Không xác định được tenant.");
 
+        var rangeValidationError = ValidateDateRange(allTime, from, to);
+        if (rangeValidationError is not null) return rangeValidationError;
+
         var query = _context.Orders
             .IgnoreQueryFilters()
             .AsNoTracking()
@@ -176,6 +179,9 @@ public class OrdersController : ControllerBase
         var tenantId = GetTenantIdFromToken();
         if (tenantId == Guid.Empty) return BadRequest("Không xác định được tenant.");
 
+        var rangeValidationError = ValidateDateRange(allTime, from, to);
+        if (rangeValidationError is not null) return rangeValidationError;
+
         var query = _context.Orders
             .IgnoreQueryFilters()
             .AsNoTracking()
@@ -223,6 +229,23 @@ public class OrdersController : ControllerBase
         var tenantClaim = User.FindFirst("tenant_id")?.Value;
         if (string.IsNullOrEmpty(tenantClaim)) return Guid.Empty;
         return Guid.Parse(tenantClaim);
+    }
+
+    private IActionResult? ValidateDateRange(bool allTime, DateTime? from, DateTime? to)
+    {
+        if (allTime)
+        {
+            return null;
+        }
+
+        var fromDate = (from ?? DateTime.UtcNow.Date).Date;
+        var toDate = (to ?? DateTime.UtcNow.Date).Date;
+        if (fromDate > toDate)
+        {
+            return BadRequest("Khoảng thời gian không hợp lệ: from phải nhỏ hơn hoặc bằng to.");
+        }
+
+        return null;
     }
 
     private (Guid? branchId, IActionResult? error) ResolveRequestedBranch(Guid requestedBranchId)
