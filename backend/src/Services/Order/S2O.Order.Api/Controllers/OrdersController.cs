@@ -112,7 +112,7 @@ public class OrdersController : ControllerBase
 
     // GET: api/v1/orders/owner/revenue-series
     [HttpGet("owner/revenue-series")]
-    [Authorize(Roles = "RestaurantOwner, Manager, Staff")]
+    [Authorize(Roles = "RestaurantOwner")]
     public async Task<IActionResult> GetOwnerRevenueSeries(
         [FromQuery] DateTime? from,
         [FromQuery] DateTime? to,
