@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ChevronLeft, RefreshCw, Utensils, Clock } from "lucide-react";
 import { toast } from "sonner";
 
@@ -36,12 +36,15 @@ type LocalOrder = {
 
 export default function TrackingPage() {
   const params = useParams<{ qrToken?: string | string[] }>();
+  const router = useRouter();
   const qrToken = useMemo(() => {
     const t = params?.qrToken;
     return Array.isArray(t) ? t[0] : t;
   }, [params]);
 
   const [order, setOrder] = useState<LocalOrder | null>(null);
+  const [paymentNotice, setPaymentNotice] = useState<string | null>(null);
+  const redirectTimerRef = useRef<number | null>(null);
 
   const clearLocalOrder = () => {
     try {
@@ -49,6 +52,14 @@ export default function TrackingPage() {
     } catch {}
     setOrder(null);
   };
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) {
+        window.clearTimeout(redirectTimerRef.current);
+      }
+    };
+  }, []);
 
   const load = () => {
     try {
@@ -69,6 +80,7 @@ export default function TrackingPage() {
     if (str.includes("confirm")) return 1;
     if (str.includes("prepar") || str.includes("cook") || str.includes("processing")) return 2;
     if (str.includes("done") || str.includes("complete")) return 3;
+    if (str.includes("paid")) return 6;
     if (str.includes("served")) return 6;
     if (str.includes("cancel")) return 5;
 
@@ -156,6 +168,22 @@ export default function TrackingPage() {
 
     const next = mapBackendOrder(o, res.value || {});
 
+    const nextStatus = toNumericStatus(next.status);
+    if (nextStatus === 4 || nextStatus === 5 || nextStatus === 6) {
+      if (nextStatus === 6) {
+        setPaymentNotice("Đã thanh toán thành công. Bàn đã sẵn sàng cho khách tiếp theo.");
+        toast.success("Đã thanh toán thành công");
+        if (redirectTimerRef.current) {
+          window.clearTimeout(redirectTimerRef.current);
+        }
+        redirectTimerRef.current = window.setTimeout(() => {
+          router.replace(qrToken ? `/guest/t/${qrToken}` : "/");
+        }, 2500);
+      }
+      clearLocalOrder();
+      return true;
+    }
+
     localStorage.setItem("guest_last_order", JSON.stringify(next));
     setOrder(next);
     return true;
@@ -172,6 +200,7 @@ export default function TrackingPage() {
       return "Đã xác nhận";
     if (str.includes("prepar") || str.includes("cook") || str.includes("processing"))
       return "Đang chế biến";
+    if (str.includes("paid")) return "Đã thanh toán";
     if (str.includes("done") || str.includes("complete") || str.includes("served"))
       return "Hoàn thành";
     if (str.includes("cancel")) return "Đã huỷ";
@@ -184,7 +213,7 @@ export default function TrackingPage() {
     if (v === 3) return "Hoàn thành";
     if (v === 4) return "Hoàn tất phục vụ";
     if (v === 5) return "Đã huỷ";
-    if (v === 6) return "Hoàn tất phục vụ";
+    if (v === 6) return "Đã thanh toán";
 
     return "Đang xử lý";
   };
@@ -200,6 +229,14 @@ export default function TrackingPage() {
       return (
         <Badge className="bg-green-50 text-green-700 gap-1">
           <Clock className="h-3 w-3" /> Done
+        </Badge>
+      );
+    }
+
+    if (text === "Đã thanh toán" || str.includes("paid") || v === 6) {
+      return (
+        <Badge className="bg-emerald-50 text-emerald-700 gap-1">
+          <Clock className="h-3 w-3" /> Paid
         </Badge>
       );
     }
@@ -300,6 +337,23 @@ export default function TrackingPage() {
       </div>
 
       <ScrollArea className="px-4 pb-20">
+        {paymentNotice && !order ? (
+          <div className="flex flex-col items-center justify-center py-20 space-y-4 text-center">
+            <div className="rounded-full bg-emerald-50 text-emerald-600 p-4">
+              <Clock className="h-8 w-8" />
+            </div>
+            <div className="space-y-2">
+              <p className="font-semibold text-lg">{paymentNotice}</p>
+              <p className="text-sm text-gray-500">
+                Hệ thống đã xóa đơn trước đó để khách tiếp theo có thể đặt món mới.
+              </p>
+            </div>
+            <Link href={qrToken ? `/guest/t/${qrToken}` : "/"}>
+              <Button>Xem Menu</Button>
+            </Link>
+          </div>
+        ) : null}
+
         {!qrToken ? (
           <div className="flex flex-col items-center py-20 space-y-4 text-gray-500">
             Thiếu QR Token. Vui lòng quét lại mã QR.

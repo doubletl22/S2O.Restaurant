@@ -45,6 +45,9 @@ public class GetTablesHandler : IRequestHandler<GetTablesQuery, Result<List<Tabl
             Id = t.Id,
             Name = t.Name,
             Capacity = t.Capacity,
+            IsActive = t.IsActive,
+            IsOccupied = t.IsOccupied,
+            Status = !t.IsActive ? "Ngừng phục vụ" : (t.IsOccupied ? "Có khách" : "Trống"),
             TenantId = t.TenantId ?? Guid.Empty,
             BranchId = t.BranchId ?? Guid.Empty,
             QrCodeGuid = t.QrCodeUrl ?? string.Empty

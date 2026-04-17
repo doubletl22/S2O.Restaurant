@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using S2O.Order.App.Abstractions;
+using S2O.Order.Domain.Enums;
 using S2O.Shared.Kernel.Results;
 using OrderEntity = S2O.Order.Domain.Entities.Order; // Alias
 
@@ -10,10 +11,13 @@ public class UpdateOrderStatusHandler : IRequestHandler<UpdateOrderStatusCommand
 {
     private readonly IOrderDbContext _context;
     private readonly IOrderNotifier _notifier;
-    public UpdateOrderStatusHandler(IOrderDbContext context, IOrderNotifier notifier)
+    private readonly ITenantClient _tenantClient;
+
+    public UpdateOrderStatusHandler(IOrderDbContext context, IOrderNotifier notifier, ITenantClient tenantClient)
     {
         _context = context;
         _notifier = notifier;
+        _tenantClient = tenantClient;
     }
 
     public async Task<Result> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
@@ -35,11 +39,35 @@ public class UpdateOrderStatusHandler : IRequestHandler<UpdateOrderStatusCommand
         // (Có thể thêm logic log lịch sử: Ai đã đổi trạng thái vào giờ nào)
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        if (order.TableId.HasValue)
+        {
+            var occupiedState = MapOccupiedState(order.Status);
+            if (occupiedState.HasValue)
+            {
+                await _tenantClient.UpdateTableOccupancyAsync(order.TableId.Value, occupiedState.Value, cancellationToken);
+            }
+        }
+
         await _notifier.NotifyOrderStatusChangedAsync(
             order.BranchId,
             order.Id,
             order.Status.ToString()
         );
         return Result.Success();
+    }
+
+    private static bool? MapOccupiedState(OrderStatus status)
+    {
+        return status switch
+        {
+            OrderStatus.Confirmed => true,
+            OrderStatus.Cooking => true,
+            OrderStatus.Ready => true,
+            OrderStatus.Paid => false,
+            OrderStatus.Completed => false,
+            OrderStatus.Cancelled => false,
+            _ => null
+        };
     }
 }

@@ -14,6 +14,8 @@ type BranchTable = {
   name: string
   capacity?: number
   isActive?: boolean
+  isOccupied?: boolean
+  status?: string
 }
 
 function formatTime(value: string) {
@@ -64,6 +66,8 @@ export default function TablesPage() {
             name: String(table.name || 'Không rõ tên bàn'),
             capacity: typeof table.capacity === 'number' ? table.capacity : undefined,
             isActive: typeof table.isActive === 'boolean' ? table.isActive : undefined,
+            isOccupied: typeof table.isOccupied === 'boolean' ? table.isOccupied : undefined,
+            status: typeof table.status === 'string' ? table.status : undefined,
           }))
         )
 
@@ -86,9 +90,43 @@ export default function TablesPage() {
   const getOrdersForTable = (tableId: string) => orders.filter((order) => order.tableId === tableId)
 
   const getTableState = (tableId: string) => {
+    const table = tables.find((item) => item.id === tableId)
     const relatedOrders = getOrdersForTable(tableId)
+    const normalizedStatus = String(table?.status || '').trim().toLowerCase()
     const pendingCount = relatedOrders.filter((order) => order.status === OrderStatus.Pending).length
     const activeCount = relatedOrders.filter((order) => order.status === OrderStatus.Confirmed || order.status === OrderStatus.Cooking).length
+
+    if (table?.isActive === false) {
+      return {
+        label: 'Ngừng phục vụ',
+        badgeClassName: 'bg-slate-100 text-slate-700 border-slate-300',
+        cardClassName: 'border-slate-300 bg-slate-50/60',
+      }
+    }
+
+    if (normalizedStatus.includes('ngừng') || normalizedStatus.includes('inactive')) {
+      return {
+        label: 'Ngừng phục vụ',
+        badgeClassName: 'bg-slate-100 text-slate-700 border-slate-300',
+        cardClassName: 'border-slate-300 bg-slate-50/60',
+      }
+    }
+
+    if (pendingCount > 0) {
+      return {
+        label: `${pendingCount} đơn mới`,
+        badgeClassName: 'bg-red-50 text-red-700 border-red-200',
+        cardClassName: 'border-red-200 bg-red-50/40',
+      }
+    }
+
+    if (normalizedStatus.includes('có khách') || normalizedStatus.includes('occupied') || table?.isOccupied) {
+      return {
+        label: 'Có khách',
+        badgeClassName: 'bg-blue-50 text-blue-700 border-blue-200',
+        cardClassName: 'border-blue-200 bg-blue-50/40',
+      }
+    }
 
     if (activeCount > 0) {
       return {
@@ -98,11 +136,11 @@ export default function TablesPage() {
       }
     }
 
-    if (pendingCount > 0) {
+    if (normalizedStatus.includes('trống') || normalizedStatus.includes('empty')) {
       return {
-        label: `${pendingCount} đơn mới`,
-        badgeClassName: 'bg-red-50 text-red-700 border-red-200',
-        cardClassName: 'border-red-200 bg-red-50/40',
+        label: 'Trống',
+        badgeClassName: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        cardClassName: 'border-emerald-200 bg-emerald-50/40',
       }
     }
 

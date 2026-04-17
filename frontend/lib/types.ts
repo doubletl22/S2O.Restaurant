@@ -82,6 +82,7 @@ export interface Table {
   capacity: number;
   branchId: string;
   isActive: boolean;
+  isOccupied?: boolean;
   qrToken?: string;
   status?: string;
 }
@@ -179,7 +180,8 @@ export enum OrderStatus {
   Ready = 3,
   Completed = 4,
   Cancelled = 5,
-  Served = 6 
+  Paid = 6,
+  Served = 6
 }
 
 export interface OrderItemDto {

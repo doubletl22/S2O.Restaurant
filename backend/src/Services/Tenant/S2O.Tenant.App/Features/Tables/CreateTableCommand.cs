@@ -14,7 +14,9 @@ namespace S2O.Tenant.App.Features.Tables;
 public record CreateTableCommand(
     Guid BranchId,
     string Name,
-    int Capacity
+    int Capacity,
+    bool IsActive = true,
+    bool IsOccupied = false
 ) : IRequest<Result<Guid>>;
 
 public class CreateTableHandler : IRequestHandler<CreateTableCommand, Result<Guid>>
@@ -77,6 +79,8 @@ public class CreateTableHandler : IRequestHandler<CreateTableCommand, Result<Gui
             Id = tableId,
             Name = request.Name,
             Capacity = request.Capacity, // Gán Capacity
+            IsActive = request.IsActive,
+            IsOccupied = request.IsOccupied,
             TenantId = tenantId,
             BranchId = request.BranchId, // [QUAN TRỌNG] Gán BranchId để không bị null
             QrCodeUrl = tableId.ToString()

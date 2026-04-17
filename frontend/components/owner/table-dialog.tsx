@@ -13,12 +13,16 @@ import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+
+const tableStatusValues = ["empty", "occupied", "inactive"] as const;
+type TableStatusFormValue = (typeof tableStatusValues)[number];
 
 const formSchema = z.object({
   name: z.string().min(1, "Tên bàn bắt buộc"),
   capacity: z.coerce.number().min(1, "Sức chứa tối thiểu là 1"),
-  // status: z.string().optional(), // Nếu muốn chỉnh status luôn ở đây
+  tableStatus: z.enum(tableStatusValues),
 });
 
 interface Props {
@@ -31,7 +35,7 @@ interface Props {
 export function TableDialog({ open, onOpenChange, tableToEdit, branchId }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", capacity: 4 },
+    defaultValues: { name: "", capacity: 4, tableStatus: "empty" },
   });
 
   // Truyền branchId vào hook để nó biết invalidateQuery nào khi xong
@@ -41,13 +45,21 @@ export function TableDialog({ open, onOpenChange, tableToEdit, branchId }: Props
   useEffect(() => {
     if (open) {
       if (tableToEdit) {
+        const statusFromTable: TableStatusFormValue =
+          tableToEdit.isActive === false
+            ? "inactive"
+            : tableToEdit.isOccupied
+              ? "occupied"
+              : "empty";
+
         form.reset({
           name: tableToEdit.name,
           capacity: tableToEdit.capacity,
+          tableStatus: statusFromTable,
         });
       } else {
         // Tự động gợi ý tên bàn tiếp theo? (Optional)
-        form.reset({ name: "", capacity: 4 });
+        form.reset({ name: "", capacity: 4, tableStatus: "empty" });
       }
     }
   }, [open, tableToEdit, form]);
@@ -60,8 +72,14 @@ export function TableDialog({ open, onOpenChange, tableToEdit, branchId }: Props
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!branchId) return; // Safety check
 
+    const isActive = values.tableStatus !== "inactive";
+    const isOccupied = values.tableStatus === "occupied";
+
     const payload = {
-        ...values,
+      name: values.name,
+      capacity: values.capacity,
+      isActive,
+      isOccupied,
         branchId: branchId // Luôn gửi kèm branchId
     };
 
@@ -98,6 +116,25 @@ export function TableDialog({ open, onOpenChange, tableToEdit, branchId }: Props
               <FormItem>
                 <FormLabel>Số ghế (Capacity)</FormLabel>
                 <FormControl><Input type="number" min="1" {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+
+            <FormField control={form.control} name="tableStatus" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Trạng thái bàn</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn trạng thái" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="empty">Trống</SelectItem>
+                    <SelectItem value="occupied">Có khách</SelectItem>
+                    <SelectItem value="inactive">Ngừng phục vụ</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )} />

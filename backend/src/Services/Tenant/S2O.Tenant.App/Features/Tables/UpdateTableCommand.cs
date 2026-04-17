@@ -4,7 +4,7 @@ using S2O.Tenant.App.Abstractions;
 
 namespace S2O.Tenant.App.Features.Tables;
 
-public record UpdateTableCommand(Guid Id, string Name, int Capacity, bool IsActive) : IRequest<Result<Guid>>;
+public record UpdateTableCommand(Guid Id, string Name, int Capacity, bool IsActive, bool IsOccupied = false) : IRequest<Result<Guid>>;
 
 public class UpdateTableHandler : IRequestHandler<UpdateTableCommand, Result<Guid>>
 {
@@ -23,6 +23,7 @@ public class UpdateTableHandler : IRequestHandler<UpdateTableCommand, Result<Gui
         table.Name = request.Name;
         table.Capacity = request.Capacity;
         table.IsActive = request.IsActive;
+        table.IsOccupied = request.IsOccupied;
 
         await _context.SaveChangesAsync(ct);
         return Result<Guid>.Success(table.Id);

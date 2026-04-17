@@ -1,6 +1,7 @@
 using S2O.Order.App.Abstractions;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Json;
 
 namespace S2O.Order.Infra.ExternalServices;
 
@@ -49,6 +50,37 @@ public class TenantClient : ITenantClient
         {
             _logger.LogError($"Error checking tenant lock status. TenantId: {tenantId}, Error: {ex.Message}");
             return false; // If we can't check, don't block the request
+        }
+    }
+
+    public async Task UpdateTableOccupancyAsync(Guid tableId, bool isOccupied, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await _httpClient.PatchAsJsonAsync(
+                $"/api/internal/tables/{tableId}/occupancy",
+                new { isOccupied },
+                cancellationToken
+            );
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning(
+                    "Failed to sync table occupancy. TableId: {TableId}, IsOccupied: {IsOccupied}, Status: {Status}",
+                    tableId,
+                    isOccupied,
+                    response.StatusCode
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error syncing table occupancy. TableId: {TableId}, IsOccupied: {IsOccupied}",
+                tableId,
+                isOccupied
+            );
         }
     }
 }

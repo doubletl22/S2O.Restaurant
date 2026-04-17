@@ -124,6 +124,7 @@ export default function OrderTicketPage() {
       const res: any = await staffService.updateOrderStatus(orderId, OrderStatus.Confirmed);
       if (res.isSuccess) {
         toast.success("Đã xác nhận đơn → Chuyển bếp");
+        await fetchTables();
         await fetchOrders();
       } else {
         toast.error("Lỗi: " + (res.error?.message || "Không xác nhận được"));
@@ -141,6 +142,7 @@ export default function OrderTicketPage() {
       const res: any = await staffService.updateOrderStatus(orderId, OrderStatus.Cancelled);
       if (res.isSuccess) {
         toast.success("Đã từ chối đơn hàng");
+        await fetchTables();
         await fetchOrders();
       } else {
         toast.error("Lỗi: " + (res.error?.message || "Không từ chối được"));
@@ -155,8 +157,7 @@ export default function OrderTicketPage() {
   const handleMarkInvoicePaid = async (orderId: string) => {
     setPayingOrderId(orderId);
     try {
-      // Frontend enum Served(6) maps to backend Paid(6)
-      const res: any = await staffService.updateOrderStatus(orderId, OrderStatus.Served);
+      const res: any = await staffService.updateOrderStatus(orderId, OrderStatus.Paid);
       if (!res?.isSuccess) {
         const desc = res?.error?.description || res?.error?.message || "Không cập nhật được trạng thái thanh toán";
         toast.error(String(desc));
@@ -165,6 +166,7 @@ export default function OrderTicketPage() {
 
       toast.success("Đã thanh toán. Hóa đơn đã chuyển vào Lịch sử");
       setSelectedInvoice(null);
+      await fetchTables();
       await fetchOrders();
     } catch (e: any) {
       toast.error(e?.message || "Có lỗi xảy ra khi thanh toán hóa đơn");

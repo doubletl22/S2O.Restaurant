@@ -14,8 +14,8 @@ function normalizeOrderStatus(status: unknown): OrderStatus {
   if (key === "ready") return OrderStatus.Ready;
   if (key === "completed" || key === "complete") return OrderStatus.Completed;
   if (key === "cancelled" || key === "canceled") return OrderStatus.Cancelled;
-  if (key === "paid") return OrderStatus.Served;
-  if (key === "served") return OrderStatus.Served;
+  if (key === "paid") return OrderStatus.Paid;
+  if (key === "served") return OrderStatus.Paid;
   return OrderStatus.Pending;
 }
 

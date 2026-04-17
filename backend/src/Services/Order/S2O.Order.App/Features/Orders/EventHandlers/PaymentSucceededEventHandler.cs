@@ -9,10 +9,12 @@ namespace S2O.Order.App.Features.Orders.EventHandlers;
 public class PaymentSucceededEventHandler : INotificationHandler<PaymentSucceededEvent>
 {
     private readonly IOrderDbContext _context;
+    private readonly ITenantClient _tenantClient;
 
-    public PaymentSucceededEventHandler(IOrderDbContext context)
+    public PaymentSucceededEventHandler(IOrderDbContext context, ITenantClient tenantClient)
     {
         _context = context;
+        _tenantClient = tenantClient;
     }
 
     public async Task Handle(PaymentSucceededEvent notification, CancellationToken cancellationToken)
@@ -32,5 +34,10 @@ public class PaymentSucceededEventHandler : INotificationHandler<PaymentSucceede
 
         // 3. Lưu thay đổi
         await _context.SaveChangesAsync(cancellationToken);
+
+        if (order.TableId.HasValue)
+        {
+            await _tenantClient.UpdateTableOccupancyAsync(order.TableId.Value, false, cancellationToken);
+        }
     }
 }

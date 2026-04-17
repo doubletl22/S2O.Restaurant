@@ -4,6 +4,9 @@ public class TableResponse
     public Guid Id { get; set; }           // ID của bàn
     public required string Name { get; set; }
     public int Capacity { get; set; }
+    public bool IsActive { get; set; }
+    public bool IsOccupied { get; set; }
+    public required string Status { get; set; }
 
     public Guid TenantId { get; set; }
     public Guid BranchId { get; set; }

@@ -41,14 +41,6 @@ public class StorefrontTenantController : ControllerBase
 
         if (table == null) return NotFound("Không tìm thấy bàn.");
 
-        // MVP phiên bàn: khi khách quét QR lần đầu thì đánh dấu bàn đang có khách.
-        // Các lần quét tiếp theo vẫn cho vào menu nhưng giữ nguyên trạng thái bàn.
-        if (!table.IsOccupied)
-        {
-            table.IsOccupied = true;
-            await _context.SaveChangesAsync();
-        }
-
         // Fallback for legacy data: some old tables were created without TenantId.
         // Resolve tenant through BranchId to keep QR flow working.
         var resolvedTenantId = table.TenantId;

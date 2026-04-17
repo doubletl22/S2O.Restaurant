@@ -9,4 +9,9 @@ public interface ITenantClient
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if tenant is locked, false otherwise. Returns false if tenant not found.</returns>
     Task<bool> IsLockedAsync(Guid tenantId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Sync table occupancy state to Tenant service.
+    /// </summary>
+    Task UpdateTableOccupancyAsync(Guid tableId, bool isOccupied, CancellationToken cancellationToken = default);
 }

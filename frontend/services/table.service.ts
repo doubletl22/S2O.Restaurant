@@ -9,7 +9,7 @@ export const tableService = {
     return response as any;
   },
 
-  create: async (body: { name: string; capacity: number; branchId: string }): Promise<Result<string>> => {
+  create: async (body: { name: string; capacity: number; branchId: string; isActive?: boolean; isOccupied?: boolean }): Promise<Result<string>> => {
     const response = await http.post("/api/v1/tables", body);
     return response as any;
   },
