@@ -58,6 +58,20 @@ public class CreateTableHandler : IRequestHandler<CreateTableCommand, Result<Gui
             return Result<Guid>.Failure(new Error("Tenant.SubscriptionExpired", "Gói dịch vụ đã hết hạn. Vui lòng gia hạn."));
         }
 
+        // Validate BranchId
+        if (request.BranchId == Guid.Empty)
+            return Result<Guid>.Failure(new Error("Table.BranchRequired", "Vui lòng chọn chi nhánh."));
+
+        // Validate Name
+        if (string.IsNullOrWhiteSpace(request.Name))
+            return Result<Guid>.Failure(new Error("Table.NameRequired", "Tên bàn không được để trống."));
+
+        if (request.Name.Length > 50)
+            return Result<Guid>.Failure(new Error("Table.NameTooLong", "Tên bàn không được quá 50 ký tự."));
+
+        if (request.Capacity <= 0)
+            return Result<Guid>.Failure(new Error("Table.CapacityInvalid", "Sức chứa phải lớn hơn 0."));
+
         if (!PlanPolicy.IsUnlimited(tenant.SubscriptionPlan))
         {
             var currentTables = await _context.Tables.CountAsync(t => t.TenantId == tenantId, ct);
@@ -67,10 +81,6 @@ public class CreateTableHandler : IRequestHandler<CreateTableCommand, Result<Gui
                 return Result<Guid>.Failure(new Error("Quota.TablesExceeded", $"Gói {PlanPolicy.Normalize(tenant.SubscriptionPlan)} cho phép tối đa {maxTables} bàn."));
             }
         }
-
-        // Validate BranchId
-        if (request.BranchId == Guid.Empty)
-            return Result<Guid>.Failure(new Error("Table.BranchRequired", "Vui lòng chọn chi nhánh."));
 
         var tableId = Guid.NewGuid();
 

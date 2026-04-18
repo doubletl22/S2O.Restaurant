@@ -20,7 +20,7 @@ const tableStatusValues = ["empty", "occupied", "inactive"] as const;
 type TableStatusFormValue = (typeof tableStatusValues)[number];
 
 const formSchema = z.object({
-  name: z.string().min(1, "Tên bàn bắt buộc"),
+  name: z.string().min(1, "Tên bàn bắt buộc").max(50, "Tên bàn không được quá 50 ký tự"),
   capacity: z.coerce.number().min(1, "Sức chứa tối thiểu là 1"),
   tableStatus: z.enum(tableStatusValues),
 });

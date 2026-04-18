@@ -20,6 +20,16 @@ public class UpdateTableHandler : IRequestHandler<UpdateTableCommand, Result<Gui
         var table = await _context.Tables.FindAsync(new object[] { request.Id }, ct);
         if (table == null) return Result<Guid>.Failure(new Error("Table.NotFound", "Bàn không tồn tại"));
 
+        // Validate Name
+        if (string.IsNullOrWhiteSpace(request.Name))
+            return Result<Guid>.Failure(new Error("Table.NameRequired", "Tên bàn không được để trống."));
+
+        if (request.Name.Length > 50)
+            return Result<Guid>.Failure(new Error("Table.NameTooLong", "Tên bàn không được quá 50 ký tự."));
+
+        if (request.Capacity <= 0)
+            return Result<Guid>.Failure(new Error("Table.CapacityInvalid", "Sức chứa phải lớn hơn 0."));
+
         table.Name = request.Name;
         table.Capacity = request.Capacity;
         table.IsActive = request.IsActive;
