@@ -92,8 +92,15 @@ public class ProductsController : ControllerBase
     {
         var result = await _sender.Send(new DeleteProductCommand(id));
 
-        return result.IsSuccess 
-            ? NoContent() 
-            : BadRequest(result.Error);
+        if (result.IsSuccess)
+            return NoContent();
+
+        if (result.Error?.Code == "Product.NotFound")
+            return NotFound(result.Error);
+
+        if (result.Error?.Code == "Product.Forbidden")
+            return Forbid();
+
+        return BadRequest(result.Error);
     }
 }

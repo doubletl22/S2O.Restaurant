@@ -45,6 +45,7 @@ public class CategoriesController : ControllerBase
     }
     // PUT: api/v1/categories/{id}
     [HttpPut("{id}")]
+    [Authorize(Roles = "RestaurantOwner")]
     public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryCommand command)
     {
         if (id != command.Id)
