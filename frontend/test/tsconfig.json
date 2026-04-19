@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "module": "commonjs",
     "moduleResolution": "node",
+    "ignoreDeprecations": "5.0",
     "resolveJsonModule": true,
     "types": ["codeceptjs", "node"],
     "baseUrl": "..",
