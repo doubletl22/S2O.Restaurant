@@ -21,19 +21,25 @@ public static class PlanPolicy
         };
     }
 
-    public static bool IsUnlimited(string? planType) => Normalize(planType) == Enterprise;
+    public static bool IsUnlimited(string? planType)
+    {
+        var normalized = Normalize(planType);
+        return normalized == Free || normalized == Enterprise;
+    }
 
     public static int GetBranchesQuota(string? planType) => Normalize(planType) switch
     {
-        Free => 10,
+        Free => int.MaxValue,
         Premium => 100,
+        Enterprise => int.MaxValue,
         _ => int.MaxValue
     };
 
     public static int GetTablesQuota(string? planType) => Normalize(planType) switch
     {
-        Free => 10,
+        Free => int.MaxValue,
         Premium => 100,
+        Enterprise => int.MaxValue,
         _ => int.MaxValue
     };
 
