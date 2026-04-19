@@ -1,0 +1,13 @@
+Mã module;Điều hướng - Phân tích giá trị biên (Navigation - Standard BVA);;;;;;;;Không áp dụng
+Yêu cầu kiểm thử;"Phân tích áp dụng Standard BVA cho module Điều hướng. Kết quả phân tích: Module Navigation kiểm tra việc truy cập URL và hiển thị giao diện — không có form nhập liệu nào với ràng buộc số. Do không có biến đầu vào có miền giá trị [min, max], Standard BVA không áp dụng cho module này.";;;;;;;;;Không đạt
+Người kiểm thử;Nhóm SQA
+Đạt;Không đạt;Chưa kiểm thử;Không áp dụng;Số lượng test case;;;;;Chưa kiểm thử
+0;0;0;1;1;;;;;Không áp dụng
+ID;Mô tả test case;Các bước thực hiện;Kết quả mong đợi;Phụ thuộc test case;Kết quả;Kỹ thuật kiểm thử;Ghi chú
+;Phân tích khả năng áp dụng BVA
+[BVA-NAV-NA];[Không áp dụng] Module Điều hướng không có trường nhập liệu số;"Phân tích module Navigation:
+1. Tất cả 14 test case trong BlackBox_Navigation.csv đều kiểm tra việc truy cập URL và hiển thị thành phần giao diện.
+2. Không có form input nào yêu cầu nhập giá trị số có ràng buộc min/max.
+3. Điều hướng chỉ liên quan đến kiểm soát truy cập (role-based) và trạng thái trang — không có biến số.
+Kết luận: Standard BVA không áp dụng cho module Điều hướng.";"Standard BVA không tạo ra test case cho module này.
+Kỹ thuật kiểm thử phù hợp: Kiểm tra điều hướng, Kiểm soát truy cập, Chuyển đổi trạng thái (đã thực hiện trong BlackBox_Navigation.csv).";;Không áp dụng;"Phân tích BVA";"Navigation không có biến số đầu vào. BVA chỉ áp dụng khi có miền giá trị [min, max] xác định cho tham số đầu vào."

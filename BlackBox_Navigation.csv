@@ -1,0 +1,76 @@
+Mã module;Điều hướng (Navigation);;;;;;;;Đạt
+Yêu cầu kiểm thử;"Xác minh tất cả các trang được bảo vệ đều có thể truy cập bởi đúng quyền (System Admin và Owner), mỗi trang tải đúng thành phần giao diện hoặc văn bản mong đợi.";;;;;;;;;Không đạt
+Người kiểm thử;Nhóm SQA
+Đạt;Không đạt;Chưa kiểm thử;Không áp dụng;Số lượng test case;;;;;Chưa kiểm thử
+14;0;0;1;15;;;;;Không áp dụng
+ID;Mô tả test case;Các bước thực hiện;Kết quả mong đợi;Phụ thuộc test case;Kết quả;Kỹ thuật kiểm thử;Ghi chú
+;Chức năng: Kiểm tra khởi tạo giao diện (trước khi đăng nhập)
+[NAV-01];System Admin đăng nhập — trang dashboard tải thành công;"1. Điều hướng đến '/login'.
+2. Nhập Email: admin@s2o.com, Mật khẩu: Admin@123.
+3. Click 'Đăng nhập'.
+4. Chờ tối đa 10 giây.";"1. Trình duyệt điều hướng đến '/dashboard'.
+2. Trang dashboard hiển thị với văn bản 'Operational'.";;Đạt;"Luồng thành công,Chuyển đổi trạng thái";Điều kiện tiên quyết cho các trang System Admin
+[NAV-02];Owner đăng nhập — trang dashboard Owner tải thành công;"1. Điều hướng đến '/login'.
+2. Nhập Email: quantran@s525o.com, Mật khẩu: Quan11209.
+3. Click 'Đăng nhập'.
+4. Chờ tối đa 10 giây.";"1. Trình duyệt điều hướng đến '/owner/dashboard'.
+2. Trang dashboard hiển thị với liên kết đến '/owner/staff'.";;Đạt;"Luồng thành công,Chuyển đổi trạng thái";Điều kiện tiên quyết cho các trang Owner
+;Chức năng: Điều hướng trang System Admin
+[NAV-03];System Admin có thể truy cập /sysadmin/dashboard;"1. Đăng nhập với quyền System Admin (xem [NAV-01]).
+2. Điều hướng đến '/sysadmin/dashboard'.
+3. Chờ tối đa 10 giây.";"1. URL là '/sysadmin/dashboard'.
+2. Văn bản 'Operational' hiển thị trên trang.";[NAV-01];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền System Admin
+[NAV-04];System Admin có thể truy cập /sysadmin/restaurants;"1. Đăng nhập với quyền System Admin (xem [NAV-01]).
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Chờ tối đa 10 giây.";"1. URL là '/sysadmin/restaurants'.
+2. Một phần tử <table> hiển thị trên trang.";[NAV-01];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền System Admin
+[NAV-05];System Admin có thể truy cập /sysadmin/users;"1. Đăng nhập với quyền System Admin (xem [NAV-01]).
+2. Điều hướng đến '/sysadmin/users'.
+3. Chờ tối đa 10 giây.";"1. URL là '/sysadmin/users'.
+2. Một phần tử <table> hiển thị trên trang.";[NAV-01];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền System Admin
+[NAV-06];System Admin có thể truy cập /sysadmin/ai-config;"1. Đăng nhập với quyền System Admin (xem [NAV-01]).
+2. Điều hướng đến '/sysadmin/ai-config'.
+3. Chờ tối đa 10 giây.";"1. URL là '/sysadmin/ai-config'.
+2. Một phần tử có role='slider' hiển thị trên trang.";[NAV-01];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền System Admin
+[NAV-07];System Admin có thể truy cập /sysadmin/settings;"1. Đăng nhập với quyền System Admin (xem [NAV-01]).
+2. Điều hướng đến '/sysadmin/settings'.
+3. Chờ tối đa 10 giây.";"1. URL là '/sysadmin/settings'.
+2. Một phần tử có role='tablist' hiển thị trên trang.";[NAV-01];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền System Admin
+;Chức năng: Điều hướng trang Owner
+[NAV-08];Owner có thể truy cập /owner/dashboard;"1. Đăng nhập với quyền Owner (xem [NAV-02]).
+2. Điều hướng đến '/owner/dashboard'.
+3. Chờ tối đa 10 giây.";"1. URL là '/owner/dashboard'.
+2. Liên kết đến '/owner/staff' hiển thị.";[NAV-02];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền Owner
+[NAV-09];Owner có thể truy cập /owner/menu;"1. Đăng nhập với quyền Owner (xem [NAV-02]).
+2. Điều hướng đến '/owner/menu'.
+3. Chờ tối đa 10 giây.";"1. URL là '/owner/menu'.
+2. Ô tìm kiếm với placeholder 'Tìm món ăn theo tên...' hiển thị.";[NAV-02];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền Owner
+[NAV-10];Owner có thể truy cập /owner/qr-codes;"1. Đăng nhập với quyền Owner (xem [NAV-02]).
+2. Điều hướng đến '/owner/qr-codes'.
+3. Chờ tối đa 10 giây.";"1. URL là '/owner/qr-codes'.
+2. Một phần tử có role='combobox' hiển thị trên trang.";[NAV-02];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền Owner
+[NAV-11];Owner có thể truy cập /owner/branches;"1. Đăng nhập với quyền Owner (xem [NAV-02]).
+2. Điều hướng đến '/owner/branches'.
+3. Chờ tối đa 10 giây.";"1. URL là '/owner/branches'.
+2. Văn bản 'Sơ đồ bàn' hiển thị trên trang.";[NAV-02];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền Owner
+[NAV-12];Owner có thể truy cập /owner/staff;"1. Đăng nhập với quyền Owner (xem [NAV-02]).
+2. Điều hướng đến '/owner/staff'.
+3. Chờ tối đa 10 giây.";"1. URL là '/owner/staff'.
+2. Văn bản 'Thêm nhân viên' hiển thị trên trang.";[NAV-02];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền Owner
+[NAV-13];Owner có thể truy cập /owner/revenue;"1. Đăng nhập với quyền Owner (xem [NAV-02]).
+2. Điều hướng đến '/owner/revenue'.
+3. Chờ tối đa 10 giây.";"1. URL là '/owner/revenue'.
+2. Một phần tử có role='tablist' hiển thị trên trang.";[NAV-02];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền Owner
+[NAV-14];Owner có thể truy cập /owner/settings;"1. Đăng nhập với quyền Owner (xem [NAV-02]).
+2. Điều hướng đến '/owner/settings'.
+3. Chờ tối đa 10 giây.";"1. URL là '/owner/settings'.
+2. Một phần tử có role='tablist' hiển thị trên trang.";[NAV-02];Đạt;"Kiểm tra điều hướng,Luồng thành công";Quyền Owner
+
+;Bổ sung test case BVA đã viết
+;Phân tích khả năng áp dụng BVA
+[BVA-NAV-NA];[Không áp dụng] Module Điều hướng không có trường nhập liệu số;"Phân tích module Navigation:
+1. Tất cả 14 test case trong BlackBox_Navigation.csv đều kiểm tra việc truy cập URL và hiển thị thành phần giao diện.
+2. Không có form input nào yêu cầu nhập giá trị số có ràng buộc min/max.
+3. Điều hướng chỉ liên quan đến kiểm soát truy cập (role-based) và trạng thái trang — không có biến số.
+Kết luận: Standard BVA không áp dụng cho module Điều hướng.";"Standard BVA không tạo ra test case cho module này.
+Kỹ thuật kiểm thử phù hợp: Kiểm tra điều hướng, Kiểm soát truy cập, Chuyển đổi trạng thái (đã thực hiện trong BlackBox_Navigation.csv).";;Không áp dụng;"Phân tích BVA";"Navigation không có biến số đầu vào. BVA chỉ áp dụng khi có miền giá trị [min, max] xác định cho tham số đầu vào."

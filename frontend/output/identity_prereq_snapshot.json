@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-04-18T18:22:51.933Z",
+  "apiBaseUrl": "http://localhost:5000",
+  "scopesRequested": [
+    "environment"
+  ],
+  "scopesResolved": [
+    "environment"
+  ],
+  "steps": {
+    "environment": {
+      "requested": true,
+      "status": "ready",
+      "details": {
+        "adminEmail": "admin@s2o.com",
+        "tenantServiceReady": true
+      }
+    },
+    "owner": {
+      "requested": false,
+      "status": "skipped",
+      "details": {}
+    },
+    "branch": {
+      "requested": false,
+      "status": "skipped",
+      "details": {}
+    }
+  }
+}

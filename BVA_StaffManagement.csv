@@ -1,0 +1,153 @@
+Mã module;Quản lý nhân viên - Phân tích giá trị biên (Staff Management - Standard BVA);;;;;;;;Chưa kiểm thử
+Yêu cầu kiểm thử;"Kiểm tra các trường nhập liệu trong form tạo nhân viên theo phương pháp Standard BVA. Số biến n=2, số test case = 4n+1 = 4×2+1 = 9 TC. Biến kiểm thử: (1) Họ và tên [min=1, max=50 ký tự]; (2) Số điện thoại [min=9, max=11 ký tự]. Giá trị danh nghĩa: Họ tên = 25 ký tự, SĐT = 10 ký tự.";;;;;;;;;Không đạt
+Người kiểm thử;Nhóm SQA
+Đạt;Không đạt;Chưa kiểm thử;Không áp dụng;Số lượng test case;;;;;Chưa kiểm thử
+0;0;13;0;13;;;;;Không áp dụng
+ID;Mô tả test case;Các bước thực hiện;Kết quả mong đợi;Phụ thuộc test case;Kết quả;Kỹ thuật kiểm thử;Ghi chú
+;Bảng giá trị biên: Họ và tên [min=1 | min+=2 | nom=25 | max-=49 | max=50] | Số điện thoại [min=9 | min+=10 | nom=10 | max-=10 | max=11]
+;--- Test case Nominal (1 TC) ---
+[BVA-STAFF-01];"[Nominal] Tạo nhân viên với tất cả giá trị danh nghĩa
+(Họ tên=25 ký tự, SĐT=10 ký tự)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva01@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên 'Nguyen Thi Nhan Vien Test' xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Nominal";"Nominal: Họ tên = 25 ký tự (nom), SĐT = 10 ký tự (nom)"
+;--- Biến 1: Họ và tên — giữ SĐT = nom (10 ký tự) (4 TC) ---
+[BVA-STAFF-02];"[Họ tên - Min=1] Tạo nhân viên với Họ và tên = 1 ký tự (giá trị tối thiểu)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva02@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'A' (1 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên 'A' xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Min";"Họ tên = 1 ký tự (min). Ràng buộc: z.string().min(1)"
+[BVA-STAFF-03];"[Họ tên - Min+=2] Tạo nhân viên với Họ và tên = 2 ký tự (ngay trên giá trị tối thiểu)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva03@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'AB' (2 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên 'AB' xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Min+";"Họ tên = 2 ký tự (min+)"
+[BVA-STAFF-04];"[Họ tên - Max-=49] Tạo nhân viên với Họ và tên = 49 ký tự (ngay dưới giá trị tối đa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva04@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Van A BVA Test Name Maximum Minus One 49x' (49 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên tương ứng xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Max-";"Họ tên = 49 ký tự (max-). Chuỗi mẫu: 'Nguyen Van A BVA Test Name Maximum Minus One 49x' = 49 ký tự"
+[BVA-STAFF-05];"[Họ tên - Max=50] Tạo nhân viên với Họ và tên = 50 ký tự (giá trị tối đa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva05@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Van A BVA Test Name Maximum Minus One 49xx' (50 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên tương ứng xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Max";"Họ tên = 50 ký tự (max). Chuỗi mẫu: 'Nguyen Van A BVA Test Name Maximum Minus One 49xx' = 50 ký tự"
+;--- Biến 2: Số điện thoại — giữ Họ tên = nom (25 ký tự) (4 TC) ---
+[BVA-STAFF-06];"[SĐT - Min=9] Tạo nhân viên với Số điện thoại = 9 ký tự (giá trị tối thiểu)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva06@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '090123456' (9 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên 'Nguyen Thi Nhan Vien Test' xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Min";"SĐT = 9 ký tự (min). Ràng buộc: z.string().min(9)"
+[BVA-STAFF-07];"[SĐT - Min+=10] Tạo nhân viên với Số điện thoại = 10 ký tự (ngay trên giá trị tối thiểu)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva07@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Min+";"SĐT = 10 ký tự (min+). Lưu ý: do khoảng [9,11] hẹp, min+(10) = nom(10) = max-(10)"
+[BVA-STAFF-08];"[SĐT - Max-=10] Tạo nhân viên với Số điện thoại = 10 ký tự (ngay dưới giá trị tối đa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva08@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Max-";"SĐT = 10 ký tự (max-). Lưu ý: do khoảng [9,11] hẹp, min+(10) = nom(10) = max-(10) — giá trị trùng nhau là bình thường"
+[BVA-STAFF-09];"[SĐT - Max=11] Tạo nhân viên với Số điện thoại = 11 ký tự (giá trị tối đa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva09@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '09012345678' (11 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Max";"SĐT = 11 ký tự (max)"
+;--- Robustness BVA - Dirty Test Cases (tổng 6n+1 = 6×2+1 = 13 TC) ---
+[BVA-STAFF-10];"[Dirty - Họ tên Min-=0] Tạo nhân viên với Họ và tên rỗng (dưới giá trị tối thiểu — input không hợp lệ)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva10@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Để trống trường Họ và tên (0 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.";"1. Form KHÔNG được gửi.
+2. Thông báo lỗi 'Họ tên bắt buộc' hiển thị ngay dưới trường Họ và tên.
+3. Dialog vẫn mở.";[STAFF-01];Chưa kiểm thử;"Robustness BVA - Dirty (Min-)";"Họ tên = 0 ký tự (min-1 = min-). Ràng buộc: z.string().min(1) — Zod từ chối phía client"
+[BVA-STAFF-11];"[Dirty - Họ tên Max+=51] Tạo nhân viên với Họ và tên = 51 ký tự (vượt giá trị tối đa giả định — input không hợp lệ)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva11@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Van A BVA Test Name Maximum Minus One 49xxxx' (51 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.";"1. Hệ thống từ chối hoặc hiển thị lỗi.
+2. Nhân viên KHÔNG xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Robustness BVA - Dirty (Max+)";"Họ tên = 51 ký tự (max+1 = max+). Frontend không có ràng buộc max — kiểm tra backend có xử lý không"
+[BVA-STAFF-12];"[Dirty - SĐT Min-=8] Tạo nhân viên với Số điện thoại = 8 ký tự (dưới giá trị tối thiểu — input không hợp lệ)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva12@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '09012345' (8 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.";"1. Form KHÔNG được gửi.
+2. Thông báo lỗi 'SĐT không hợp lệ' hiển thị ngay dưới trường Số điện thoại.
+3. Dialog vẫn mở.";[STAFF-01];Chưa kiểm thử;"Robustness BVA - Dirty (Min-)";"SĐT = 8 ký tự (min-1 = min-). Ràng buộc: z.string().min(9) — Zod từ chối phía client"
+[BVA-STAFF-13];"[Dirty - SĐT Max+=12] Tạo nhân viên với Số điện thoại = 12 ký tự (vượt giá trị tối đa giả định — input không hợp lệ)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva13@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '090123456789' (12 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.";"1. Hệ thống từ chối hoặc hiển thị lỗi.
+2. Nhân viên KHÔNG xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Robustness BVA - Dirty (Max+)";"SĐT = 12 ký tự (max+1 = max+). Frontend không có ràng buộc max — kiểm tra backend có xử lý không"

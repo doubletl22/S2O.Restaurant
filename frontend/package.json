@@ -4,11 +4,26 @@
   "private": true,
   "scripts": {
     "build": "next build",
+    "case": "powershell -ExecutionPolicy Bypass -File ./test/identity/scripts/run_identity_case.ps1",
+    "case:headless": "powershell -ExecutionPolicy Bypass -File ./test/identity/scripts/run_identity_case.ps1 -Headless",
     "dev": "next dev",
     "lint": "eslint .",
     "start": "next start",
+<<<<<<< Updated upstream
     "test:e2e": "cross-env TS_NODE_PROJECT=tsconfig.codecept.json codeceptjs run --steps",
     "test:e2e:headless": "cross-env HEADLESS=true TS_NODE_PROJECT=tsconfig.codecept.json codeceptjs run --steps"
+=======
+    "test:e2e:prereq": "ts-node --project tsconfig.codecept.json ./test/identity/scripts/setup_prerequisites.ts",
+    "test:e2e:prereq:environment": "ts-node --project tsconfig.codecept.json ./test/identity/scripts/setup_prerequisites.ts --scope=environment",
+    "test:e2e:prereq:owner": "ts-node --project tsconfig.codecept.json ./test/identity/scripts/setup_prerequisites.ts --scope=owner",
+    "test:e2e:prereq:branch": "ts-node --project tsconfig.codecept.json ./test/identity/scripts/setup_prerequisites.ts --scope=branch",
+    "test:e2e:case": "powershell -ExecutionPolicy Bypass -File ./test/identity/scripts/run_identity_case.ps1",
+    "test:e2e:case:headless": "powershell -ExecutionPolicy Bypass -File ./test/identity/scripts/run_identity_case.ps1 -Headless",
+    "test:e2e": "ts-node --project tsconfig.codecept.json ./node_modules/codeceptjs/bin/codecept.js run --steps",
+    "test:e2e:headless": "set \"HEADLESS=true\" && ts-node --project tsconfig.codecept.json ./node_modules/codeceptjs/bin/codecept.js run --steps",
+    "test:e2e:full": "npm run test:e2e:prereq && npm run test:e2e",
+    "test:e2e:full:headless": "npm run test:e2e:prereq && npm run test:e2e:headless"
+>>>>>>> Stashed changes
   },
   "ts-node": {
     "project": "tsconfig.codecept.json"

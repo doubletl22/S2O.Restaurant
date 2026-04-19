@@ -1,0 +1,105 @@
+Mã module;Quản lý nhà hàng (Restaurants Management);;;;;;;;Đạt
+Yêu cầu kiểm thử;"Xác minh quyền System Admin có thể xem danh sách nhà hàng và thực hiện đầy đủ vòng đời nhà hàng: đăng ký, khóa, mở khóa và xóa nhà hàng.";;;;;;;;;Không đạt
+Người kiểm thử;Nhóm SQA
+Đạt;Không đạt;Chưa kiểm thử;Không áp dụng;Số lượng test case;;;;;Chưa kiểm thử
+5;0;7;0;12;;;;;Không áp dụng
+ID;Mô tả test case;Các bước thực hiện;Kết quả mong đợi;Phụ thuộc test case;Kết quả;Kỹ thuật kiểm thử;Ghi chú
+;Chức năng: Kiểm tra khởi tạo giao diện
+[REST-01];System Admin có thể truy cập trang quản lý nhà hàng;"1. Điều hướng đến '/login'.
+2. Nhập Email: admin@s2o.com, Mật khẩu: Admin@123.
+3. Click 'Đăng nhập'.
+4. Chờ chuyển hướng đến '/dashboard'.
+5. Điều hướng đến '/sysadmin/restaurants'.
+6. Chờ tối đa 10 giây.";"1. URL là '/sysadmin/restaurants'.
+2. Một phần tử <table> hiển thị danh sách nhà hàng trên trang.";;Đạt;"Kiểm tra giao diện/Smoke,Kiểm tra điều hướng";Yêu cầu quyền System Admin
+;Chức năng: Kiểm tra dữ liệu form
+[REST-02];Đăng ký mới một nhà hàng;"1. Đăng nhập với quyền System Admin (xem [REST-01]).
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click nút 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền: Tên nhà hàng (duy nhất), Tên chủ quán, Email (duy nhất), Mật khẩu, Địa chỉ, Số điện thoại.
+5. Gửi form đăng ký.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách nhà hàng.";[REST-01];Đạt;"Luồng thành công,Phân vùng tương đương";Email phải là duy nhất
+;Chức năng: Thực hiện vòng đời nhà hàng
+[REST-03];Khóa một nhà hàng đang hoạt động;"1. Đăng nhập với quyền System Admin (xem [REST-01]).
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Tìm nhà hàng cần khóa trong bảng.
+4. Click hành động 'Khóa' của nhà hàng đó.
+5. Xác nhận hành động nếu hộp thoại xác nhận xuất hiện.";"1. Thông báo thành công được hiển thị.
+2. Trạng thái hàng nhà hàng thay đổi thành 'Đã khóa'.
+3. Owner không thể đăng nhập bằng tài khoản nhà hàng đó.";[REST-02];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Nhà hàng phải đang ở trạng thái hoạt động
+[REST-04];Mở khóa một nhà hàng đang bị khóa;"1. Đăng nhập với quyền System Admin (xem [REST-01]).
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Tìm nhà hàng đang bị khóa trong bảng.
+4. Click hành động 'Mở khóa' của nhà hàng đó.
+5. Xác nhận hành động nếu hộp thoại xác nhận xuất hiện.";"1. Thông báo thành công được hiển thị.
+2. Trạng thái hàng nhà hàng trở lại hoạt động.
+3. Owner có thể đăng nhập lại bằng tài khoản nhà hàng đó.";[REST-03];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Nhà hàng phải đang ở trạng thái bị khóa
+[REST-05];Xóa một nhà hàng;"1. Đăng nhập với quyền System Admin (xem [REST-01]).
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Tìm nhà hàng cần xóa trong bảng.
+4. Click hành động 'Xóa' của nhà hàng đó.
+5. Xác nhận xóa trong hộp thoại xác nhận.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng đã xóa không còn xuất hiện trong bảng danh sách nhà hàng.";[REST-02];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Dữ liệu nhà hàng bị xóa vĩnh viễn
+
+;Bổ sung test case BVA đã viết
+;Bảng giá trị biên: Mật khẩu Owner [min=6 | min+=7 | nom=28 | max-=49 | max=50]
+;--- Test case Nominal (1 TC) ---
+[BVA-REST-01];"[Nominal] Đăng ký nhà hàng với Mật khẩu = 28 ký tự (giá trị danh nghĩa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@1234567890abcdefghijkl' (28 ký tự).
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Standard BVA - Nominal";"Nominal: Mật khẩu = 28 ký tự. Ràng buộc: minLength=6 (tenant-dialog.tsx)"
+;--- Biến: Mật khẩu Owner (4 TC) ---
+[BVA-REST-02];"[Mật khẩu - Min=6] Đăng ký nhà hàng với Mật khẩu = 6 ký tự (giá trị tối thiểu)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@12' (6 ký tự).
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Standard BVA - Min";"Mật khẩu = 6 ký tự (min). Ràng buộc: minLength: { value: 6, message: 'Tối thiểu 6 ký tự' }"
+[BVA-REST-03];"[Mật khẩu - Min+=7] Đăng ký nhà hàng với Mật khẩu = 7 ký tự (ngay trên giá trị tối thiểu)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@123' (7 ký tự).
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Standard BVA - Min+";"Mật khẩu = 7 ký tự (min+)"
+[BVA-REST-04];"[Mật khẩu - Max-=49] Đăng ký nhà hàng với Mật khẩu = 49 ký tự (ngay dưới giá trị tối đa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@' + 45 ký tự bất kỳ (tổng cộng 49 ký tự), ví dụ: 'Abc@123456789012345678901234567890123456789abcd'.
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Standard BVA - Max-";"Mật khẩu = 49 ký tự (max-). Chuỗi mẫu: 'Abc@123456789012345678901234567890123456789abcd' = 49 ký tự"
+[BVA-REST-05];"[Mật khẩu - Max=50] Đăng ký nhà hàng với Mật khẩu = 50 ký tự (giá trị tối đa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@' + 46 ký tự bất kỳ (tổng cộng 50 ký tự), ví dụ: 'Abc@123456789012345678901234567890123456789abcde'.
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Standard BVA - Max";"Mật khẩu = 50 ký tự (max). Chuỗi mẫu: 'Abc@123456789012345678901234567890123456789abcde' = 50 ký tự"
+;--- Robustness BVA - Dirty Test Cases (tổng 6n+1 = 6×1+1 = 7 TC) ---
+[BVA-REST-06];"[Dirty - Mật khẩu Min-=5] Đăng ký nhà hàng với Mật khẩu = 5 ký tự (dưới giá trị tối thiểu — input không hợp lệ)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@1' (5 ký tự).
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Form KHÔNG được gửi.
+2. Thông báo lỗi 'Tối thiểu 6 ký tự' hiển thị ngay dưới trường Mật khẩu.
+3. Dialog vẫn mở.";[REST-01];Chưa kiểm thử;"Robustness BVA - Dirty (Min-)";"Mật khẩu = 5 ký tự (min-1 = min-). Ràng buộc: minLength: { value: 6 } — React Hook Form từ chối phía client"
+[BVA-REST-07];"[Dirty - Mật khẩu Max+=51] Đăng ký nhà hàng với Mật khẩu = 51 ký tự (vượt giá trị tối đa giả định — input không hợp lệ)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@12345678901234567890123456789012345678901234567' (51 ký tự).
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Hệ thống từ chối hoặc hiển thị lỗi.
+2. Nhà hàng KHÔNG xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Robustness BVA - Dirty (Max+)";"Mật khẩu = 51 ký tự (max+1 = max+). Frontend không có ràng buộc max — kiểm tra backend có xử lý không"

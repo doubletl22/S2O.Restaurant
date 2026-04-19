@@ -1,0 +1,195 @@
+Mã module;Quản lý nhân viên (Staff Management);;;;;;;;Đạt
+Yêu cầu kiểm thử;"Xác minh quyền Owner có thể xem danh sách nhân viên và thực hiện đầy đủ vòng đời nhân viên: tạo mới, cập nhật, xóa tài khoản nhân viên và lọc danh sách nhân viên theo chi nhánh (SRT-31).";;;;;;;;;Không đạt
+Người kiểm thử;Nhóm SQA
+Đạt;Không đạt;Chưa kiểm thử;Không áp dụng;Số lượng test case;;;;;Chưa kiểm thử
+5;0;13;0;18;;;;;Không áp dụng
+ID;Mô tả test case;Các bước thực hiện;Kết quả mong đợi;Phụ thuộc test case;Kết quả;Kỹ thuật kiểm thử;Ghi chú
+;Chức năng: Kiểm tra khởi tạo giao diện
+[STAFF-01];Owner có thể truy cập trang quản lý nhân viên;"1. Điều hướng đến '/login'.
+2. Nhập Email: quantran@s525o.com, Mật khẩu: Quan11209.
+3. Click 'Đăng nhập'.
+4. Chờ chuyển hướng đến '/owner/dashboard'.
+5. Điều hướng đến '/owner/staff'.
+6. Chờ tối đa 10 giây.";"1. URL là '/owner/staff'.
+2. Nút hoặc văn bản 'Thêm nhân viên' hiển thị trên trang.";;Đạt;"Kiểm tra giao diện/Smoke,Kiểm tra điều hướng";Yêu cầu quyền Owner
+;Chức năng: Kiểm tra dữ liệu form
+[STAFF-02];Tạo mới tài khoản nhân viên;"1. Đăng nhập với quyền Owner (xem [STAFF-01]).
+2. Điều hướng đến '/owner/staff'.
+3. Click nút 'Thêm nhân viên'.
+4. Điền: Họ và tên, Email (duy nhất), Mật khẩu, Số điện thoại.
+5. Gửi form tạo mới.";"1. Thông báo thành công được hiển thị.
+2. Nhân viên mới xuất hiện trong danh sách với tên và email đã nhập.";[STAFF-01];Đạt;"Luồng thành công,Phân vùng tương đương";Email phải là duy nhất trong mỗi lần chạy
+;Chức năng: Thực hiện thao tác CRUD
+[STAFF-03];Cập nhật thông tin tài khoản nhân viên;"1. Đăng nhập với quyền Owner (xem [STAFF-01]).
+2. Điều hướng đến '/owner/staff'.
+3. Tìm nhân viên cần cập nhật trong danh sách.
+4. Click hành động chỉnh sửa/cập nhật của nhân viên đó.
+5. Thay đổi trường Họ và tên.
+6. Gửi form cập nhật.";"1. Thông báo thành công được hiển thị.
+2. Danh sách nhân viên phản ánh tên đã cập nhật cho bản ghi được chỉnh sửa.";[STAFF-02];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Phải có bản ghi nhân viên tồn tại
+[STAFF-04];Xóa tài khoản nhân viên;"1. Đăng nhập với quyền Owner (xem [STAFF-01]).
+2. Điều hướng đến '/owner/staff'.
+3. Tìm nhân viên cần xóa trong danh sách.
+4. Click hành động xóa của nhân viên đó.
+5. Xác nhận xóa nếu hộp thoại xác nhận xuất hiện.";"1. Thông báo thành công được hiển thị.
+2. Nhân viên đã xóa không còn xuất hiện trong danh sách nhân viên.";[STAFF-02];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Nhân viên không được có phụ thuộc đang hoạt động
+;Chức năng: Lọc danh sách nhân viên (SRT-31)
+[STAFF-05];Lọc nhân viên theo chi nhánh (SRT-31);"1. Đăng nhập với quyền Owner (xem [STAFF-01]).
+2. Điều hướng đến '/owner/staff'.
+3. Tìm dropdown lọc chi nhánh (combobox đầu tiên trên trang).
+4. Chọn một chi nhánh cụ thể (option thứ 2, bỏ qua 'Tất cả chi nhánh').
+5. Chờ danh sách cập nhật (networkidle).
+6. Quan sát danh sách nhân viên hiển thị.
+7. Reset dropdown về 'Tất cả chi nhánh' (option đầu tiên).
+8. Quan sát danh sách sau khi reset.";"1. Sau bước 6: Chỉ hiển thị nhân viên thuộc chi nhánh đã chọn.
+2. Nhân viên được gán chi nhánh đó vẫn xuất hiện trong danh sách.
+3. Sau bước 8: Danh sách hiển thị lại toàn bộ nhân viên (không lọc).";[STAFF-02];Đạt;"Luồng thành công,Kiểm tra giao diện";Phải có ít nhất một chi nhánh và một nhân viên được gán chi nhánh đó
+
+;Bổ sung test case BVA đã viết
+;Bảng giá trị biên: Họ và tên [min=1 | min+=2 | nom=25 | max-=49 | max=50] | Số điện thoại [min=9 | min+=10 | nom=10 | max-=10 | max=11]
+;--- Test case Nominal (1 TC) ---
+[BVA-STAFF-01];"[Nominal] Tạo nhân viên với tất cả giá trị danh nghĩa
+(Họ tên=25 ký tự, SĐT=10 ký tự)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva01@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên 'Nguyen Thi Nhan Vien Test' xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Nominal";"Nominal: Họ tên = 25 ký tự (nom), SĐT = 10 ký tự (nom)"
+;--- Biến 1: Họ và tên — giữ SĐT = nom (10 ký tự) (4 TC) ---
+[BVA-STAFF-02];"[Họ tên - Min=1] Tạo nhân viên với Họ và tên = 1 ký tự (giá trị tối thiểu)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva02@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'A' (1 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên 'A' xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Min";"Họ tên = 1 ký tự (min). Ràng buộc: z.string().min(1)"
+[BVA-STAFF-03];"[Họ tên - Min+=2] Tạo nhân viên với Họ và tên = 2 ký tự (ngay trên giá trị tối thiểu)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva03@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'AB' (2 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên 'AB' xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Min+";"Họ tên = 2 ký tự (min+)"
+[BVA-STAFF-04];"[Họ tên - Max-=49] Tạo nhân viên với Họ và tên = 49 ký tự (ngay dưới giá trị tối đa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva04@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Van A BVA Test Name Maximum Minus One 49x' (49 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên tương ứng xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Max-";"Họ tên = 49 ký tự (max-). Chuỗi mẫu: 'Nguyen Van A BVA Test Name Maximum Minus One 49x' = 49 ký tự"
+[BVA-STAFF-05];"[Họ tên - Max=50] Tạo nhân viên với Họ và tên = 50 ký tự (giá trị tối đa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva05@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Van A BVA Test Name Maximum Minus One 49xx' (50 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên tương ứng xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Max";"Họ tên = 50 ký tự (max). Chuỗi mẫu: 'Nguyen Van A BVA Test Name Maximum Minus One 49xx' = 50 ký tự"
+;--- Biến 2: Số điện thoại — giữ Họ tên = nom (25 ký tự) (4 TC) ---
+[BVA-STAFF-06];"[SĐT - Min=9] Tạo nhân viên với Số điện thoại = 9 ký tự (giá trị tối thiểu)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva06@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '090123456' (9 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên 'Nguyen Thi Nhan Vien Test' xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Min";"SĐT = 9 ký tự (min). Ràng buộc: z.string().min(9)"
+[BVA-STAFF-07];"[SĐT - Min+=10] Tạo nhân viên với Số điện thoại = 10 ký tự (ngay trên giá trị tối thiểu)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva07@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Min+";"SĐT = 10 ký tự (min+). Lưu ý: do khoảng [9,11] hẹp, min+(10) = nom(10) = max-(10)"
+[BVA-STAFF-08];"[SĐT - Max-=10] Tạo nhân viên với Số điện thoại = 10 ký tự (ngay dưới giá trị tối đa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva08@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Max-";"SĐT = 10 ký tự (max-). Lưu ý: do khoảng [9,11] hẹp, min+(10) = nom(10) = max-(10) — giá trị trùng nhau là bình thường"
+[BVA-STAFF-09];"[SĐT - Max=11] Tạo nhân viên với Số điện thoại = 11 ký tự (giá trị tối đa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva09@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '09012345678' (11 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.
+10. Chờ tối đa 10 giây.";"1. Form gửi thành công, dialog đóng lại.
+2. Nhân viên xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Standard BVA - Max";"SĐT = 11 ký tự (max)"
+;--- Robustness BVA - Dirty Test Cases (tổng 6n+1 = 6×2+1 = 13 TC) ---
+[BVA-STAFF-10];"[Dirty - Họ tên Min-=0] Tạo nhân viên với Họ và tên rỗng (dưới giá trị tối thiểu — input không hợp lệ)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva10@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Để trống trường Họ và tên (0 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.";"1. Form KHÔNG được gửi.
+2. Thông báo lỗi 'Họ tên bắt buộc' hiển thị ngay dưới trường Họ và tên.
+3. Dialog vẫn mở.";[STAFF-01];Chưa kiểm thử;"Robustness BVA - Dirty (Min-)";"Họ tên = 0 ký tự (min-1 = min-). Ràng buộc: z.string().min(1) — Zod từ chối phía client"
+[BVA-STAFF-11];"[Dirty - Họ tên Max+=51] Tạo nhân viên với Họ và tên = 51 ký tự (vượt giá trị tối đa giả định — input không hợp lệ)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva11@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Van A BVA Test Name Maximum Minus One 49xxxx' (51 ký tự).
+7. Nhập Số điện thoại: '0901234567' (10 ký tự - nom).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.";"1. Hệ thống từ chối hoặc hiển thị lỗi.
+2. Nhân viên KHÔNG xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Robustness BVA - Dirty (Max+)";"Họ tên = 51 ký tự (max+1 = max+). Frontend không có ràng buộc max — kiểm tra backend có xử lý không"
+[BVA-STAFF-12];"[Dirty - SĐT Min-=8] Tạo nhân viên với Số điện thoại = 8 ký tự (dưới giá trị tối thiểu — input không hợp lệ)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva12@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '09012345' (8 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.";"1. Form KHÔNG được gửi.
+2. Thông báo lỗi 'SĐT không hợp lệ' hiển thị ngay dưới trường Số điện thoại.
+3. Dialog vẫn mở.";[STAFF-01];Chưa kiểm thử;"Robustness BVA - Dirty (Min-)";"SĐT = 8 ký tự (min-1 = min-). Ràng buộc: z.string().min(9) — Zod từ chối phía client"
+[BVA-STAFF-13];"[Dirty - SĐT Max+=12] Tạo nhân viên với Số điện thoại = 12 ký tự (vượt giá trị tối đa giả định — input không hợp lệ)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/staff'.
+3. Click 'Thêm nhân viên'.
+4. Nhập Email: staff_bva13@s2o.test.
+5. Nhập Mật khẩu: Staff@123.
+6. Nhập Họ và tên: 'Nguyen Thi Nhan Vien Test' (25 ký tự - nom).
+7. Nhập Số điện thoại: '090123456789' (12 ký tự).
+8. Chọn vai trò và chi nhánh.
+9. Click 'Lưu thay đổi'.";"1. Hệ thống từ chối hoặc hiển thị lỗi.
+2. Nhân viên KHÔNG xuất hiện trong danh sách.";[STAFF-01];Chưa kiểm thử;"Robustness BVA - Dirty (Max+)";"SĐT = 12 ký tự (max+1 = max+). Frontend không có ràng buộc max — kiểm tra backend có xử lý không"

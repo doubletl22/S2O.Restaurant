@@ -1,0 +1,242 @@
+Mã module;Quản lý người dùng (User Management);;;;;;;;Đạt
+Yêu cầu kiểm thử;"Xác minh quyền System Admin có thể xem danh sách người dùng và thực hiện đầy đủ vòng đời tài khoản admin: tạo mới, xem lại hành động, đổi mật khẩu (SRT-12), khóa/mở khóa tài khoản (SRT-9) và xóa tài khoản System Admin.";;;;;;;;;Không đạt
+Người kiểm thử;Nhóm SQA
+Đạt;Không đạt;Chưa kiểm thử;Không áp dụng;Số lượng test case;;;;;Chưa kiểm thử
+7;0;20;0;27;;;;;Không áp dụng
+ID;Mô tả test case;Các bước thực hiện;Kết quả mong đợi;Phụ thuộc test case;Kết quả;Kỹ thuật kiểm thử;Ghi chú
+;Chức năng: Kiểm tra khởi tạo giao diện
+[USER-01];System Admin có thể truy cập trang quản lý người dùng;"1. Điều hướng đến '/login'.
+2. Nhập Email: admin@s2o.com, Mật khẩu: Admin@123.
+3. Click 'Đăng nhập'.
+4. Chờ chuyển hướng đến '/dashboard'.
+5. Điều hướng đến '/sysadmin/users'.
+6. Chờ tối đa 10 giây.";"1. URL là '/sysadmin/users'.
+2. Một phần tử <table> hiển thị danh sách tài khoản người dùng trên trang.";;Đạt;"Kiểm tra giao diện/Smoke,Kiểm tra điều hướng";Yêu cầu quyền System Admin
+;Chức năng: Kiểm tra dữ liệu form
+[USER-02];Tạo mới tài khoản System Admin;"1. Đăng nhập với quyền System Admin (xem [USER-01]).
+2. Điều hướng đến '/sysadmin/users'.
+3. Click nút 'Thêm' / 'Tạo Admin'.
+4. Điền: Email (duy nhất, vd: sysadmin_test@s2o.com), Họ và tên, Mật khẩu (Admin@Test123).
+5. Gửi form tạo mới.";"1. Thông báo thành công được hiển thị.
+2. Tài khoản admin mới xuất hiện trong bảng người dùng với email và họ tên đã nhập.";[USER-01];Đạt;"Luồng thành công,Phân vùng tương đương";Email phải là duy nhất trong mỗi lần chạy
+;Chức năng: Thực hiện vòng đời tài khoản admin
+[USER-03];Xem lại thông tin và hành động của tài khoản admin đã tạo;"1. Đăng nhập với quyền System Admin (xem [USER-01]).
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin cần xem trong bảng.
+4. Click vào hàng tài khoản hoặc liên kết hành động 'Chi tiết'.
+5. Quan sát màn hình chi tiết tài khoản.";"1. Màn hình chi tiết hoặc modal tài khoản mở ra.
+2. Email, họ tên và thông tin quyền của tài khoản hiển thị đúng.
+3. Các hành động kiểm duyệt liên quan đến tài khoản hiển thị.";[USER-02];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Phải có tài khoản admin đã được tạo
+[USER-04];Xóa tài khoản admin;"1. Đăng nhập với quyền System Admin (xem [USER-01]).
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin cần xóa trong bảng.
+4. Click hành động 'Xóa' của tài khoản đó.
+5. Xác nhận xóa trong hộp thoại xác nhận.";"1. Thông báo thành công được hiển thị.
+2. Tài khoản admin đã xóa không còn xuất hiện trong bảng người dùng.";[USER-02];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Tài khoản phải tồn tại và không phải tài khoản đang đăng nhập
+;Chức năng: Quản lý mật khẩu và trạng thái tài khoản (SRT-9, SRT-12)
+[USER-05];Đổi mật khẩu tài khoản admin (SRT-12);"1. Đăng nhập với quyền System Admin (xem [USER-01]).
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin vừa tạo trong bảng (dùng ô tìm kiếm nếu cần).
+4. Click hành động 'Đổi mật khẩu' (menu item đầu tiên, index 0) của tài khoản.
+5. Nhập mật khẩu mới hợp lệ (vd: NewPass@456) vào dialog.
+6. Click 'Xác nhận'.";"1. Thông báo thành công được hiển thị.
+2. Dialog đóng lại.
+3. Tài khoản vẫn xuất hiện trong bảng (không bị xóa).";[USER-02];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Mật khẩu mới phải đáp ứng ràng buộc ASP.NET Identity (tối thiểu 6 ký tự)
+[USER-06];Khóa tài khoản admin (SRT-9);"1. Đăng nhập với quyền System Admin (xem [USER-01]).
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin vừa tạo trong bảng.
+4. Click hành động 'Khóa' (menu item thứ hai, index 1) của tài khoản.
+5. Xác nhận trong hộp thoại popup.";"1. Thông báo thành công được hiển thị.
+2. Trạng thái tài khoản trong bảng chuyển sang 'Locked'.";[USER-02];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Tài khoản phải đang ở trạng thái Active trước khi khóa
+[USER-07];Mở khóa tài khoản admin đã bị khóa (SRT-9);"1. Đăng nhập với quyền System Admin (xem [USER-01]).
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin đang bị khóa trong bảng.
+4. Click hành động 'Mở khóa' (menu item thứ hai, index 1 — cùng vị trí với Khóa nhưng đổi nhãn) của tài khoản.
+5. Xác nhận trong hộp thoại popup.";"1. Thông báo thành công được hiển thị.
+2. Trạng thái tài khoản trong bảng chuyển về 'Active'.";[USER-06];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Tài khoản phải đang ở trạng thái Locked trước khi mở khóa
+
+;Bổ sung test case BVA đã viết
+;Bảng giá trị biên: Họ và tên [min=1 | min+=2 | nom=25 | max-=49 | max=50] | Mật khẩu [min=6 | min+=7 | nom=28 | max-=49 | max=50]
+;--- Test case Nominal (1 TC) ---
+[BVA-USER-01];"[Nominal] Tạo System Admin với tất cả giá trị danh nghĩa
+(Họ tên=25 ký tự, Mật khẩu=28 ký tự)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva01@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'Admin BVA User Test Name1' (25 ký tự).
+6. Nhập Mật khẩu: 'Abc@123456789012345678901234' (28 ký tự).
+7. Click 'Tạo tài khoản'.
+8. Chờ tối đa 10 giây.";"1. Thông báo 'Tạo tài khoản thành công' được hiển thị.
+2. Tài khoản 'Admin BVA User Test Name1' xuất hiện trong bảng người dùng.";[USER-01];Chưa kiểm thử;"Standard BVA - Nominal";"Nominal: Họ tên = 25 ký tự, Mật khẩu = 28 ký tự. Ràng buộc từ ASP.NET Identity backend."
+;--- Biến 1: Họ và tên — giữ Mật khẩu = nom (28 ký tự) (4 TC) ---
+[BVA-USER-02];"[Họ tên - Min=1] Tạo System Admin với Họ và tên = 1 ký tự (giá trị tối thiểu)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva02@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'A' (1 ký tự).
+6. Nhập Mật khẩu: 'Abc@123456789012345678901234' (28 ký tự - nom).
+7. Click 'Tạo tài khoản'.
+8. Chờ tối đa 10 giây.";"1. Thông báo 'Tạo tài khoản thành công' được hiển thị.
+2. Tài khoản 'A' xuất hiện trong bảng người dùng.";[USER-01];Chưa kiểm thử;"Standard BVA - Min";"Họ tên = 1 ký tự (min)"
+[BVA-USER-03];"[Họ tên - Min+=2] Tạo System Admin với Họ và tên = 2 ký tự (ngay trên giá trị tối thiểu)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva03@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'AB' (2 ký tự).
+6. Nhập Mật khẩu: 'Abc@123456789012345678901234' (28 ký tự - nom).
+7. Click 'Tạo tài khoản'.
+8. Chờ tối đa 10 giây.";"1. Thông báo 'Tạo tài khoản thành công' được hiển thị.
+2. Tài khoản 'AB' xuất hiện trong bảng người dùng.";[USER-01];Chưa kiểm thử;"Standard BVA - Min+";"Họ tên = 2 ký tự (min+)"
+[BVA-USER-04];"[Họ tên - Max-=49] Tạo System Admin với Họ và tên = 49 ký tự (ngay dưới giá trị tối đa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva04@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'Nguyen Van A BVA Test Name Maximum Minus One 49xx' (49 ký tự).
+6. Nhập Mật khẩu: 'Abc@123456789012345678901234' (28 ký tự - nom).
+7. Click 'Tạo tài khoản'.
+8. Chờ tối đa 10 giây.";"1. Thông báo 'Tạo tài khoản thành công' được hiển thị.
+2. Tài khoản tương ứng xuất hiện trong bảng người dùng.";[USER-01];Chưa kiểm thử;"Standard BVA - Max-";"Họ tên = 49 ký tự (max-). Chuỗi mẫu: 'Nguyen Van A BVA Test Name Maximum Minus One 49xx' = 49 ký tự"
+[BVA-USER-05];"[Họ tên - Max=50] Tạo System Admin với Họ và tên = 50 ký tự (giá trị tối đa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva05@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'Nguyen Van A BVA Test Name Maximum Minus One 49xxx' (50 ký tự).
+6. Nhập Mật khẩu: 'Abc@123456789012345678901234' (28 ký tự - nom).
+7. Click 'Tạo tài khoản'.
+8. Chờ tối đa 10 giây.";"1. Thông báo 'Tạo tài khoản thành công' được hiển thị.
+2. Tài khoản tương ứng xuất hiện trong bảng người dùng.";[USER-01];Chưa kiểm thử;"Standard BVA - Max";"Họ tên = 50 ký tự (max). Chuỗi mẫu: 'Nguyen Van A BVA Test Name Maximum Minus One 49xxx' = 50 ký tự"
+;--- Biến 2: Mật khẩu — giữ Họ tên = nom (25 ký tự) (4 TC) ---
+[BVA-USER-06];"[Mật khẩu - Min=6] Tạo System Admin với Mật khẩu = 6 ký tự (giá trị tối thiểu)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva06@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'Admin BVA User Test Name1' (25 ký tự - nom).
+6. Nhập Mật khẩu: 'Abc@12' (6 ký tự).
+7. Click 'Tạo tài khoản'.
+8. Chờ tối đa 10 giây.";"1. Thông báo 'Tạo tài khoản thành công' được hiển thị.
+2. Tài khoản tương ứng xuất hiện trong bảng người dùng.";[USER-01];Chưa kiểm thử;"Standard BVA - Min";"Mật khẩu = 6 ký tự (min). Ràng buộc ASP.NET Identity: RequiredLength = 6"
+[BVA-USER-07];"[Mật khẩu - Min+=7] Tạo System Admin với Mật khẩu = 7 ký tự (ngay trên giá trị tối thiểu)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva07@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'Admin BVA User Test Name1' (25 ký tự - nom).
+6. Nhập Mật khẩu: 'Abc@123' (7 ký tự).
+7. Click 'Tạo tài khoản'.
+8. Chờ tối đa 10 giây.";"1. Thông báo 'Tạo tài khoản thành công' được hiển thị.
+2. Tài khoản tương ứng xuất hiện trong bảng người dùng.";[USER-01];Chưa kiểm thử;"Standard BVA - Min+";"Mật khẩu = 7 ký tự (min+)"
+[BVA-USER-08];"[Mật khẩu - Max-=49] Tạo System Admin với Mật khẩu = 49 ký tự (ngay dưới giá trị tối đa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva08@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'Admin BVA User Test Name1' (25 ký tự - nom).
+6. Nhập Mật khẩu: 'Abc@123456789012345678901234567890123456789012345' (49 ký tự).
+7. Click 'Tạo tài khoản'.
+8. Chờ tối đa 10 giây.";"1. Thông báo 'Tạo tài khoản thành công' được hiển thị.
+2. Tài khoản tương ứng xuất hiện trong bảng người dùng.";[USER-01];Chưa kiểm thử;"Standard BVA - Max-";"Mật khẩu = 49 ký tự (max-). Chuỗi mẫu: 'Abc@123456789012345678901234567890123456789012345' = 49 ký tự"
+[BVA-USER-09];"[Mật khẩu - Max=50] Tạo System Admin với Mật khẩu = 50 ký tự (giá trị tối đa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva09@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'Admin BVA User Test Name1' (25 ký tự - nom).
+6. Nhập Mật khẩu: 'Abc@1234567890123456789012345678901234567890123456' (50 ký tự).
+7. Click 'Tạo tài khoản'.
+8. Chờ tối đa 10 giây.";"1. Thông báo 'Tạo tài khoản thành công' được hiển thị.
+2. Tài khoản tương ứng xuất hiện trong bảng người dùng.";[USER-01];Chưa kiểm thử;"Standard BVA - Max";"Mật khẩu = 50 ký tự (max). Chuỗi mẫu: 'Abc@1234567890123456789012345678901234567890123456' = 50 ký tự"
+;--- Robustness BVA - Dirty Test Cases (tổng 6n+1 = 6×2+1 = 13 TC) ---
+[BVA-USER-10];"[Dirty - Họ tên Min-=0] Tạo System Admin với Họ và tên rỗng (dưới giá trị tối thiểu — input không hợp lệ)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva10@s2o.test (duy nhất).
+5. Để trống trường Họ và tên (0 ký tự).
+6. Nhập Mật khẩu: 'Abc@123456789012345678901234' (28 ký tự - nom).
+7. Click 'Tạo tài khoản'.";"1. Hệ thống từ chối tạo tài khoản.
+2. Thông báo lỗi hiển thị (frontend hoặc API).
+3. Tài khoản KHÔNG xuất hiện trong bảng.";[USER-01];Chưa kiểm thử;"Robustness BVA - Dirty (Min-)";"Họ tên = 0 ký tự (min-). Form users page không có Zod — backend ASP.NET Identity xử lý validation"
+[BVA-USER-11];"[Dirty - Họ tên Max+=51] Tạo System Admin với Họ và tên = 51 ký tự (vượt giá trị tối đa giả định — input không hợp lệ)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva11@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'Nguyen Van A BVA Test Name Maximum Minus One 49xxxx' (51 ký tự).
+6. Nhập Mật khẩu: 'Abc@123456789012345678901234' (28 ký tự - nom).
+7. Click 'Tạo tài khoản'.";"1. Hệ thống từ chối hoặc hiển thị lỗi.
+2. Tài khoản KHÔNG xuất hiện trong bảng.";[USER-01];Chưa kiểm thử;"Robustness BVA - Dirty (Max+)";"Họ tên = 51 ký tự (max+). Không có ràng buộc max phía frontend — kiểm tra backend"
+[BVA-USER-12];"[Dirty - Mật khẩu Min-=5] Tạo System Admin với Mật khẩu = 5 ký tự (dưới giá trị tối thiểu — input không hợp lệ)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva12@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'Admin BVA User Test Name1' (25 ký tự - nom).
+6. Nhập Mật khẩu: 'Abc@1' (5 ký tự).
+7. Click 'Tạo tài khoản'.";"1. Hệ thống từ chối tạo tài khoản.
+2. Thông báo lỗi liên quan đến mật khẩu hiển thị.
+3. Tài khoản KHÔNG xuất hiện trong bảng.";[USER-01];Chưa kiểm thử;"Robustness BVA - Dirty (Min-)";"Mật khẩu = 5 ký tự (min-). Ràng buộc ASP.NET Identity RequiredLength=6 từ chối phía backend"
+[BVA-USER-13];"[Dirty - Mật khẩu Max+=51] Tạo System Admin với Mật khẩu = 51 ký tự (vượt giá trị tối đa giả định — input không hợp lệ)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Click 'Thêm Admin'.
+4. Nhập Email: user_bva13@s2o.test (duy nhất).
+5. Nhập Họ và tên: 'Admin BVA User Test Name1' (25 ký tự - nom).
+6. Nhập Mật khẩu: 'Abc@12345678901234567890123456789012345678901234567' (51 ký tự).
+7. Click 'Tạo tài khoản'.";"1. Hệ thống từ chối hoặc hiển thị lỗi.
+2. Tài khoản KHÔNG xuất hiện trong bảng.";[USER-01];Chưa kiểm thử;"Robustness BVA - Dirty (Max+)";"Mật khẩu = 51 ký tự (max+). Không có ràng buộc max phía frontend — kiểm tra backend"
+;=== PHẦN B: Form đổi mật khẩu admin (SRT-12) ===
+;Bảng giá trị biên: Mật khẩu mới [min=6 | min+=7 | nom=28 | max-=49 | max=50]
+;--- Test case Nominal (1 TC) ---
+[BVA-USER-14];"[Nominal - Đổi mật khẩu] Đổi mật khẩu admin với Mật khẩu mới = 28 ký tự (giá trị danh nghĩa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin cần đổi mật khẩu (ô tìm kiếm nếu cần).
+4. Click hành động 'Đổi mật khẩu' (menu item đầu tiên, index 0).
+5. Nhập Mật khẩu mới: 'Abc@123456789012345678901234' (28 ký tự).
+6. Click 'Xác nhận'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Dialog đóng lại.
+3. Tài khoản vẫn xuất hiện trong bảng (không bị xóa).";[USER-02];Chưa kiểm thử;"Standard BVA - Nominal";"Nominal: Mật khẩu mới = 28 ký tự. Ràng buộc ASP.NET Identity: RequiredLength=6"
+;--- Biến: Mật khẩu mới (4 TC) ---
+[BVA-USER-15];"[Đổi mật khẩu - Min=6] Đổi mật khẩu admin với Mật khẩu mới = 6 ký tự (giá trị tối thiểu)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin cần đổi mật khẩu.
+4. Click hành động 'Đổi mật khẩu' (index 0).
+5. Nhập Mật khẩu mới: 'Abc@12' (6 ký tự).
+6. Click 'Xác nhận'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Dialog đóng lại.";[USER-02];Chưa kiểm thử;"Standard BVA - Min";"Mật khẩu mới = 6 ký tự (min). Ràng buộc ASP.NET Identity: RequiredLength=6"
+[BVA-USER-16];"[Đổi mật khẩu - Min+=7] Đổi mật khẩu admin với Mật khẩu mới = 7 ký tự (ngay trên giá trị tối thiểu)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin cần đổi mật khẩu.
+4. Click hành động 'Đổi mật khẩu' (index 0).
+5. Nhập Mật khẩu mới: 'Abc@123' (7 ký tự).
+6. Click 'Xác nhận'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Dialog đóng lại.";[USER-02];Chưa kiểm thử;"Standard BVA - Min+";"Mật khẩu mới = 7 ký tự (min+)"
+[BVA-USER-17];"[Đổi mật khẩu - Max-=49] Đổi mật khẩu admin với Mật khẩu mới = 49 ký tự (ngay dưới giá trị tối đa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin cần đổi mật khẩu.
+4. Click hành động 'Đổi mật khẩu' (index 0).
+5. Nhập Mật khẩu mới: 'Abc@123456789012345678901234567890123456789012345' (49 ký tự).
+6. Click 'Xác nhận'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Dialog đóng lại.";[USER-02];Chưa kiểm thử;"Standard BVA - Max-";"Mật khẩu mới = 49 ký tự (max-). Chuỗi mẫu: 'Abc@123456789012345678901234567890123456789012345' = 49 ký tự"
+[BVA-USER-18];"[Đổi mật khẩu - Max=50] Đổi mật khẩu admin với Mật khẩu mới = 50 ký tự (giá trị tối đa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin cần đổi mật khẩu.
+4. Click hành động 'Đổi mật khẩu' (index 0).
+5. Nhập Mật khẩu mới: 'Abc@1234567890123456789012345678901234567890123456' (50 ký tự).
+6. Click 'Xác nhận'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Dialog đóng lại.";[USER-02];Chưa kiểm thử;"Standard BVA - Max";"Mật khẩu mới = 50 ký tự (max). Chuỗi mẫu: 'Abc@1234567890123456789012345678901234567890123456' = 50 ký tự"
+;--- Robustness BVA - Dirty Test Cases (6n+1 = 6×1+1 = 7 TC, thêm 2 dirty) ---
+[BVA-USER-19];"[Dirty - Đổi mật khẩu Min-=5] Đổi mật khẩu admin với Mật khẩu mới = 5 ký tự (dưới giá trị tối thiểu — input không hợp lệ)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin cần đổi mật khẩu.
+4. Click hành động 'Đổi mật khẩu' (index 0).
+5. Nhập Mật khẩu mới: 'Abc@1' (5 ký tự).
+6. Click 'Xác nhận'.
+7. Chờ tối đa 10 giây.";"1. Hệ thống từ chối đổi mật khẩu.
+2. Thông báo lỗi liên quan đến mật khẩu quá ngắn hiển thị.
+3. Mật khẩu tài khoản KHÔNG bị thay đổi.";[USER-02];Chưa kiểm thử;"Robustness BVA - Dirty (Min-)";"Mật khẩu mới = 5 ký tự (min-). Ràng buộc ASP.NET Identity RequiredLength=6 từ chối phía backend"
+[BVA-USER-20];"[Dirty - Đổi mật khẩu Max+=51] Đổi mật khẩu admin với Mật khẩu mới = 51 ký tự (vượt giá trị tối đa giả định — input không hợp lệ)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/users'.
+3. Tìm tài khoản admin cần đổi mật khẩu.
+4. Click hành động 'Đổi mật khẩu' (index 0).
+5. Nhập Mật khẩu mới: 'Abc@12345678901234567890123456789012345678901234567' (51 ký tự).
+6. Click 'Xác nhận'.
+7. Chờ tối đa 10 giây.";"1. Hệ thống từ chối hoặc hiển thị lỗi.
+2. Mật khẩu tài khoản KHÔNG bị thay đổi.";[USER-02];Chưa kiểm thử;"Robustness BVA - Dirty (Max+)";"Mật khẩu mới = 51 ký tự (max+). Không có ràng buộc max phía frontend — kiểm tra backend xử lý không"

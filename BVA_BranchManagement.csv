@@ -1,0 +1,67 @@
+Mã module;Quản lý chi nhánh - Phân tích giá trị biên (Branch Management - Standard BVA);;;;;;;;Chưa kiểm thử
+Yêu cầu kiểm thử;"Kiểm tra trường Tên chi nhánh trong form tạo chi nhánh theo phương pháp Standard BVA. Số biến n=1, số test case = 4n+1 = 4×1+1 = 5 TC. Biến kiểm thử: Tên chi nhánh [min=1, max=50 ký tự]. Giá trị danh nghĩa: Tên chi nhánh = 25 ký tự.";;;;;;;;;Không đạt
+Người kiểm thử;Nhóm SQA
+Đạt;Không đạt;Chưa kiểm thử;Không áp dụng;Số lượng test case;;;;;Chưa kiểm thử
+0;0;7;0;7;;;;;Không áp dụng
+ID;Mô tả test case;Các bước thực hiện;Kết quả mong đợi;Phụ thuộc test case;Kết quả;Kỹ thuật kiểm thử;Ghi chú
+;Bảng giá trị biên: Tên chi nhánh [min=1 | min+=2 | nom=25 | max-=49 | max=50]
+;--- Test case Nominal (1 TC) ---
+[BVA-BRANCH-01];"[Nominal] Tạo chi nhánh với Tên chi nhánh = 25 ký tự (giá trị danh nghĩa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/branches'.
+3. Click nút 'Thêm'.
+4. Nhập Tên chi nhánh: 'Chi Nhanh BVA Test Nom 25c' (25 ký tự).
+5. Nhập Địa chỉ và Số điện thoại tùy ý.
+6. Click 'Tạo chi nhánh'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Chi nhánh 'Chi Nhanh BVA Test Nom 25c' xuất hiện trong danh sách.";[BRANCH-01];Chưa kiểm thử;"Standard BVA - Nominal";"Nominal: Tên chi nhánh = 25 ký tự (nom). Ràng buộc: z.string().min(1)"
+;--- Biến: Tên chi nhánh (4 TC) ---
+[BVA-BRANCH-02];"[Tên chi nhánh - Min=1] Tạo chi nhánh với Tên chi nhánh = 1 ký tự (giá trị tối thiểu)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/branches'.
+3. Click nút 'Thêm'.
+4. Nhập Tên chi nhánh: 'A' (1 ký tự).
+5. Nhập Địa chỉ và Số điện thoại tùy ý.
+6. Click 'Tạo chi nhánh'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Chi nhánh 'A' xuất hiện trong danh sách.";[BRANCH-01];Chưa kiểm thử;"Standard BVA - Min";"Tên chi nhánh = 1 ký tự (min). Ràng buộc: z.string().min(1)"
+[BVA-BRANCH-03];"[Tên chi nhánh - Min+=2] Tạo chi nhánh với Tên chi nhánh = 2 ký tự (ngay trên giá trị tối thiểu)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/branches'.
+3. Click nút 'Thêm'.
+4. Nhập Tên chi nhánh: 'Q1' (2 ký tự).
+5. Nhập Địa chỉ và Số điện thoại tùy ý.
+6. Click 'Tạo chi nhánh'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Chi nhánh 'Q1' xuất hiện trong danh sách.";[BRANCH-01];Chưa kiểm thử;"Standard BVA - Min+";"Tên chi nhánh = 2 ký tự (min+)"
+[BVA-BRANCH-04];"[Tên chi nhánh - Max-=49] Tạo chi nhánh với Tên chi nhánh = 49 ký tự (ngay dưới giá trị tối đa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/branches'.
+3. Click nút 'Thêm'.
+4. Nhập Tên chi nhánh: 'Chi Nhanh BVA Test Maximum Minus One Chars 49x' (49 ký tự).
+5. Nhập Địa chỉ và Số điện thoại tùy ý.
+6. Click 'Tạo chi nhánh'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Chi nhánh tương ứng xuất hiện trong danh sách.";[BRANCH-01];Chưa kiểm thử;"Standard BVA - Max-";"Tên chi nhánh = 49 ký tự (max-). Chuỗi mẫu: 'Chi Nhanh BVA Test Maximum Minus One Chars 49x' = 49 ký tự"
+[BVA-BRANCH-05];"[Tên chi nhánh - Max=50] Tạo chi nhánh với Tên chi nhánh = 50 ký tự (giá trị tối đa)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/branches'.
+3. Click nút 'Thêm'.
+4. Nhập Tên chi nhánh: 'Chi Nhanh BVA Test Maximum Minus One Chars 49xx' (50 ký tự).
+5. Nhập Địa chỉ và Số điện thoại tùy ý.
+6. Click 'Tạo chi nhánh'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Chi nhánh tương ứng xuất hiện trong danh sách.";[BRANCH-01];Chưa kiểm thử;"Standard BVA - Max";"Tên chi nhánh = 50 ký tự (max). Chuỗi mẫu: 'Chi Nhanh BVA Test Maximum Minus One Chars 49xx' = 50 ký tự"
+;--- Robustness BVA - Dirty Test Cases (tổng 6n+1 = 6×1+1 = 7 TC) ---
+[BVA-BRANCH-06];"[Dirty - Tên chi nhánh Min-=0] Tạo chi nhánh với Tên chi nhánh rỗng (dưới giá trị tối thiểu — input không hợp lệ)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/branches'.
+3. Click nút 'Thêm'.
+4. Để trống trường Tên chi nhánh (0 ký tự).
+5. Nhập Địa chỉ và Số điện thoại tùy ý.
+6. Click 'Tạo chi nhánh'.
+7. Chờ tối đa 10 giây.";"1. Form KHÔNG được gửi.
+2. Thông báo lỗi 'Tên chi nhánh bắt buộc' hiển thị ngay dưới trường Tên chi nhánh.
+3. Dialog vẫn mở.";[BRANCH-01];Chưa kiểm thử;"Robustness BVA - Dirty (Min-)";"Tên chi nhánh = 0 ký tự (min-1 = min-). Ràng buộc: z.string().min(1) — Zod từ chối phía client"
+[BVA-BRANCH-07];"[Dirty - Tên chi nhánh Max+=51] Tạo chi nhánh với Tên chi nhánh = 51 ký tự (vượt giá trị tối đa giả định — input không hợp lệ)";"1. Đăng nhập với quyền Owner.
+2. Điều hướng đến '/owner/branches'.
+3. Click nút 'Thêm'.
+4. Nhập Tên chi nhánh: 'Chi Nhanh BVA Test Maximum Minus One Chars 49xxxxx' (51 ký tự).
+5. Nhập Địa chỉ và Số điện thoại tùy ý.
+6. Click 'Tạo chi nhánh'.
+7. Chờ tối đa 10 giây.";"1. Hệ thống từ chối hoặc hiển thị lỗi.
+2. Chi nhánh KHÔNG xuất hiện trong danh sách.";[BRANCH-01];Chưa kiểm thử;"Robustness BVA - Dirty (Max+)";"Tên chi nhánh = 51 ký tự (max+1 = max+). Frontend không có ràng buộc max — kiểm tra backend có xử lý không"

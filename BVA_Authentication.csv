@@ -1,0 +1,13 @@
+Mã module;Xác thực - Phân tích giá trị biên (Authentication - Standard BVA);;;;;;;;Không áp dụng
+Yêu cầu kiểm thử;"Phân tích áp dụng Standard BVA cho form đăng nhập. Kết quả phân tích: Form đăng nhập chỉ có 2 trường là Email (type=email, required) và Mật khẩu (type=password, required). Cả hai trường KHÔNG có ràng buộc độ dài (minLength/maxLength) ở phía frontend. Do không có miền giá trị số [min, max] xác định, Standard BVA không áp dụng trực tiếp cho module Xác thực. BVA có thể áp dụng ở tầng backend nếu có ràng buộc API rõ ràng.";;;;;;;;;Không đạt
+Người kiểm thử;Nhóm SQA
+Đạt;Không đạt;Chưa kiểm thử;Không áp dụng;Số lượng test case;;;;;Chưa kiểm thử
+0;0;0;1;1;;;;;Không áp dụng
+ID;Mô tả test case;Các bước thực hiện;Kết quả mong đợi;Phụ thuộc test case;Kết quả;Kỹ thuật kiểm thử;Ghi chú
+;Phân tích khả năng áp dụng BVA
+[BVA-AUTH-NA];[Không áp dụng] Form đăng nhập không có ràng buộc giá trị biên số;"Phân tích form đăng nhập tại '/login':
+1. Trường Email: type='email', required — chỉ kiểm tra định dạng email (pattern), không có min/max độ dài.
+2. Trường Mật khẩu: type='password', required — chỉ kiểm tra trường không rỗng (HTML5 required), không có min/max độ dài.
+3. Không có Zod schema hay minLength/maxLength rule nào được định nghĩa cho form đăng nhập.
+Kết luận: Không có biến số nào có miền giá trị [min, max] xác định → Standard BVA (4n+1) không áp dụng.";"Standard BVA không tạo ra test case cho module này do thiếu ràng buộc số.
+Kỹ thuật kiểm thử phù hợp cho module Authentication là: Phân vùng tương đương (EP) và Kiểm tra luồng (đã được thực hiện trong BlackBox_Authentication.csv).";;Không áp dụng;"Phân tích BVA";"Form đăng nhập (app/(auth)/login/page.tsx) chỉ dùng HTML5 required và type='email'. Không có validation số. BVA áp dụng ở backend nếu backend có ràng buộc độ dài mật khẩu cho quá trình đăng nhập."

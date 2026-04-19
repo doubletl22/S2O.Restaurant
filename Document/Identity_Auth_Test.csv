@@ -1,0 +1,37 @@
+Module Code;Auth
+Test requirement;Verify authentication flows: redirect to login when unauthenticated and login for SystemAdmin and Owner roles including negative cases
+Tester;S2O Test Team
+Pass;Fail;Untested;N/A;Number of Test cases
+6;0;0;0;6
+ID;Test Case Description;Test Case Procedure;Expected Output;Inter-test case Dependence;Result;Testing technique;Note
+;Function: Check redirect when unauthenticated
+[AUTH-01];Redirect to login page when accessing root URL without login;"1. Open the browser.
+2. Navigate to '/' without being logged in.";"1. URL automatically changes to contain '/login'.
+2. Text 'S2O Restaurant' is displayed on the login page.";-;Pass;Navigation check / State transition;
+;Function: Login as SystemAdmin
+[AUTH-02];Login successfully as SystemAdmin;"1. Navigate to '/login'.
+2. Fill Email: admin@s2o.com.
+3. Fill Password: Admin@123.
+4. Click button 'Đăng nhập'.";"1. URL changes to contain '/dashboard'.
+2. SystemAdmin dashboard content is displayed.";[AUTH-01];Pass;Positive flow / State transition;
+;Function: Login as Owner
+[AUTH-03];Login successfully as Owner;"1. Navigate to '/login'.
+2. Fill Email: quantran@s525o.com.
+3. Fill Password: Quan11209.
+4. Click button 'Đăng nhập'.";"1. URL changes to contain '/owner/dashboard'.
+2. Owner dashboard content is displayed.";[AUTH-01];Pass;Positive flow / State transition;
+;Function: Validate form - Negative cases
+[AUTH-04];Empty form submission stays on login page;"1. Navigate to '/login'.
+2. Click 'Đăng nhập' without entering any credentials.";"1. Page remains on '/login'.
+2. 'S2O Restaurant' text remains visible.
+3. No navigation occurs.";[AUTH-01];Pass;Equivalence Partitioning / Boundary;
+[AUTH-05];Login fails with incorrect password;"1. Navigate to '/login'.
+2. Fill Email: admin@s2o.com.
+3. Fill Password: WrongPassword123 (incorrect).
+4. Click 'Đăng nhập'.";"1. Page remains on '/login'.
+2. Error message 'Mật khẩu không đúng' is displayed.";[AUTH-01];Pass;Equivalence Partitioning / Negative path;
+;Function: Access control
+[AUTH-06];Unauthorized direct access to sysadmin page redirects to login;"1. Without logging in.
+2. Navigate directly to '/sysadmin/dashboard'.";"1. URL changes to contain '/login'.
+2. 'S2O Restaurant' text is displayed.
+3. User cannot access sysadmin content.";[AUTH-01];Pass;Negative path / State transition / Access control;

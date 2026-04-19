@@ -1,0 +1,67 @@
+Mã module;Quản lý nhà hàng - Phân tích giá trị biên (Restaurants Management - Standard BVA);;;;;;;;Chưa kiểm thử
+Yêu cầu kiểm thử;"Kiểm tra trường Mật khẩu trong form đăng ký nhà hàng mới theo phương pháp Standard BVA. Số biến n=1, số test case = 4n+1 = 4×1+1 = 5 TC. Biến kiểm thử: Mật khẩu Owner [min=6, max=50 ký tự]. Giá trị danh nghĩa: Mật khẩu = 28 ký tự.";;;;;;;;;Không đạt
+Người kiểm thử;Nhóm SQA
+Đạt;Không đạt;Chưa kiểm thử;Không áp dụng;Số lượng test case;;;;;Chưa kiểm thử
+0;0;7;0;7;;;;;Không áp dụng
+ID;Mô tả test case;Các bước thực hiện;Kết quả mong đợi;Phụ thuộc test case;Kết quả;Kỹ thuật kiểm thử;Ghi chú
+;Bảng giá trị biên: Mật khẩu Owner [min=6 | min+=7 | nom=28 | max-=49 | max=50]
+;--- Test case Nominal (1 TC) ---
+[BVA-REST-01];"[Nominal] Đăng ký nhà hàng với Mật khẩu = 28 ký tự (giá trị danh nghĩa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@1234567890abcdefghijkl' (28 ký tự).
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Standard BVA - Nominal";"Nominal: Mật khẩu = 28 ký tự. Ràng buộc: minLength=6 (tenant-dialog.tsx)"
+;--- Biến: Mật khẩu Owner (4 TC) ---
+[BVA-REST-02];"[Mật khẩu - Min=6] Đăng ký nhà hàng với Mật khẩu = 6 ký tự (giá trị tối thiểu)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@12' (6 ký tự).
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Standard BVA - Min";"Mật khẩu = 6 ký tự (min). Ràng buộc: minLength: { value: 6, message: 'Tối thiểu 6 ký tự' }"
+[BVA-REST-03];"[Mật khẩu - Min+=7] Đăng ký nhà hàng với Mật khẩu = 7 ký tự (ngay trên giá trị tối thiểu)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@123' (7 ký tự).
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Standard BVA - Min+";"Mật khẩu = 7 ký tự (min+)"
+[BVA-REST-04];"[Mật khẩu - Max-=49] Đăng ký nhà hàng với Mật khẩu = 49 ký tự (ngay dưới giá trị tối đa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@' + 45 ký tự bất kỳ (tổng cộng 49 ký tự), ví dụ: 'Abc@123456789012345678901234567890123456789abcd'.
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Standard BVA - Max-";"Mật khẩu = 49 ký tự (max-). Chuỗi mẫu: 'Abc@123456789012345678901234567890123456789abcd' = 49 ký tự"
+[BVA-REST-05];"[Mật khẩu - Max=50] Đăng ký nhà hàng với Mật khẩu = 50 ký tự (giá trị tối đa)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@' + 46 ký tự bất kỳ (tổng cộng 50 ký tự), ví dụ: 'Abc@123456789012345678901234567890123456789abcde'.
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Thông báo thành công được hiển thị.
+2. Nhà hàng mới xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Standard BVA - Max";"Mật khẩu = 50 ký tự (max). Chuỗi mẫu: 'Abc@123456789012345678901234567890123456789abcde' = 50 ký tự"
+;--- Robustness BVA - Dirty Test Cases (tổng 6n+1 = 6×1+1 = 7 TC) ---
+[BVA-REST-06];"[Dirty - Mật khẩu Min-=5] Đăng ký nhà hàng với Mật khẩu = 5 ký tự (dưới giá trị tối thiểu — input không hợp lệ)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@1' (5 ký tự).
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Form KHÔNG được gửi.
+2. Thông báo lỗi 'Tối thiểu 6 ký tự' hiển thị ngay dưới trường Mật khẩu.
+3. Dialog vẫn mở.";[REST-01];Chưa kiểm thử;"Robustness BVA - Dirty (Min-)";"Mật khẩu = 5 ký tự (min-1 = min-). Ràng buộc: minLength: { value: 6 } — React Hook Form từ chối phía client"
+[BVA-REST-07];"[Dirty - Mật khẩu Max+=51] Đăng ký nhà hàng với Mật khẩu = 51 ký tự (vượt giá trị tối đa giả định — input không hợp lệ)";"1. Đăng nhập với quyền System Admin.
+2. Điều hướng đến '/sysadmin/restaurants'.
+3. Click 'Đăng ký' / 'Thêm nhà hàng'.
+4. Điền Tên nhà hàng, Tên chủ quán, Email (duy nhất), Địa chỉ, Hotline.
+5. Nhập Mật khẩu: 'Abc@12345678901234567890123456789012345678901234567' (51 ký tự).
+6. Click 'Khởi tạo Nhà hàng'.
+7. Chờ tối đa 10 giây.";"1. Hệ thống từ chối hoặc hiển thị lỗi.
+2. Nhà hàng KHÔNG xuất hiện trong bảng danh sách.";[REST-01];Chưa kiểm thử;"Robustness BVA - Dirty (Max+)";"Mật khẩu = 51 ký tự (max+1 = max+). Frontend không có ràng buộc max — kiểm tra backend có xử lý không"

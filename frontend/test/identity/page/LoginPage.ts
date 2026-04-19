@@ -1,17 +1,20 @@
 const { I } = inject();
 
 export = {
-  // Các selector trên giao diện (hãy điều chỉnh theo HTML thực tế của bạn)
+  // Luu selector dang nhap thanh mot cho de test thay doi it diem hon khi UI doi.
   fields: {
-    email: 'input[type="email"]',
-    password: 'input[type="password"]'
+    email: "input[type=\"email\"]",
+    password: "input[type=\"password\"]"
   },
-  submitButton: 'button[type="submit"]',
+  submitButton: "button[type=\"submit\"]",
 
-  // Hàm thực hiện đăng nhập
+  // Helper nay dien thong tin va gui form dang nhap.
   sendForm(email: string, password: string) {
+    // Dien email vao o dang nhap dang hien.
     I.fillField(this.fields.email, email);
+    // Dien mat khau vao o dang nhap dang hien.
     I.fillField(this.fields.password, password);
+    // Nhan nut submit de kich hoat quy trinh xac thuc.
     I.click(this.submitButton);
   }
 }

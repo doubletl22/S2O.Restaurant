@@ -1,0 +1,58 @@
+Mã module;Xác thực (Authentication);;;;;;;;Đạt
+Yêu cầu kiểm thử;"Xác minh các luồng xác thực hoạt động đúng: chuyển hướng khi chưa đăng nhập, giao diện trang đăng nhập, kiểm tra dữ liệu form, đăng nhập thành công/thất bại theo từng quyền và kiểm soát truy cập.";;;;;;;;;Không đạt
+Người kiểm thử;Nhóm SQA
+Đạt;Không đạt;Chưa kiểm thử;Không áp dụng;Số lượng test case;;;;;Chưa kiểm thử
+7;0;0;1;8;;;;;Không áp dụng
+ID;Mô tả test case;Các bước thực hiện;Kết quả mong đợi;Phụ thuộc test case;Kết quả;Kỹ thuật kiểm thử;Ghi chú
+;Chức năng: Kiểm tra khởi tạo giao diện
+[AUTH-01];Truy cập trang chủ khi chưa đăng nhập sẽ chuyển hướng về trang đăng nhập;"1. Mở trình duyệt.
+2. Điều hướng đến '/'.
+3. Quan sát URL và nội dung trang.";"1. URL thay đổi thành '/login'.
+2. Trang đăng nhập với tiêu đề 'S2O Restaurant' được hiển thị.";;Đạt;"Chuyển đổi trạng thái,Kiểm tra điều hướng";Bảo vệ route phía client
+[AUTH-02];Trang đăng nhập hiển thị đúng các thành phần giao diện;"1. Điều hướng đến '/login'.
+2. Quan sát tất cả các thành phần hiển thị.";"1. Tiêu đề trang 'S2O Restaurant' hiển thị.
+2. Trường nhập email (type=email) có mặt.
+3. Trường nhập mật khẩu (type=password) có mặt.
+4. Nút 'Đăng nhập' được bật và hiển thị.";;Đạt;"Kiểm tra giao diện/Smoke,Kiểm tra giao diện cơ bản";Kiểm tra giao diện cơ bản
+;Chức năng: Kiểm tra định dạng form
+[AUTH-03];Gửi form trống — ở lại trang đăng nhập;"1. Điều hướng đến '/login'.
+2. Để trống trường Email và Mật khẩu.
+3. Click 'Đăng nhập'.";"1. Form không được gửi đi.
+2. URL trang vẫn là '/login'.
+3. Form đăng nhập vẫn hiển thị.";[AUTH-02];Đạt;"Phân vùng tương đương,Kiểm tra HTML5";Thuộc tính required của HTML5 ngăn gửi form
+;Chức năng: Kiểm tra nút và logic xử lý
+[AUTH-04];Đăng nhập thành công với quyền System Admin — chuyển hướng đến /dashboard;"1. Điều hướng đến '/login'.
+2. Nhập Email: admin@s2o.com.
+3. Nhập Mật khẩu: Admin@123.
+4. Click 'Đăng nhập'.
+5. Chờ tối đa 10 giây.";"1. Nút submit chuyển sang trạng thái đang tải/vô hiệu hóa.
+2. Trình duyệt điều hướng đến '/dashboard'.
+3. Trang dashboard của System Admin tải thành công.";[AUTH-02];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Quyền System Admin
+[AUTH-05];Đăng nhập thành công với quyền Owner — chuyển hướng đến /owner/dashboard;"1. Điều hướng đến '/login'.
+2. Nhập Email: quantran@s525o.com.
+3. Nhập Mật khẩu: Quan11209.
+4. Click 'Đăng nhập'.
+5. Chờ tối đa 10 giây.";"1. Nút submit chuyển sang trạng thái đang tải/vô hiệu hóa.
+2. Trình duyệt điều hướng đến '/owner/dashboard'.
+3. Trang dashboard của Owner tải thành công.";[AUTH-02];Đạt;"Luồng thành công,Chuyển đổi trạng thái";Quyền Owner
+[AUTH-06];Đăng nhập thất bại khi sai mật khẩu — hiển thị thông báo lỗi;"1. Điều hướng đến '/login'.
+2. Nhập Email: admin@s2o.com.
+3. Nhập Mật khẩu: WrongPassword123.
+4. Click 'Đăng nhập'.
+5. Chờ tối đa 5 giây.";"1. Người dùng ở lại trang '/login'.
+2. Thông báo lỗi 'Mật khẩu không đúng' được hiển thị.";[AUTH-02];Đạt;"Phân vùng tương đương,Luồng thất bại";API trả về mô tả lỗi
+;Chức năng: Kiểm soát truy cập
+[AUTH-07];Truy cập trực tiếp trái phép vào /sysadmin/dashboard khi chưa đăng nhập sẽ chuyển hướng về trang đăng nhập;"1. Mở trình duyệt mà không đăng nhập.
+2. Điều hướng trực tiếp đến '/sysadmin/dashboard'.
+3. Chờ tối đa 5 giây.";"1. Bộ bảo vệ route phía client kích hoạt chuyển hướng.
+2. URL trình duyệt thay đổi thành '/login'.
+3. Trang đăng nhập với tiêu đề 'S2O Restaurant' được hiển thị.";[AUTH-01];Đạt;"Bảo mật,Kiểm soát truy cập";Route được bảo vệ
+
+;Bổ sung test case BVA đã viết
+;Phân tích khả năng áp dụng BVA
+[BVA-AUTH-NA];[Không áp dụng] Form đăng nhập không có ràng buộc giá trị biên số;"Phân tích form đăng nhập tại '/login':
+1. Trường Email: type='email', required — chỉ kiểm tra định dạng email (pattern), không có min/max độ dài.
+2. Trường Mật khẩu: type='password', required — chỉ kiểm tra trường không rỗng (HTML5 required), không có min/max độ dài.
+3. Không có Zod schema hay minLength/maxLength rule nào được định nghĩa cho form đăng nhập.
+Kết luận: Không có biến số nào có miền giá trị [min, max] xác định → Standard BVA (4n+1) không áp dụng.";"Standard BVA không tạo ra test case cho module này do thiếu ràng buộc số.
+Kỹ thuật kiểm thử phù hợp cho module Authentication là: Phân vùng tương đương (EP) và Kiểm tra luồng (đã được thực hiện trong BlackBox_Authentication.csv).";;Không áp dụng;"Phân tích BVA";"Form đăng nhập (app/(auth)/login/page.tsx) chỉ dùng HTML5 required và type='email'. Không có validation số. BVA áp dụng ở backend nếu backend có ràng buộc độ dài mật khẩu cho quá trình đăng nhập."

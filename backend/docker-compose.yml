@@ -51,8 +51,10 @@ services:
       - Cloudinary__ApiKey=demo
       - Cloudinary__ApiSecret=demo
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
     ports:
       - "5001:8080"
     networks:
@@ -73,7 +75,8 @@ services:
       - Cloudinary__ApiKey=demo
       - Cloudinary__ApiSecret=demo
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
       - "5002:8080"
     networks:
@@ -96,7 +99,8 @@ services:
       - ExternalServices__CatalogUrl=http://catalog-api:8080
       - ExternalServices__TenantUrl=http://tenant-api:8080
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
       - "5003:8080"
     networks:
@@ -122,8 +126,10 @@ services:
       - ExternalServices__BookingApiBaseUrl=http://booking-api:8080
       - ExternalServices__PaymentApiBaseUrl=http://payment-api:8080
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
     ports:
       - "5004:8080"
     networks:
@@ -142,7 +148,8 @@ services:
       - Jwt__Issuer=S2O.Identity
       - Jwt__Audience=S2O.Restaurant
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
       - "5005:8080"
     networks:
@@ -160,7 +167,8 @@ services:
       - Jwt__Issuer=S2O.Identity
       - Jwt__Audience=S2O.Restaurant
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
       - "5006:8080"
     networks:
