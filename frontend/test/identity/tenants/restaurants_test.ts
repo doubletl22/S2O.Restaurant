@@ -137,11 +137,17 @@ Scenario("[REST-02] Đăng ký mới một nhà hàng", ({ I }) => {
 Scenario("[REST-03] Khóa một nhà hàng đang hoạt động", async ({ I }) => {
   await ensureMainRestaurantReady(false);
   goToRestaurants(I);
-  // Tim dung nha hang can doi trang thai.
   I.fillField(RESTAURANT_SEARCH_INPUT, draft.restaurantName);
   I.waitForTableRow(draft.restaurantName);
-  // Menu action dau tien doi giua Active va Locked.
-  I.clickTableRowActionAndAcceptPopup(draft.restaurantName, 0);
+  // "Khoa" mo Dialog form nhap ly do — khong phai native confirm nua.
+  I.clickTableRowAction(draft.restaurantName, 0);
+  I.usePlaywrightTo("fill lock dialog and submit", async ({ page }) => {
+    const dialog = page.getByRole("dialog");
+    await dialog.waitFor({ state: "visible", timeout: 10000 });
+    await dialog.locator("#lock-reason").fill("Vi phạm chính sách vận hành");
+    await page.getByRole("button", { name: "Xác nhận khóa" }).click();
+    await dialog.waitFor({ state: "hidden", timeout: 10000 });
+  });
   I.waitForTableRowStatus(draft.restaurantName, "Locked");
 });
 
@@ -150,8 +156,8 @@ Scenario("[REST-04] Mở khóa một nhà hàng đang bị khóa", async ({ I })
   goToRestaurants(I);
   I.fillField(RESTAURANT_SEARCH_INPUT, draft.restaurantName);
   I.waitForTableRow(draft.restaurantName);
-  // Click lai cung action do de dua tenant ve trang thai hoat dong.
-  I.clickTableRowActionAndAcceptPopup(draft.restaurantName, 0);
+  // Voi restaurant dang bi khoa: index 0 = "Gia han 1 thang", index 1 = "Mo khoa".
+  I.clickTableRowActionAndAcceptPopup(draft.restaurantName, 1);
   I.waitForTableRowStatus(draft.restaurantName, "Active");
 });
 
