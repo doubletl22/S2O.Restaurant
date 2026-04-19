@@ -42,6 +42,13 @@ interface CategoryFormValues {
   isActive: boolean;
 }
 
+const toStrictBoolean = (value: unknown): boolean => {
+  if (value === true) return true;
+  if (typeof value === "string") return value.trim().toLowerCase() === "true";
+  if (typeof value === "number") return value === 1;
+  return false;
+};
+
 export function CategoryDialog({
   open,
   onOpenChange,
@@ -69,10 +76,11 @@ export function CategoryDialog({
   useEffect(() => {
     if (open) {
       if (categoryToEdit) {
+        const rawIsActive = (categoryToEdit as any)?.isActive ?? (categoryToEdit as any)?.IsActive;
         form.reset({
           name: categoryToEdit.name,
           description: categoryToEdit.description || "",
-          isActive: categoryToEdit.isActive,
+          isActive: toStrictBoolean(rawIsActive),
         });
       } else {
         form.reset({
@@ -158,9 +166,16 @@ export function CategoryDialog({
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Kích hoạt</FormLabel>
+                      <div className="flex items-center gap-2">
+                        <FormLabel className="text-base">Trạng thái sử dụng</FormLabel>
+                        <span className={field.value === true ? "text-green-700 text-xs font-medium" : "text-muted-foreground text-xs font-medium"}>
+                          {field.value === true ? "Đang sử dụng" : "Không sử dụng"}
+                        </span>
+                      </div>
                       <div className="text-[12px] text-muted-foreground">
-                        Hiển thị danh mục này trên thực đơn khách hàng.
+                        {field.value === true
+                          ? "Đang sử dụng: danh mục có thể hiển thị trong thực đơn."
+                          : "Không sử dụng: cần chuyển sang trạng thái này trước khi xóa danh mục."}
                       </div>
                     </div>
                     <FormControl>

@@ -18,6 +18,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatCurrency, cn } from "@/lib/utils";
 
+const coerceIsActive = (value: unknown): boolean => {
+  if (value === true) return true;
+  if (typeof value === "string") return value.trim().toLowerCase() === "true";
+  if (typeof value === "number") return value === 1;
+  return false;
+};
+
 export default function MenuPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [keyword, setKeyword] = useState("");
@@ -104,8 +111,14 @@ export default function MenuPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => { setEditingCategory(cat); setIsCatDialogOpen(true); }}>
-                            <Edit className="mr-2 h-4 w-4" /> Đổi tên
+                          <DropdownMenuItem onClick={() => {
+                            setEditingCategory({
+                              ...cat,
+                              isActive: coerceIsActive(cat?.isActive ?? cat?.IsActive),
+                            });
+                            setIsCatDialogOpen(true);
+                          }}>
+                            <Edit className="mr-2 h-4 w-4" /> Sửa
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             className="text-red-600 focus:text-red-600" 

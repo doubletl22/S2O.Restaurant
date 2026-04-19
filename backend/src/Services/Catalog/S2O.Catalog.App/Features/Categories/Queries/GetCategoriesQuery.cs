@@ -22,7 +22,8 @@ public class GetCategoriesHandler : IRequestHandler<GetCategoriesQuery, Result<L
             .Select(c => new CategoryResponse{
                 Id = c.Id,
                 Name = c.Name,
-                Description = c.Description
+                Description = c.Description,
+                IsActive = c.IsActive
             })
             .ToListAsync(ct);
 

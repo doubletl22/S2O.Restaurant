@@ -38,6 +38,13 @@ import { CategoryDialog } from "@/components/owner/category-dialog";
 import { categoryService } from "@/services/category.service";
 import { Category } from "@/lib/types";
 
+const coerceIsActive = (value: unknown): boolean => {
+  if (value === true) return true;
+  if (typeof value === "string") return value.trim().toLowerCase() === "true";
+  if (typeof value === "number") return value === 1;
+  return false;
+};
+
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +79,10 @@ export default function CategoriesPage() {
   };
 
   const handleEdit = (category: Category) => {
-    setEditingCategory(category);
+    setEditingCategory({
+      ...category,
+      isActive: coerceIsActive((category as any)?.isActive ?? (category as any)?.IsActive),
+    });
     setIsDialogOpen(true);
   };
 
@@ -159,8 +169,8 @@ export default function CategoriesPage() {
                     {cat.description || "---"}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={cat.isActive ? "outline" : "secondary"} className={cat.isActive ? "bg-green-50 text-green-700 border-green-200" : ""}>
-                      {cat.isActive ? "Hiển thị" : "Đã ẩn"}
+                    <Badge variant={cat.isActive === true ? "outline" : "secondary"} className={cat.isActive === true ? "bg-green-50 text-green-700 border-green-200" : ""}>
+                      {cat.isActive === true ? "Đang sử dụng" : "Không sử dụng"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -173,13 +183,13 @@ export default function CategoriesPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Hành động</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleEdit(cat)}>
-                          <Edit className="mr-2 h-4 w-4" /> Sửa danh mục
+                          <Edit className="mr-2 h-4 w-4" /> Sửa
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           className="text-red-600 focus:text-red-600"
                           onClick={() => setCategoryToDelete(cat.id)}
                         >
-                          <Trash2 className="mr-2 h-4 w-4" /> Xóa danh mục
+                          <Trash2 className="mr-2 h-4 w-4" /> Xóa
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

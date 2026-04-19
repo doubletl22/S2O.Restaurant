@@ -21,6 +21,12 @@ public class DeleteCategoryHandler : IRequestHandler<DeleteCategoryCommand, Resu
         var category = await _context.Categories.FindAsync(new object[] { request.Id }, ct);
         if (category == null) return Result<bool>.Failure(new Error("Category.NotFound", "Danh mục không tồn tại"));
 
+        // Không cho xóa danh mục đang hiển thị/đang sử dụng.
+        if (category.IsActive)
+        {
+            return Result<bool>.Failure(new Error("Category.ActiveCannotDelete", "Không thể xóa danh mục đang sử dụng. Vui lòng chuyển trạng thái sang ẩn trước."));
+        }
+
         // Kiểm tra xem có món ăn nào đang dùng danh mục này không
         bool hasProducts = await _context.Products.AnyAsync(p => p.CategoryId == request.Id, ct);
         if (hasProducts)
