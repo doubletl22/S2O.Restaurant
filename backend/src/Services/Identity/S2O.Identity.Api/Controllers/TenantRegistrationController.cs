@@ -22,6 +22,6 @@ public class TenantRegistrationController : ControllerBase
     public async Task<IActionResult> RegisterTenant([FromBody] RegisterTenantCommand command)
     {
         var result = await _sender.Send(command);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 }

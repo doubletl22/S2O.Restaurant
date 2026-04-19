@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using S2O.Identity.App.Features.Users.Commands;
 using S2O.Identity.Domain.Entities;
 using S2O.Identity.Infra.Persistence;
+using S2O.Shared.Kernel.Results;
 using System.Security.Claims; 
 
 namespace S2O.Identity.Api.Controllers;
@@ -39,6 +40,12 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
     {
         var requesterTenantId = GetRequesterTenantId();
+        var normalizedRole = NormalizeRole(request.Role);
+
+        if (normalizedRole is null)
+        {
+            return BadRequest(new Error("Users.InvalidRequest", "Role không hợp lệ."));
+        }
 
         Guid? targetTenantId;
 
@@ -46,36 +53,37 @@ public class UsersController : ControllerBase
         {
             // --- TRƯỜNG HỢP SYSTEM ADMIN ---
             // SystemAdmin đang tạo tài khoản cho Chủ nhà hàng (RestaurantOwner)
-            if (request.Role == "RestaurantOwner")
+            if (string.Equals(normalizedRole, "RestaurantOwner", StringComparison.OrdinalIgnoreCase))
             {
                 if (request.TenantId == null)
                 {
-                    return BadRequest("Khi tạo chủ nhà hàng, bắt buộc phải nhập TenantId của nhà hàng đó.");
+                    return BadRequest(new Error("Users.InvalidRequest", "Khi tạo chủ nhà hàng, bắt buộc phải nhập TenantId của nhà hàng đó."));
                 }
                 targetTenantId = request.TenantId;
             }
             // SystemAdmin tạo Admin khác
-            else if (request.Role == "SystemAdmin")
+            else if (string.Equals(normalizedRole, "SystemAdmin", StringComparison.OrdinalIgnoreCase))
             {
                 targetTenantId = null;
             }
             else
             {
-                return BadRequest("SystemAdmin chỉ nên tạo RestaurantOwner hoặc SystemAdmin khác.");
+                return BadRequest(new Error("Users.InvalidRequest", "SystemAdmin chỉ nên tạo RestaurantOwner hoặc SystemAdmin khác."));
             }
         }
         else // --- TRƯỜNG HỢP RESTAURANT OWNER ---
         {
             // Owner không được tạo SystemAdmin (Chống đảo chính :D)
-            if (request.Role == "SystemAdmin" || request.Role == "RestaurantOwner")
+            if (string.Equals(normalizedRole, "SystemAdmin", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(normalizedRole, "RestaurantOwner", StringComparison.OrdinalIgnoreCase))
             {
-                return StatusCode(403, "Bạn không đủ quyền để tạo Role này.");
+                return StatusCode(StatusCodes.Status403Forbidden, new Error("Users.Forbidden", "Bạn không đủ quyền để tạo Role này."));
             }
 
             // Owner bắt buộc phải tạo Staff/User thuộc cùng Tenant với mình
             if (!requesterTenantId.HasValue)
             {
-                return BadRequest("Lỗi Token: Tài khoản của bạn bị thiếu TenantId.");
+                return BadRequest(new Error("Auth.InvalidTenantClaim", "Lỗi Token: Tài khoản của bạn bị thiếu TenantId."));
             }
 
             targetTenantId = requesterTenantId.Value;
@@ -96,18 +104,24 @@ public class UsersController : ControllerBase
         var result = await _userManager.CreateAsync(newUser, request.Password);
         if (!result.Succeeded)
         {
-            return BadRequest(result.Errors);
+            return BadRequest(new Error("Users.CreateFailed", BuildIdentityErrorMessage(result.Errors)));
         }
 
         // 5. Gán Role
-        await _userManager.AddToRoleAsync(newUser, request.Role);
+        var roleAssignResult = await _userManager.AddToRoleAsync(newUser, normalizedRole);
+        if (!roleAssignResult.Succeeded)
+        {
+            // Best effort rollback để tránh tạo user không có role hợp lệ.
+            await _userManager.DeleteAsync(newUser);
+            return BadRequest(new Error("Users.CreateFailed", BuildIdentityErrorMessage(roleAssignResult.Errors)));
+        }
 
         return Ok(new
         {
             Message = "Tạo tài khoản thành công!",
             UserId = newUser.Id,
             TenantId = newUser.TenantId,
-            Role = request.Role
+            Role = normalizedRole
         });
     }
 
@@ -115,7 +129,7 @@ public class UsersController : ControllerBase
     [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
     public async Task<IActionResult> ResetPassword(Guid id, [FromBody] string newPassword)
     {
-        var scopeError = await ValidateManagedUserScopeAsync(id, newPassword);
+        var scopeError = await ValidateManagedUserScopeAsync(id);
         if (scopeError != null) return scopeError;
 
         var command = new AdminResetPasswordCommand(id, newPassword);
@@ -144,7 +158,7 @@ public class UsersController : ControllerBase
     [Authorize(Roles = "SystemAdmin,RestaurantOwner")] 
     public async Task<IActionResult> UpdateUserRole(Guid id, [FromBody] UpdateUserRoleCommand command)
     {
-        if (id != command.UserId) return BadRequest("ID không khớp");
+        if (id != command.UserId) return BadRequest(new Error("Users.InvalidRequest", "ID không khớp"));
 
         var scopeError = await ValidateManagedUserScopeAsync(id, command.NewRole);
         if (scopeError != null) return scopeError;
@@ -160,10 +174,16 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> LockUser(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
-        if (user == null) return NotFound("Không tìm thấy user");
+        if (user == null) return NotFound(new Error("Users.NotFound", "Không tìm thấy user"));
 
         // Khóa đến năm 9999
-        await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+        var lockResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+        if (!lockResult.Succeeded)
+        {
+            var errors = string.Join(", ", lockResult.Errors.Select(e => e.Description));
+            return BadRequest(new Error("Users.UpdateFailed", string.IsNullOrWhiteSpace(errors) ? "Không thể khóa tài khoản." : errors));
+        }
+
         return Ok(new { Message = "Đã khóa tài khoản" });
     }
 
@@ -172,9 +192,15 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> UnlockUser(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
-        if (user == null) return NotFound("Không tìm thấy user");
+        if (user == null) return NotFound(new Error("Users.NotFound", "Không tìm thấy user"));
 
-        await _userManager.SetLockoutEndDateAsync(user, null);
+        var unlockResult = await _userManager.SetLockoutEndDateAsync(user, null);
+        if (!unlockResult.Succeeded)
+        {
+            var errors = string.Join(", ", unlockResult.Errors.Select(e => e.Description));
+            return BadRequest(new Error("Users.UpdateFailed", string.IsNullOrWhiteSpace(errors) ? "Không thể mở khóa tài khoản." : errors));
+        }
+
         return Ok(new { Message = "Đã mở khóa tài khoản" });
     }
 
@@ -253,6 +279,27 @@ public class UsersController : ControllerBase
         return Guid.TryParse(tenantClaim, out var tenantId) ? tenantId : null;
     }
 
+    private static string? NormalizeRole(string? role)
+    {
+        if (string.IsNullOrWhiteSpace(role))
+        {
+            return null;
+        }
+
+        var trimmed = role.Trim();
+        return trimmed.Length == 0 ? null : trimmed;
+    }
+
+    private static string BuildIdentityErrorMessage(IEnumerable<IdentityError> errors)
+    {
+        var messages = errors
+            .Select(error => error.Description)
+            .Where(description => !string.IsNullOrWhiteSpace(description))
+            .ToList();
+
+        return messages.Count == 0 ? "Thao tác không thành công." : string.Join("; ", messages);
+    }
+
     private async Task<IActionResult?> ValidateManagedUserScopeAsync(Guid targetUserId, string? nextRole = null)
     {
         if (string.IsNullOrWhiteSpace(nextRole) == false)
@@ -263,7 +310,7 @@ public class UsersController : ControllerBase
         var targetUser = await _userManager.FindByIdAsync(targetUserId.ToString());
         if (targetUser == null)
         {
-            return NotFound("Không tìm thấy user");
+            return NotFound(new Error("Users.NotFound", "Không tìm thấy user"));
         }
 
         if (User.IsInRole("SystemAdmin"))
@@ -273,30 +320,30 @@ public class UsersController : ControllerBase
 
         if (!User.IsInRole("RestaurantOwner"))
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden, new Error("Users.Forbidden", "Bạn không có quyền thao tác với tài khoản này."));
         }
 
         var requesterTenantId = GetRequesterTenantId();
         if (!requesterTenantId.HasValue)
         {
-            return BadRequest("Lỗi Token: Tài khoản của bạn bị thiếu TenantId.");
+            return BadRequest(new Error("Auth.InvalidTenantClaim", "Lỗi Token: Tài khoản của bạn bị thiếu TenantId."));
         }
 
         if (targetUser.TenantId != requesterTenantId.Value)
         {
-            return Forbid();
+            return StatusCode(StatusCodes.Status403Forbidden, new Error("Users.Forbidden", "Bạn không có quyền thao tác với tài khoản này."));
         }
 
         var targetRoles = await _userManager.GetRolesAsync(targetUser);
         if (targetRoles.Contains("SystemAdmin") || targetRoles.Contains("RestaurantOwner"))
         {
-            return StatusCode(StatusCodes.Status403Forbidden, "Bạn không đủ quyền thao tác với tài khoản này.");
+            return StatusCode(StatusCodes.Status403Forbidden, new Error("Users.Forbidden", "Bạn không đủ quyền thao tác với tài khoản này."));
         }
 
         if (string.Equals(nextRole, "SystemAdmin", StringComparison.OrdinalIgnoreCase)
             || string.Equals(nextRole, "RestaurantOwner", StringComparison.OrdinalIgnoreCase))
         {
-            return StatusCode(StatusCodes.Status403Forbidden, "Bạn không đủ quyền gán vai trò này.");
+            return StatusCode(StatusCodes.Status403Forbidden, new Error("Users.Forbidden", "Bạn không đủ quyền gán vai trò này."));
         }
 
         return null;

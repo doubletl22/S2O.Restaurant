@@ -146,6 +146,11 @@ public class StaffController : ControllerBase
     {
         var code = error.Code ?? string.Empty;
 
+        if (code.Equals("Staff.DeleteBlocked", StringComparison.OrdinalIgnoreCase))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, error);
+        }
+
         if (code.Contains("Forbidden", StringComparison.OrdinalIgnoreCase))
         {
             return StatusCode(StatusCodes.Status403Forbidden, error);
@@ -153,7 +158,7 @@ public class StaffController : ControllerBase
 
         if (code.Contains("Unauthorized", StringComparison.OrdinalIgnoreCase))
         {
-            return StatusCode(StatusCodes.Status403Forbidden, error);
+            return Unauthorized(error);
         }
 
         if (code.Contains("NotFound", StringComparison.OrdinalIgnoreCase))
@@ -196,30 +201,45 @@ public class StaffController : ControllerBase
         var client = _httpClientFactory.CreateClient();
         client.DefaultRequestHeaders.Authorization = parsedAuthorization;
 
-        var url = $"{baseUrl.TrimEnd('/')}/api/v1/branches";
-        using var response = await client.GetAsync(url, cancellationToken);
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            return BranchValidationState.ServiceUnavailable;
-        }
-
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
-
-        if (!TryGetBranchArray(document.RootElement, out var branchArray))
-        {
-            return BranchValidationState.ServiceUnavailable;
-        }
-
-        foreach (var item in branchArray.EnumerateArray())
-        {
-            if (TryReadGuid(item, "id", out var id) || TryReadGuid(item, "Id", out id))
+            var url = $"{baseUrl.TrimEnd('/')}/api/v1/branches";
+            using var response = await client.GetAsync(url, cancellationToken);
+            if (!response.IsSuccessStatusCode)
             {
-                if (id == branchId) return BranchValidationState.Valid;
+                return BranchValidationState.ServiceUnavailable;
             }
-        }
 
-        return BranchValidationState.Invalid;
+            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+
+            if (!TryGetBranchArray(document.RootElement, out var branchArray))
+            {
+                return BranchValidationState.ServiceUnavailable;
+            }
+
+            foreach (var item in branchArray.EnumerateArray())
+            {
+                if (TryReadGuid(item, "id", out var id) || TryReadGuid(item, "Id", out id))
+                {
+                    if (id == branchId) return BranchValidationState.Valid;
+                }
+            }
+
+            return BranchValidationState.Invalid;
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return BranchValidationState.ServiceUnavailable;
+        }
+        catch (HttpRequestException)
+        {
+            return BranchValidationState.ServiceUnavailable;
+        }
+        catch (JsonException)
+        {
+            return BranchValidationState.ServiceUnavailable;
+        }
     }
 
     private static bool TryReadGuid(JsonElement element, string propertyName, out Guid value)
