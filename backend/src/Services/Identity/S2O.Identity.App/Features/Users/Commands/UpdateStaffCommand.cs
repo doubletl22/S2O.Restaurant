@@ -18,6 +18,18 @@ public record UpdateStaffCommand(
 
 public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<bool>>
 {
+    private static readonly HashSet<string> AllowedStaffRoles = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Staff",
+        "RestaurantStaff",
+        "Manager",
+        "Chef",
+        "Waiter"
+    };
+
+    private const int MinPasswordLength = 6;
+    private const int MaxPasswordLength = 50;
+
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
     public UpdateStaffHandler(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
@@ -28,6 +40,12 @@ public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<boo
 
     public async Task<Result<bool>> Handle(UpdateStaffCommand request, CancellationToken cancellationToken)
     {
+        var validationResult = ValidateRequest(request);
+        if (validationResult is not null)
+        {
+            return validationResult;
+        }
+
         var user = await _userManager.FindByIdAsync(request.UserId.ToString());
 
         if (user == null)
@@ -37,8 +55,11 @@ public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<boo
         if (user.TenantId != request.TenantId)
             return Result<bool>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền sửa nhân viên này"));
 
+        var normalizedFullName = request.FullName.Trim();
+        var normalizedRole = request.Role.Trim();
+
         // 1. Cập nhật thông tin cơ bản
-        user.FullName = request.FullName;
+        user.FullName = normalizedFullName;
         user.BranchId = request.BranchId;
         user.IsActive = request.IsActive;
 
@@ -48,33 +69,110 @@ public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<boo
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var passResult = await _userManager.ResetPasswordAsync(user, token, request.Password);
             if (!passResult.Succeeded)
-                return Result<bool>.Failure(new Error("Staff.PasswordError", "Lỗi đổi mật khẩu"));
+            {
+                var passwordError = string.Join(", ", passResult.Errors.Select(e => e.Description));
+                return Result<bool>.Failure(new Error("Staff.PasswordError", string.IsNullOrWhiteSpace(passwordError) ? "Lỗi đổi mật khẩu" : passwordError));
+            }
         }
 
         // 3. Cập nhật Role
         var currentRoles = await _userManager.GetRolesAsync(user);
-        if (!currentRoles.Contains(request.Role))
+        if (!currentRoles.Contains(normalizedRole, StringComparer.OrdinalIgnoreCase))
         {
+            if (!await _roleManager.RoleExistsAsync(normalizedRole))
+            {
+                return Result<bool>.Failure(new Error("Role.Invalid", "Vai trò không hợp lệ cho nhân viên."));
+            }
+
             // Xóa role cũ và thêm role mới
-            await _userManager.RemoveFromRolesAsync(user, currentRoles);
-            await _userManager.AddToRoleAsync(user, request.Role);
+            var removeRolesResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            if (!removeRolesResult.Succeeded)
+            {
+                var removeRoleError = string.Join(", ", removeRolesResult.Errors.Select(e => e.Description));
+                return Result<bool>.Failure(new Error("Staff.RoleUpdateFailed", string.IsNullOrWhiteSpace(removeRoleError) ? "Không thể xóa vai trò cũ." : removeRoleError));
+            }
+
+            var addRoleResult = await _userManager.AddToRoleAsync(user, normalizedRole);
+            if (!addRoleResult.Succeeded)
+            {
+                var addRoleError = string.Join(", ", addRoleResult.Errors.Select(e => e.Description));
+                return Result<bool>.Failure(new Error("Staff.RoleUpdateFailed", string.IsNullOrWhiteSpace(addRoleError) ? "Không thể thêm vai trò mới." : addRoleError));
+            }
 
             // Cập nhật lại Claim Role trong DB luôn để lần sau login đúng
             var claims = await _userManager.GetClaimsAsync(user);
             var roleClaim = claims.FirstOrDefault(c => c.Type == "role");
-            if (roleClaim != null) await _userManager.RemoveClaimAsync(user, roleClaim);
-            await _userManager.AddClaimAsync(user, new Claim("role", request.Role));
+            if (roleClaim != null)
+            {
+                var removeRoleClaimResult = await _userManager.RemoveClaimAsync(user, roleClaim);
+                if (!removeRoleClaimResult.Succeeded)
+                {
+                    return Result<bool>.Failure(new Error("Staff.RoleUpdateFailed", "Không thể cập nhật claim vai trò."));
+                }
+            }
+
+            var addRoleClaimResult = await _userManager.AddClaimAsync(user, new Claim("role", normalizedRole));
+            if (!addRoleClaimResult.Succeeded)
+            {
+                return Result<bool>.Failure(new Error("Staff.RoleUpdateFailed", "Không thể cập nhật claim vai trò."));
+            }
         }
 
         // Cập nhật Claim BranchId mới nếu đổi chi nhánh
         var branchClaim = (await _userManager.GetClaimsAsync(user)).FirstOrDefault(c => c.Type == "branch_id");
-        if (branchClaim != null) await _userManager.RemoveClaimAsync(user, branchClaim);
-        await _userManager.AddClaimAsync(user, new Claim("branch_id", request.BranchId.ToString()));
+        if (branchClaim != null)
+        {
+            var removeBranchClaimResult = await _userManager.RemoveClaimAsync(user, branchClaim);
+            if (!removeBranchClaimResult.Succeeded)
+            {
+                return Result<bool>.Failure(new Error("Staff.UpdateFailed", "Không thể cập nhật claim chi nhánh."));
+            }
+        }
+
+        var addBranchClaimResult = await _userManager.AddClaimAsync(user, new Claim("branch_id", request.BranchId.ToString()));
+        if (!addBranchClaimResult.Succeeded)
+        {
+            return Result<bool>.Failure(new Error("Staff.UpdateFailed", "Không thể cập nhật claim chi nhánh."));
+        }
 
 
         // 4. Lưu User
-        await _userManager.UpdateAsync(user);
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            var updateError = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+            return Result<bool>.Failure(new Error("Staff.UpdateFailed", string.IsNullOrWhiteSpace(updateError) ? "Không thể cập nhật nhân viên." : updateError));
+        }
 
         return Result<bool>.Success(true);
+    }
+
+    private static Result<bool>? ValidateRequest(UpdateStaffCommand request)
+    {
+        if (string.IsNullOrWhiteSpace(request.FullName))
+        {
+            return Result<bool>.Failure(new Error("Staff.InvalidFullName", "Họ tên không hợp lệ."));
+        }
+
+        if (request.BranchId == Guid.Empty)
+        {
+            return Result<bool>.Failure(new Error("Branch.Invalid", "Chi nhánh không hợp lệ."));
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Role) || !AllowedStaffRoles.Contains(request.Role.Trim()))
+        {
+            return Result<bool>.Failure(new Error("Role.Invalid", "Vai trò không hợp lệ cho nhân viên."));
+        }
+
+        if (!string.IsNullOrEmpty(request.Password))
+        {
+            var password = request.Password.Trim();
+            if (password.Length < MinPasswordLength || password.Length > MaxPasswordLength)
+            {
+                return Result<bool>.Failure(new Error("Staff.PasswordError", $"Mật khẩu phải có độ dài từ {MinPasswordLength} đến {MaxPasswordLength} ký tự."));
+            }
+        }
+
+        return null;
     }
 }

@@ -61,8 +61,7 @@ public class StaffController : ControllerBase
             return BadRequest("Token không hợp lệ hoặc thiếu TenantId.");
         }
 
-        var authHeader = Request.Headers.Authorization.ToString();
-        if (!await BranchExistsAsync(command.BranchId, authHeader, HttpContext.RequestAborted))
+        if (!await IsBranchValidForCurrentRequestAsync(command.BranchId, HttpContext.RequestAborted))
         {
             return BadRequest("Chi nhánh không tồn tại hoặc không thuộc tenant hiện tại.");
         }
@@ -81,6 +80,11 @@ public class StaffController : ControllerBase
         if (!TryGetCurrentTenantId(out var tenantId))
         {
             return BadRequest("Token không hợp lệ hoặc thiếu TenantId.");
+        }
+
+        if (!await IsBranchValidForCurrentRequestAsync(command.BranchId, HttpContext.RequestAborted))
+        {
+            return BadRequest("Chi nhánh không tồn tại hoặc không thuộc tenant hiện tại.");
         }
 
         var safeCommand = command with { TenantId = tenantId }; 
@@ -104,6 +108,12 @@ public class StaffController : ControllerBase
         return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
     }
 
+    private async Task<bool> IsBranchValidForCurrentRequestAsync(Guid branchId, CancellationToken cancellationToken)
+    {
+        var authHeader = Request.Headers.Authorization.ToString();
+        return await BranchExistsAsync(branchId, authHeader, cancellationToken);
+    }
+
     private async Task<bool> BranchExistsAsync(Guid branchId, string authorizationHeader, CancellationToken cancellationToken)
     {
         if (branchId == Guid.Empty || string.IsNullOrWhiteSpace(authorizationHeader))
@@ -117,8 +127,13 @@ public class StaffController : ControllerBase
             return false;
         }
 
+        if (!AuthenticationHeaderValue.TryParse(authorizationHeader, out var parsedAuthorization) || parsedAuthorization is null)
+        {
+            return false;
+        }
+
         var client = _httpClientFactory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(authorizationHeader);
+        client.DefaultRequestHeaders.Authorization = parsedAuthorization;
 
         var url = $"{baseUrl.TrimEnd('/')}/api/v1/branches";
         using var response = await client.GetAsync(url, cancellationToken);
@@ -130,12 +145,12 @@ public class StaffController : ControllerBase
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         using var document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
 
-        if (document.RootElement.ValueKind != JsonValueKind.Array)
+        if (!TryGetBranchArray(document.RootElement, out var branchArray))
         {
             return false;
         }
 
-        foreach (var item in document.RootElement.EnumerateArray())
+        foreach (var item in branchArray.EnumerateArray())
         {
             if (TryReadGuid(item, "id", out var id) || TryReadGuid(item, "Id", out id))
             {
@@ -156,5 +171,33 @@ public class StaffController : ControllerBase
         }
 
         return Guid.TryParse(prop.GetString(), out value);
+    }
+
+    private static bool TryGetBranchArray(JsonElement root, out JsonElement branchArray)
+    {
+        branchArray = default;
+
+        if (root.ValueKind == JsonValueKind.Array)
+        {
+            branchArray = root;
+            return true;
+        }
+
+        if (root.ValueKind == JsonValueKind.Object)
+        {
+            if (root.TryGetProperty("value", out var camelValue) && camelValue.ValueKind == JsonValueKind.Array)
+            {
+                branchArray = camelValue;
+                return true;
+            }
+
+            if (root.TryGetProperty("Value", out var pascalValue) && pascalValue.ValueKind == JsonValueKind.Array)
+            {
+                branchArray = pascalValue;
+                return true;
+            }
+        }
+
+        return false;
     }
 }
