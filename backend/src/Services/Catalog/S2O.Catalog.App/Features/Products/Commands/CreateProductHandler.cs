@@ -58,6 +58,22 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
             }
         }
 
+        var normalizedName = (request.Name ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(normalizedName))
+        {
+            return Result<Guid>.Failure(new Error("Product.NameRequired", "Tên món không được để trống."));
+        }
+
+        var normalizedNameLower = normalizedName.ToLower();
+        var duplicateExists = await _context.Products.AnyAsync(
+            p => p.TenantId == currentTenantId.Value && p.Name.ToLower() == normalizedNameLower,
+            cancellationToken);
+
+        if (duplicateExists)
+        {
+            return Result<Guid>.Failure(new Error("Product.DuplicateName", "Tên món đã tồn tại."));
+        }
+
         // ✅ Upload Image
         string imageUrl = string.Empty;
 
@@ -78,8 +94,8 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
         var product = new Product
         {
             Id = Guid.NewGuid(),
-            Name = request.Name,
-            Description = request.Description,
+            Name = normalizedName,
+            Description = request.Description ?? string.Empty,
             Price = request.Price,
             CategoryId = request.CategoryId,
             ImageUrl = imageUrl,

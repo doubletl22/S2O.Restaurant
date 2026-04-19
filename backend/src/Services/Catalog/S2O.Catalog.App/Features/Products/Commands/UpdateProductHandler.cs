@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using S2O.Catalog.App.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using S2O.Shared.Kernel.Interfaces; // [1] Namespace chứa Interface của bạn
 using S2O.Shared.Kernel.Results;
 
@@ -25,8 +26,26 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result
             return Result<Guid>.Failure(new Error("Product.NotFound", "Không tìm thấy món ăn"));
         }
 
+        var normalizedName = (request.Name ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(normalizedName))
+        {
+            return Result<Guid>.Failure(new Error("Product.NameRequired", "Tên món không được để trống."));
+        }
+
+        var normalizedNameLower = normalizedName.ToLower();
+        var duplicateExists = await _context.Products.AnyAsync(
+            p => p.TenantId == product.TenantId
+                 && p.Id != request.Id
+                 && p.Name.ToLower() == normalizedNameLower,
+            cancellationToken);
+
+        if (duplicateExists)
+        {
+            return Result<Guid>.Failure(new Error("Product.DuplicateName", "Tên món đã tồn tại."));
+        }
+
         // 2. Cập nhật thông tin text
-        product.Name = request.Name;
+        product.Name = normalizedName;
         product.Description = request.Description ?? string.Empty;
         product.Price = request.Price;
         product.CategoryId = request.CategoryId;

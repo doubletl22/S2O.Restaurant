@@ -55,10 +55,26 @@ public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, Resu
             }
         }
 
+        var normalizedName = (request.Name ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(normalizedName))
+        {
+            return Result<Guid>.Failure(new Error("Category.NameRequired", "Tên thực đơn không được để trống."));
+        }
+
+        var normalizedNameLower = normalizedName.ToLower();
+        var duplicateExists = await _context.Categories.AnyAsync(
+            c => c.TenantId == currentTenantId.Value && c.Name.ToLower() == normalizedNameLower,
+            cancellationToken);
+
+        if (duplicateExists)
+        {
+            return Result<Guid>.Failure(new Error("Category.DuplicateName", "Tên thực đơn đã tồn tại."));
+        }
+
         var category = new Category
         {
             Id = Guid.NewGuid(),
-            Name = request.Name,
+            Name = normalizedName,
             Description = request.Description,
             IsActive = request.IsActive,
             TenantId = currentTenantId.Value

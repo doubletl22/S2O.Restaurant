@@ -85,14 +85,16 @@ export function CategoryDialog({
   }, [open, categoryToEdit, form]);
 
   const onSubmit = (data: CategoryFormValues) => {
+    const normalizedName = data.name.trim();
+
     if (categoryToEdit) {
       updateMutation.mutate({
         id: categoryToEdit.id,
-        data: { ...data, id: categoryToEdit.id },
+        data: { ...data, name: normalizedName, id: categoryToEdit.id },
       });
     } else {
       createMutation.mutate({
-        name: data.name,
+        name: normalizedName,
         description: data.description,
         isActive: true,
       });
@@ -118,7 +120,10 @@ export function CategoryDialog({
             <FormField
               control={form.control}
               name="name"
-              rules={{ required: "Tên danh mục là bắt buộc" }}
+              rules={{
+                required: "Tên danh mục là bắt buộc",
+                validate: (value) => value.trim().length > 0 || "Tên danh mục là bắt buộc",
+              }}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tên danh mục <span className="text-red-500">*</span></FormLabel>

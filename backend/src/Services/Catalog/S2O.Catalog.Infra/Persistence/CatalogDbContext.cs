@@ -34,5 +34,13 @@ public class CatalogDbContext : BaseDbContext, ICatalogDbContext
             .Property(p => p.IsActive)
             .IsRequired()
             .ValueGeneratedNever();
+
+        builder.Entity<Category>()
+            .HasIndex(c => new { c.TenantId, c.Name })
+            .IsUnique();
+
+        builder.Entity<Product>()
+            .HasIndex(p => new { p.TenantId, p.Name })
+            .IsUnique();
     }
 }

@@ -68,7 +68,9 @@ public class AutoLockExpiredSubscriptionsService : BackgroundService
                 // - Có subscription hết hạn (SubscriptionExpiry <= now)
                 // - Chưa bị khóa (IsLocked = false)
                 var expiredTenants = await context.Tenants
-                    .Where(t => t.SubscriptionExpiry <= DateTime.UtcNow && !t.IsLocked)
+                    .Where(t => t.SubscriptionExpiry > DateTime.MinValue
+                                && t.SubscriptionExpiry <= DateTime.UtcNow
+                                && !t.IsLocked)
                     .ToListAsync(stoppingToken);
 
                 if (expiredTenants.Count == 0)
