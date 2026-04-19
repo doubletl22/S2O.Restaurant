@@ -51,7 +51,11 @@ public class DeleteStaffHandler : IRequestHandler<DeleteStaffCommand, Result<boo
             return Result<bool>.Failure(new Error("Staff.DeleteBlocked", "Không thể xóa tài khoản đang bị khóa."));
         }
 
-        await RemoveBranchMappingsAsync(user.Id, cancellationToken);
+        var mappingCleanupResult = await RemoveBranchMappingsAsync(user.Id, cancellationToken);
+        if (mappingCleanupResult is not null)
+        {
+            return mappingCleanupResult;
+        }
 
         var result = await _userManager.DeleteAsync(user);
 
@@ -97,29 +101,43 @@ public class DeleteStaffHandler : IRequestHandler<DeleteStaffCommand, Result<boo
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
-            return Result<ApplicationUser>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền xóa nhân viên này"));
+            return Result<ApplicationUser>.Failure(new Error("Staff.NotFound", "Không tìm thấy nhân viên cần xóa."));
         }
 
         if (user.TenantId != tenantId)
         {
-            return Result<ApplicationUser>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền xóa nhân viên này"));
+            return Result<ApplicationUser>.Failure(new Error("Staff.Forbidden", "Bạn không có quyền xóa nhân viên này."));
         }
 
         return Result<ApplicationUser>.Success(user);
     }
 
-    private async Task RemoveBranchMappingsAsync(Guid userId, CancellationToken cancellationToken)
+    private async Task<Result<bool>?> RemoveBranchMappingsAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var mappings = await _context.UserBranches
-            .Where(mapping => mapping.UserId == userId)
-            .ToListAsync(cancellationToken);
-
-        if (mappings.Count == 0)
+        try
         {
-            return;
-        }
+            var mappings = await _context.UserBranches
+                .Where(mapping => mapping.UserId == userId)
+                .ToListAsync(cancellationToken);
 
-        _context.UserBranches.RemoveRange(mappings);
-        await _context.SaveChangesAsync(cancellationToken);
+            if (mappings.Count == 0)
+            {
+                return null;
+            }
+
+            _context.UserBranches.RemoveRange(mappings);
+            var saveChanges = await _context.SaveChangesAsync(cancellationToken);
+
+            if (saveChanges <= 0)
+            {
+                return Result<bool>.Failure(new Error("Staff.DeleteFailed", "Không thể xóa mapping chi nhánh của nhân viên."));
+            }
+
+            return null;
+        }
+        catch
+        {
+            return Result<bool>.Failure(new Error("Staff.DeleteFailed", "Lỗi hệ thống khi xóa mapping chi nhánh của nhân viên."));
+        }
     }
 }

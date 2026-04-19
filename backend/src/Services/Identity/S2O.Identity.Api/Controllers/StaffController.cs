@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using S2O.Identity.App.Features.Register;
 using S2O.Identity.App.Features.Users.Commands;
 using S2O.Identity.App.Features.Users.Queries;
+using S2O.Shared.Kernel.Results;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -15,6 +16,13 @@ namespace S2O.Identity.Api.Controllers;
 [Authorize(Roles = "RestaurantOwner, SystemAdmin")]
 public class StaffController : ControllerBase
 {
+    private enum BranchValidationState
+    {
+        Valid,
+        Invalid,
+        ServiceUnavailable
+    }
+
     private readonly ISender _sender;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
@@ -44,13 +52,13 @@ public class StaffController : ControllerBase
     {
         if (!TryGetCurrentTenantId(out var tenantId))
         {
-            return BadRequest("Token không hợp lệ hoặc thiếu TenantId.");
+            return Unauthorized(new Error("Auth.InvalidTenantClaim", "Token không hợp lệ hoặc thiếu TenantId."));
         }
 
         var query = new GetOwnerStaffQuery(tenantId, branchId, keyword);
 
         var result = await _sender.Send(query);
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        return ToActionResult(result, value => Ok(value));
     }
 
     [HttpPost]
@@ -58,39 +66,56 @@ public class StaffController : ControllerBase
     {
         if (!TryGetCurrentTenantId(out var tenantId))
         {
-            return BadRequest("Token không hợp lệ hoặc thiếu TenantId.");
+            return Unauthorized(new Error("Auth.InvalidTenantClaim", "Token không hợp lệ hoặc thiếu TenantId."));
         }
 
-        if (!await IsBranchValidForCurrentRequestAsync(command.BranchId, HttpContext.RequestAborted))
+        var branchValidation = await ValidateBranchForCurrentRequestAsync(command.BranchId, HttpContext.RequestAborted);
+        if (branchValidation == BranchValidationState.ServiceUnavailable)
         {
-            return BadRequest("Chi nhánh không tồn tại hoặc không thuộc tenant hiện tại.");
+            return StatusCode(StatusCodes.Status502BadGateway,
+                new Error("Branch.ValidationUnavailable", "Không thể kiểm tra thông tin chi nhánh do dịch vụ tenant tạm thời không khả dụng."));
+        }
+
+        if (branchValidation == BranchValidationState.Invalid)
+        {
+            return BadRequest(new Error("Branch.NotFound", "Chi nhánh không tồn tại hoặc không thuộc tenant hiện tại."));
         }
 
         var safeCommand = command with { TenantId = tenantId };
 
         var result = await _sender.Send(safeCommand);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+        return ToActionResult(result, value => Ok(value));
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateStaffCommand command)
     {
-        if (id != command.UserId) return BadRequest("ID không khớp");
+        if (id != command.UserId)
+        {
+            return BadRequest(new Error("Staff.InvalidRequest", "ID không khớp"));
+        }
 
         if (!TryGetCurrentTenantId(out var tenantId))
         {
-            return BadRequest("Token không hợp lệ hoặc thiếu TenantId.");
+            return Unauthorized(new Error("Auth.InvalidTenantClaim", "Token không hợp lệ hoặc thiếu TenantId."));
         }
 
-        if (!await IsBranchValidForCurrentRequestAsync(command.BranchId, HttpContext.RequestAborted))
+        var branchValidation = await ValidateBranchForCurrentRequestAsync(command.BranchId, HttpContext.RequestAborted);
+        if (branchValidation == BranchValidationState.ServiceUnavailable)
         {
-            return BadRequest("Chi nhánh không tồn tại hoặc không thuộc tenant hiện tại.");
+            return StatusCode(StatusCodes.Status502BadGateway,
+                new Error("Branch.ValidationUnavailable", "Không thể kiểm tra thông tin chi nhánh do dịch vụ tenant tạm thời không khả dụng."));
+        }
+
+        if (branchValidation == BranchValidationState.Invalid)
+        {
+            return BadRequest(new Error("Branch.NotFound", "Chi nhánh không tồn tại hoặc không thuộc tenant hiện tại."));
         }
 
         var safeCommand = command with { TenantId = tenantId }; 
 
         var result = await _sender.Send(safeCommand);
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+        return ToActionResult(result, value => Ok(value));
     }
 
     [HttpDelete("{id}")]
@@ -98,38 +123,74 @@ public class StaffController : ControllerBase
     {
         if (!TryGetCurrentTenantId(out var tenantId))
         {
-            return BadRequest("Token không hợp lệ hoặc thiếu TenantId.");
+            return Unauthorized(new Error("Auth.InvalidTenantClaim", "Token không hợp lệ hoặc thiếu TenantId."));
         }
 
         var command = new DeleteStaffCommand(id, tenantId);
 
         var result = await _sender.Send(command);
-
-        return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+        return ToActionResult(result, value => Ok(value));
     }
 
-    private async Task<bool> IsBranchValidForCurrentRequestAsync(Guid branchId, CancellationToken cancellationToken)
+    private IActionResult ToActionResult<T>(Result<T> result, Func<T, IActionResult> onSuccess)
+    {
+        if (result.IsSuccess)
+        {
+            return onSuccess(result.Value);
+        }
+
+        return ErrorToActionResult(result.Error);
+    }
+
+    private IActionResult ErrorToActionResult(Error error)
+    {
+        var code = error.Code ?? string.Empty;
+
+        if (code.Contains("Forbidden", StringComparison.OrdinalIgnoreCase))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, error);
+        }
+
+        if (code.Contains("Unauthorized", StringComparison.OrdinalIgnoreCase))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, error);
+        }
+
+        if (code.Contains("NotFound", StringComparison.OrdinalIgnoreCase))
+        {
+            return NotFound(error);
+        }
+
+        if (code.StartsWith("Auth.", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized(error);
+        }
+
+        return BadRequest(error);
+    }
+
+    private async Task<BranchValidationState> ValidateBranchForCurrentRequestAsync(Guid branchId, CancellationToken cancellationToken)
     {
         var authHeader = Request.Headers.Authorization.ToString();
-        return await BranchExistsAsync(branchId, authHeader, cancellationToken);
+        return await ValidateBranchAsync(branchId, authHeader, cancellationToken);
     }
 
-    private async Task<bool> BranchExistsAsync(Guid branchId, string authorizationHeader, CancellationToken cancellationToken)
+    private async Task<BranchValidationState> ValidateBranchAsync(Guid branchId, string authorizationHeader, CancellationToken cancellationToken)
     {
         if (branchId == Guid.Empty || string.IsNullOrWhiteSpace(authorizationHeader))
         {
-            return false;
+            return BranchValidationState.Invalid;
         }
 
         var baseUrl = _configuration["ExternalServices:TenantApiBaseUrl"];
         if (string.IsNullOrWhiteSpace(baseUrl))
         {
-            return false;
+            return BranchValidationState.ServiceUnavailable;
         }
 
         if (!AuthenticationHeaderValue.TryParse(authorizationHeader, out var parsedAuthorization) || parsedAuthorization is null)
         {
-            return false;
+            return BranchValidationState.Invalid;
         }
 
         var client = _httpClientFactory.CreateClient();
@@ -139,7 +200,7 @@ public class StaffController : ControllerBase
         using var response = await client.GetAsync(url, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
-            return false;
+            return BranchValidationState.ServiceUnavailable;
         }
 
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
@@ -147,18 +208,18 @@ public class StaffController : ControllerBase
 
         if (!TryGetBranchArray(document.RootElement, out var branchArray))
         {
-            return false;
+            return BranchValidationState.ServiceUnavailable;
         }
 
         foreach (var item in branchArray.EnumerateArray())
         {
             if (TryReadGuid(item, "id", out var id) || TryReadGuid(item, "Id", out id))
             {
-                if (id == branchId) return true;
+                if (id == branchId) return BranchValidationState.Valid;
             }
         }
 
-        return false;
+        return BranchValidationState.Invalid;
     }
 
     private static bool TryReadGuid(JsonElement element, string propertyName, out Guid value)

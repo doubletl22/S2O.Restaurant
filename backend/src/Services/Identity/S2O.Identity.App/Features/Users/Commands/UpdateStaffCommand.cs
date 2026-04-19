@@ -232,12 +232,12 @@ public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<boo
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
-            return Result<ApplicationUser>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền sửa nhân viên này"));
+            return Result<ApplicationUser>.Failure(new Error("Staff.NotFound", "Không tìm thấy nhân viên cần cập nhật."));
         }
 
         if (user.TenantId != tenantId)
         {
-            return Result<ApplicationUser>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền sửa nhân viên này"));
+            return Result<ApplicationUser>.Failure(new Error("Staff.Forbidden", "Bạn không có quyền sửa nhân viên này."));
         }
 
         return Result<ApplicationUser>.Success(user);
