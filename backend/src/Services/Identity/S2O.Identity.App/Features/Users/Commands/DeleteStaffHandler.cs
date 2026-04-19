@@ -32,17 +32,13 @@ public class DeleteStaffHandler : IRequestHandler<DeleteStaffCommand, Result<boo
             return validationResult;
         }
 
-        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
-
-        if (user == null)
+        var scopedUserResult = await ResolveScopedUserAsync(request.UserId, request.TenantId);
+        if (scopedUserResult.IsFailure)
         {
-            return Result<bool>.Failure(new Error("Staff.NotFound", "Nhân viên không tồn tại"));
+            return Result<bool>.Failure(scopedUserResult.Error);
         }
 
-        if (user.TenantId != request.TenantId)
-        {
-            return Result<bool>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền xóa nhân viên này"));
-        }
+        var user = scopedUserResult.Value;
 
         var targetRoles = await _userManager.GetRolesAsync(user);
         if (HasProtectedRole(targetRoles))
@@ -94,6 +90,22 @@ public class DeleteStaffHandler : IRequestHandler<DeleteStaffCommand, Result<boo
         }
 
         return false;
+    }
+
+    private async Task<Result<ApplicationUser>> ResolveScopedUserAsync(Guid userId, Guid tenantId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+        {
+            return Result<ApplicationUser>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền xóa nhân viên này"));
+        }
+
+        if (user.TenantId != tenantId)
+        {
+            return Result<ApplicationUser>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền xóa nhân viên này"));
+        }
+
+        return Result<ApplicationUser>.Success(user);
     }
 
     private async Task RemoveBranchMappingsAsync(Guid userId, CancellationToken cancellationToken)

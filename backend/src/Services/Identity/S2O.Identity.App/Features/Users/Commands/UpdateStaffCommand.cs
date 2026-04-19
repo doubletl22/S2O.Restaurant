@@ -54,14 +54,13 @@ public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<boo
             return validationResult;
         }
 
-        var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+        var scopedUserResult = await ResolveScopedUserAsync(request.UserId, request.TenantId);
+        if (scopedUserResult.IsFailure)
+        {
+            return Result<bool>.Failure(scopedUserResult.Error);
+        }
 
-        if (user == null)
-            return Result<bool>.Failure(new Error("Staff.NotFound", "Không tìm thấy nhân viên"));
-
-        // [Security Check] Đảm bảo nhân viên này thuộc Tenant của Owner đang gọi
-        if (user.TenantId != request.TenantId)
-            return Result<bool>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền sửa nhân viên này"));
+        var user = scopedUserResult.Value;
 
         var branchValidationResult = await ValidateBranchAsync(request.BranchId, request.TenantId, cancellationToken);
         if (branchValidationResult is not null)
@@ -163,19 +162,18 @@ public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<boo
             return Result<bool>.Failure(new Error("Staff.UpdateFailed", "Không thể cập nhật claim chi nhánh."));
         }
 
-        var branchSyncResult = await SyncUserBranchAsync(user.Id, request.BranchId, request.TenantId, cancellationToken);
-        if (branchSyncResult is not null)
-        {
-            return branchSyncResult;
-        }
-
-
         // 4. Lưu User
         var updateResult = await _userManager.UpdateAsync(user);
         if (!updateResult.Succeeded)
         {
             var updateError = string.Join(", ", updateResult.Errors.Select(e => e.Description));
             return Result<bool>.Failure(new Error("Staff.UpdateFailed", string.IsNullOrWhiteSpace(updateError) ? "Không thể cập nhật nhân viên." : updateError));
+        }
+
+        var branchSyncResult = await SyncUserBranchAsync(user.Id, request.BranchId, normalizedRole, cancellationToken);
+        if (branchSyncResult is not null)
+        {
+            return branchSyncResult;
         }
 
         return Result<bool>.Success(true);
@@ -229,7 +227,23 @@ public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<boo
         return null;
     }
 
-    private async Task<Result<bool>?> SyncUserBranchAsync(Guid userId, Guid branchId, Guid tenantId, CancellationToken cancellationToken)
+    private async Task<Result<ApplicationUser>> ResolveScopedUserAsync(Guid userId, Guid tenantId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+        {
+            return Result<ApplicationUser>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền sửa nhân viên này"));
+        }
+
+        if (user.TenantId != tenantId)
+        {
+            return Result<ApplicationUser>.Failure(new Error("Staff.Unauthorized", "Bạn không có quyền sửa nhân viên này"));
+        }
+
+        return Result<ApplicationUser>.Success(user);
+    }
+
+    private async Task<Result<bool>?> SyncUserBranchAsync(Guid userId, Guid branchId, string normalizedRole, CancellationToken cancellationToken)
     {
         var staleMappings = await _context.UserBranches
             .Where(mapping => mapping.UserId == userId)
@@ -238,14 +252,13 @@ public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<boo
         if (staleMappings.Count > 0)
         {
             _context.UserBranches.RemoveRange(staleMappings);
-            await _context.SaveChangesAsync(cancellationToken);
         }
 
         var newMapping = new UserBranch
         {
             UserId = userId,
             BranchId = branchId,
-            IsManager = string.Equals(await ResolvePrimaryRoleAsync(userId, cancellationToken), "Manager", StringComparison.OrdinalIgnoreCase)
+            IsManager = string.Equals(normalizedRole, "Manager", StringComparison.OrdinalIgnoreCase)
         };
 
         await _context.UserBranches.AddAsync(newMapping, cancellationToken);
@@ -257,17 +270,5 @@ public class UpdateStaffHandler : IRequestHandler<UpdateStaffCommand, Result<boo
         }
 
         return null;
-    }
-
-    private async Task<string> ResolvePrimaryRoleAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null)
-        {
-            return "Staff";
-        }
-
-        var roles = await _userManager.GetRolesAsync(user);
-        return roles.FirstOrDefault() ?? "Staff";
     }
 }
