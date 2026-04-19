@@ -1,11 +1,9 @@
-﻿using System.Security.Claims; // [New]
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using S2O.Identity.App.Features.Register;
 using S2O.Identity.App.Features.Users.Commands;
 using S2O.Identity.App.Features.Users.Queries;
-using S2O.Shared.Kernel.Results; // Đảm bảo import Result class
 
 namespace S2O.Identity.Api.Controllers;
 
@@ -21,27 +19,40 @@ public class StaffController : ControllerBase
         _sender = sender;
     }
 
-    private Guid GetCurrentTenantId()
+    private bool TryGetCurrentTenantId(out Guid tenantId)
     {
+        tenantId = Guid.Empty;
+
         var tenantClaim = User.FindFirst("tenant_id")?.Value;
-        return tenantClaim != null ? Guid.Parse(tenantClaim) : Guid.Empty;
+        if (string.IsNullOrWhiteSpace(tenantClaim))
+        {
+            return false;
+        }
+
+        return Guid.TryParse(tenantClaim, out tenantId);
     }
 
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] string? keyword = null, [FromQuery] Guid? branchId = null)
     {
-        var tenantId = GetCurrentTenantId();
+        if (!TryGetCurrentTenantId(out var tenantId))
+        {
+            return BadRequest("Token không hợp lệ hoặc thiếu TenantId.");
+        }
 
         var query = new GetOwnerStaffQuery(tenantId, branchId, keyword);
 
         var result = await _sender.Send(query);
-        return Ok(result.Value);
+        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] RegisterStaffCommand command)
     {
-        var tenantId = GetCurrentTenantId();
+        if (!TryGetCurrentTenantId(out var tenantId))
+        {
+            return BadRequest("Token không hợp lệ hoặc thiếu TenantId.");
+        }
 
         var safeCommand = command with { TenantId = tenantId };
 
@@ -54,7 +65,11 @@ public class StaffController : ControllerBase
     {
         if (id != command.UserId) return BadRequest("ID không khớp");
 
-        var tenantId = GetCurrentTenantId();
+        if (!TryGetCurrentTenantId(out var tenantId))
+        {
+            return BadRequest("Token không hợp lệ hoặc thiếu TenantId.");
+        }
+
         var safeCommand = command with { TenantId = tenantId }; 
 
         var result = await _sender.Send(safeCommand);
@@ -64,7 +79,10 @@ public class StaffController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var tenantId = GetCurrentTenantId(); 
+        if (!TryGetCurrentTenantId(out var tenantId))
+        {
+            return BadRequest("Token không hợp lệ hoặc thiếu TenantId.");
+        }
 
         var command = new DeleteStaffCommand(id, tenantId);
 
