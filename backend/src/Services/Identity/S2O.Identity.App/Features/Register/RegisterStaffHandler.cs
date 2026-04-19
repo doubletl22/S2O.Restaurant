@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Net.Mail;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,15 @@ namespace S2O.Identity.App.Features.Register;
 
 public class RegisterStaffHandler : IRequestHandler<RegisterStaffCommand, Result<Guid>>
 {
+    private static readonly HashSet<string> AllowedStaffRoles = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Staff",
+        "RestaurantStaff",
+        "Manager",
+        "Chef",
+        "Waiter"
+    };
+
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
     private readonly IAuthDbContext _context;
@@ -30,6 +40,38 @@ public class RegisterStaffHandler : IRequestHandler<RegisterStaffCommand, Result
 
     public async Task<Result<Guid>> Handle(RegisterStaffCommand request, CancellationToken cancellationToken)
     {
+        var normalizedEmail = request.Email?.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedEmail))
+        {
+            return Result<Guid>.Failure(new Error("Staff.InvalidEmail", "Email không hợp lệ."));
+        }
+
+        try
+        {
+            _ = new MailAddress(normalizedEmail);
+        }
+        catch
+        {
+            return Result<Guid>.Failure(new Error("Staff.InvalidEmail", "Email không hợp lệ."));
+        }
+
+        var normalizedFullName = request.FullName?.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedFullName))
+        {
+            return Result<Guid>.Failure(new Error("Staff.InvalidFullName", "Họ tên không hợp lệ."));
+        }
+
+        var normalizedRole = request.Role?.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedRole) || !AllowedStaffRoles.Contains(normalizedRole))
+        {
+            return Result<Guid>.Failure(new Error("Role.Invalid", "Vai trò không hợp lệ cho nhân viên."));
+        }
+
+        if (request.BranchId == Guid.Empty)
+        {
+            return Result<Guid>.Failure(new Error("Branch.Invalid", "Chi nhánh không hợp lệ."));
+        }
+
         var subscriptionResult = await _subscriptionReader.GetTenantSubscriptionAsync(request.TenantId, cancellationToken);
         if (subscriptionResult.IsFailure)
         {
@@ -52,17 +94,17 @@ public class RegisterStaffHandler : IRequestHandler<RegisterStaffCommand, Result
             }
         }
 
-        if (!await _roleManager.RoleExistsAsync(request.Role))
+        if (!await _roleManager.RoleExistsAsync(normalizedRole))
         {
-            var newRole = new ApplicationRole { Name = request.Role };
+            var newRole = new ApplicationRole { Name = normalizedRole };
             await _roleManager.CreateAsync(newRole);
         }
 
         var user = new ApplicationUser
         {
-            UserName = request.Email,
-            Email = request.Email,
-            FullName = request.FullName,
+            UserName = normalizedEmail,
+            Email = normalizedEmail,
+            FullName = normalizedFullName,
             BranchId = request.BranchId,
             TenantId = request.TenantId,
             PhoneNumber = request.PhoneNumber,
@@ -78,14 +120,14 @@ public class RegisterStaffHandler : IRequestHandler<RegisterStaffCommand, Result
             return Result<Guid>.Failure(new Error("Identity.RegisterFailed", errors));
         }
 
-        await _userManager.AddToRoleAsync(user, request.Role);
+        await _userManager.AddToRoleAsync(user, normalizedRole);
 
         var claims = new List<Claim>
         {
             new Claim("tenant_id", request.TenantId.ToString()),
             new Claim("branch_id", request.BranchId.ToString()),
-            new Claim("full_name", request.FullName),
-            new Claim("role", request.Role)
+            new Claim("full_name", normalizedFullName),
+            new Claim("role", normalizedRole)
         };
         await _userManager.AddClaimsAsync(user, claims);
 
