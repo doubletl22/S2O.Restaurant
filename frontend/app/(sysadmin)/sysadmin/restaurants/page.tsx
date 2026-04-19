@@ -26,6 +26,8 @@ import { TenantDialog } from "@/components/sysadmin/tenant-dialog";
 import { tenantService } from "@/services/tenant.service";
 import { Tenant } from "@/lib/types";
 
+const NEW_TENANT_SESSION_KEY = "sysadmin:newly-created-tenant-name";
+
 // Helper: Normalize Vietnamese diacritics (ITC_4.2)
 // VD: "Phở" → "pho", "Café" → "cafe"
 function normalizeVietnamese(str: string): string {
@@ -51,6 +53,13 @@ export default function RestaurantsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const pageSize = 10;
+
+  const handleTenantCreated = (createdRestaurantName: string) => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(NEW_TENANT_SESSION_KEY, createdRestaurantName);
+      window.location.reload();
+    }
+  };
 
   const loadData = async (keyword?: string) => {
     try {
@@ -89,6 +98,17 @@ export default function RestaurantsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const pendingTenantName = sessionStorage.getItem(NEW_TENANT_SESSION_KEY);
+    if (!pendingTenantName) return;
+
+    sessionStorage.removeItem(NEW_TENANT_SESSION_KEY);
+    setCurrentPage(1);
+    setSearchTerm(pendingTenantName);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -415,7 +435,7 @@ export default function RestaurantsPage() {
       </div>
       
       {/* Dialogs logic... */}
-      <TenantDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onSuccess={loadData} />
+      <TenantDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onSuccess={handleTenantCreated} />
       <AlertDialog open={!!tenantToDelete} onOpenChange={(open) => !open && setTenantToDelete(null)}>
         <AlertDialogContent>
              <AlertDialogHeader>
@@ -456,6 +476,7 @@ export default function RestaurantsPage() {
                 id="lock-permanent"
                 checked={isLockPermanent}
                 onChange={(e) => setIsLockPermanent(e.target.checked)}
+                title="Khóa mãi mãi cho đến khi Admin mở"
               />
               <Label htmlFor="lock-permanent" className="text-sm font-normal cursor-pointer">✓ Khóa mãi mãi cho đến khi Admin mở</Label>
             </div>

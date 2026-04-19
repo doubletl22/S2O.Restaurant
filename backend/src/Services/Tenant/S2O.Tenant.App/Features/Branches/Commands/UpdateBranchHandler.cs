@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Results; 
 using S2O.Tenant.App.Abstractions;
 
@@ -7,15 +9,25 @@ namespace S2O.Tenant.App.Features.Branches.Commands;
 public class UpdateBranchHandler : IRequestHandler<UpdateBranchCommand, Result<Guid>>
 {
     private readonly ITenantDbContext _context;
+    private readonly ITenantContext _tenantContext;
 
-    public UpdateBranchHandler(ITenantDbContext context)
+    public UpdateBranchHandler(ITenantDbContext context, ITenantContext tenantContext)
     {
         _context = context;
+        _tenantContext = tenantContext;
     }
 
     public async Task<Result<Guid>> Handle(UpdateBranchCommand request, CancellationToken cancellationToken)
     {
-        var branch = await _context.Branches.FindAsync(new object[] { request.Id }, cancellationToken);
+        if (_tenantContext.TenantId == null || _tenantContext.TenantId == Guid.Empty)
+        {
+            return Result<Guid>.Failure(new Error("Auth.NoTenant", "Khong xac dinh duoc tenant tu token."));
+        }
+
+        var tenantId = _tenantContext.TenantId.Value;
+
+        var branch = await _context.Branches
+            .FirstOrDefaultAsync(b => b.Id == request.Id && b.TenantId == tenantId, cancellationToken);
 
         if (branch == null)
         {

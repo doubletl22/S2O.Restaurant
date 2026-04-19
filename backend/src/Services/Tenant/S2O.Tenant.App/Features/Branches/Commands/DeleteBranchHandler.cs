@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore; // Cần cái này để dùng .Where
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Results;
 using S2O.Tenant.App.Abstractions;
 
@@ -8,16 +9,26 @@ namespace S2O.Tenant.App.Features.Branches.Commands;
 public class DeleteBranchHandler : IRequestHandler<DeleteBranchCommand, Result<Guid>>
 {
     private readonly ITenantDbContext _context; // Đổi thành ITenantDbContext
+    private readonly ITenantContext _tenantContext;
 
-    public DeleteBranchHandler(ITenantDbContext context)
+    public DeleteBranchHandler(ITenantDbContext context, ITenantContext tenantContext)
     {
         _context = context;
+        _tenantContext = tenantContext;
     }
 
     public async Task<Result<Guid>> Handle(DeleteBranchCommand request, CancellationToken cancellationToken)
     {
+        if (_tenantContext.TenantId == null || _tenantContext.TenantId == Guid.Empty)
+        {
+            return Result<Guid>.Failure(new Error("Auth.NoTenant", "Khong xac dinh duoc tenant tu token."));
+        }
+
+        var tenantId = _tenantContext.TenantId.Value;
+
         // 1. Tìm chi nhánh cần xóa
-        var branch = await _context.Branches.FindAsync(new object[] { request.Id }, cancellationToken);
+        var branch = await _context.Branches
+            .FirstOrDefaultAsync(b => b.Id == request.Id && b.TenantId == tenantId, cancellationToken);
 
         if (branch == null)
         {
@@ -26,7 +37,7 @@ public class DeleteBranchHandler : IRequestHandler<DeleteBranchCommand, Result<G
 
         // [QUAN TRỌNG] 2. Xóa tất cả Bàn (Tables) thuộc chi nhánh này trước
         // Nếu không xóa Tables, Database sẽ báo lỗi Foreign Key Constraint (Lỗi 500)
-        var tables = _context.Tables.Where(t => t.BranchId == request.Id);
+        var tables = _context.Tables.Where(t => t.BranchId == request.Id && t.TenantId == tenantId);
         _context.Tables.RemoveRange(tables);
 
         // [MỞ RỘNG] Nếu Chi nhánh có Nhân viên (Employees), bạn cũng cần xóa hoặc vô hiệu hóa họ ở đây

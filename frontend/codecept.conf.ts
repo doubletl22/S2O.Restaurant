@@ -17,7 +17,7 @@ export const config: CodeceptJS.MainConfig = {
   },
   include: {
     I: "./steps_file",
-    loginPage: "./pages/LoginPage.ts",
+    loginPage: "./test/identity/page/LoginPage.ts",
   },
   name: "S2O-Restaurant-E2E",
 };

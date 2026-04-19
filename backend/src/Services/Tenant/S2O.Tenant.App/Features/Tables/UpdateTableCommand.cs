@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using S2O.Shared.Kernel.Interfaces;
 using S2O.Shared.Kernel.Results;
 using S2O.Tenant.App.Abstractions;
 
@@ -9,16 +11,25 @@ public record UpdateTableCommand(Guid Id, string Name, int Capacity, bool IsActi
 public class UpdateTableHandler : IRequestHandler<UpdateTableCommand, Result<Guid>>
 {
     private readonly ITenantDbContext _context;
+    private readonly ITenantContext _tenantContext;
 
-    public UpdateTableHandler(ITenantDbContext context)
+    public UpdateTableHandler(ITenantDbContext context, ITenantContext tenantContext)
     {
         _context = context;
+        _tenantContext = tenantContext;
     }
 
     public async Task<Result<Guid>> Handle(UpdateTableCommand request, CancellationToken ct)
     {
-        var table = await _context.Tables.FindAsync(new object[] { request.Id }, ct);
-        if (table == null) return Result<Guid>.Failure(new Error("Table.NotFound", "Bàn không tồn tại"));
+        if (_tenantContext.TenantId == null || _tenantContext.TenantId == Guid.Empty)
+            return Result<Guid>.Failure(new Error("Auth.NoTenant", "Khong xac dinh duoc tenant tu token."));
+
+        var tenantId = _tenantContext.TenantId.Value;
+
+        var table = await _context.Tables
+            .FirstOrDefaultAsync(t => t.Id == request.Id && t.TenantId == tenantId, ct);
+
+        if (table == null) return Result<Guid>.Failure(new Error("Table.NotFound", "Bàn không tồn tại hoặc bạn không có quyền sửa"));
 
         // Validate Name
         if (string.IsNullOrWhiteSpace(request.Name))

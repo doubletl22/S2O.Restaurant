@@ -82,6 +82,11 @@ public class CreateTableHandler : IRequestHandler<CreateTableCommand, Result<Gui
             }
         }
 
+        var branchBelongsToTenant = await _context.Branches
+            .AnyAsync(b => b.Id == request.BranchId && b.TenantId == tenantId, ct);
+        if (!branchBelongsToTenant)
+            return Result<Guid>.Failure(new Error("Branch.NotFound", "Chi nhánh không tồn tại hoặc không thuộc nhà hàng của bạn."));
+
         var tableId = Guid.NewGuid();
 
         var table = new Table

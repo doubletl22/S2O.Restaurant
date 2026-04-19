@@ -38,7 +38,7 @@ import { tenantService } from "@/services/tenant.service"; // Đổi sang tenant
 interface TenantDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onSuccess: (createdRestaurantName: string) => void;
 }
 
 export function TenantDialog({ open, onOpenChange, onSuccess }: TenantDialogProps) {
@@ -77,7 +77,7 @@ export function TenantDialog({ open, onOpenChange, onSuccess }: TenantDialogProp
         toast.success("Khởi tạo nhà hàng thành công!", {
           description: `Chủ sở hữu: ${data.ownerName} (${data.email})`,
         });
-        onSuccess();
+        onSuccess(data.restaurantName);
         onOpenChange(false);
       } else {
         // Fallback error (thường interceptor đã xử lý)
