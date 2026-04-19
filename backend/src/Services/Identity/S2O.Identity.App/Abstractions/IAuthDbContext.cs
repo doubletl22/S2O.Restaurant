@@ -7,6 +7,7 @@ namespace S2O.Identity.App.Abstractions;
 public interface IAuthDbContext
 {
     DbSet<ApplicationRole> Roles { get; }
+    DbSet<Branch> Branches { get; }
     DbSet<IdentityUserRole<Guid>> UserRoles { get; }
     DbSet<UserBranch> UserBranches { get; }
     DbSet<ApplicationUser> Users { get; }

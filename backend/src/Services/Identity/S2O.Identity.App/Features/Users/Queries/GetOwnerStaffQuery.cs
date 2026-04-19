@@ -21,6 +21,12 @@ public record GetOwnerStaffQuery(Guid TenantId, Guid? BranchId, string? Keyword)
 
 public class GetOwnerStaffHandler : IRequestHandler<GetOwnerStaffQuery, Result<List<StaffDto>>>
 {
+    private static readonly HashSet<string> ProtectedRoles = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "RestaurantOwner",
+        "SystemAdmin"
+    };
+
     private readonly UserManager<ApplicationUser> _userManager;
 
     public GetOwnerStaffHandler(UserManager<ApplicationUser> userManager)
@@ -30,18 +36,30 @@ public class GetOwnerStaffHandler : IRequestHandler<GetOwnerStaffQuery, Result<L
 
     public async Task<Result<List<StaffDto>>> Handle(GetOwnerStaffQuery request, CancellationToken cancellationToken)
     {
-        var query = _userManager.Users.Where(u => u.TenantId == request.TenantId);
+        var validationError = ValidateRequest(request);
+        if (validationError is not null)
+        {
+            return validationError;
+        }
+
+        var normalizedKeyword = NormalizeKeyword(request.Keyword);
+
+        var query = _userManager.Users
+            .AsNoTracking()
+            .Where(u => u.TenantId == request.TenantId);
 
         if (request.BranchId.HasValue)
         {
             query = query.Where(u => u.BranchId == request.BranchId);
         }
 
-        if (!string.IsNullOrEmpty(request.Keyword))
+        if (!string.IsNullOrWhiteSpace(normalizedKeyword))
         {
+            var keyword = normalizedKeyword!;
             query = query.Where(u =>
-                u.FullName.Contains(request.Keyword) ||
-                (u.PhoneNumber != null && u.PhoneNumber.Contains(request.Keyword))
+                (u.FullName != null && u.FullName.Contains(keyword)) ||
+                (u.PhoneNumber != null && u.PhoneNumber.Contains(keyword)) ||
+                (u.Email != null && u.Email.Contains(keyword))
             );
         }
 
@@ -54,25 +72,54 @@ public class GetOwnerStaffHandler : IRequestHandler<GetOwnerStaffQuery, Result<L
             var primaryRole = roles.FirstOrDefault() ?? "Staff";
 
             // Bỏ qua RestaurantOwner và SystemAdmin - chỉ hiển thị staff
-            if (primaryRole == "RestaurantOwner" || primaryRole == "SystemAdmin")
+            if (IsProtectedRole(primaryRole))
             {
                 continue;
             }
 
-            Guid userId = Guid.Parse(user.Id.ToString());
-
-            staffList.Add(new StaffDto
-            {
-                Id = userId,
-                Email = user.Email ?? "",
-                FullName = user.FullName,
-                PhoneNumber = user.PhoneNumber ?? "",
-                Role = primaryRole,
-                BranchId = user.BranchId,
-                IsActive = user.IsActive
-            });
+            staffList.Add(MapToStaffDto(user, primaryRole));
         }
 
         return Result<List<StaffDto>>.Success(staffList);
+    }
+
+    private static Result<List<StaffDto>>? ValidateRequest(GetOwnerStaffQuery request)
+    {
+        if (request.TenantId == Guid.Empty)
+        {
+            return Result<List<StaffDto>>.Failure(new Error("Staff.InvalidTenant", "TenantId không hợp lệ."));
+        }
+
+        return null;
+    }
+
+    private static string? NormalizeKeyword(string? keyword)
+    {
+        if (string.IsNullOrWhiteSpace(keyword))
+        {
+            return null;
+        }
+
+        var trimmed = keyword.Trim();
+        return trimmed.Length == 0 ? null : trimmed;
+    }
+
+    private static bool IsProtectedRole(string? role)
+    {
+        return !string.IsNullOrWhiteSpace(role) && ProtectedRoles.Contains(role);
+    }
+
+    private static StaffDto MapToStaffDto(ApplicationUser user, string role)
+    {
+        return new StaffDto
+        {
+            Id = user.Id,
+            Email = user.Email ?? string.Empty,
+            FullName = user.FullName ?? string.Empty,
+            PhoneNumber = user.PhoneNumber ?? string.Empty,
+            Role = role,
+            BranchId = user.BranchId,
+            IsActive = user.IsActive
+        };
     }
 }
