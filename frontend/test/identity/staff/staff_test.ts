@@ -80,6 +80,33 @@ function selectFirstStaffBranch(I: CodeceptJS.I, label: string) {
   });
 }
 
+function selectStaffFilterOption(I: CodeceptJS.I, optionIndex: number, label: string, waitAfterMs: number) {
+  I.usePlaywrightTo(label, async ({ page }) => {
+    const filterSelect = page.getByRole("combobox").first();
+    const targetOption = page.getByRole("option").nth(optionIndex);
+
+    await filterSelect.waitFor({ state: "visible", timeout: 10000 });
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await filterSelect.click({ force: true });
+
+      try {
+        // Dropdown filter dung portal, nen can cho option hien ra ro rang truoc khi click.
+        await targetOption.waitFor({ state: "visible", timeout: 3000 });
+        await targetOption.click();
+        await page.waitForLoadState("networkidle").catch(() => undefined);
+        await page.waitForTimeout(waitAfterMs);
+        return;
+      } catch {
+        await page.keyboard.press("Escape").catch(() => undefined);
+        await page.waitForTimeout(300);
+      }
+    }
+
+    throw new Error(`Unable to select filter option at index ${optionIndex}`);
+  });
+}
+
 function createStaff(I: CodeceptJS.I, staffDraft: StaffDraft) {
   // Mo dialog them nhan vien moi.
   openCreateStaffDialog(I);
@@ -166,27 +193,14 @@ Scenario("[STAFF-05] Lọc nhân viên theo chi nhánh", async ({ I }) => {
   await ensureMainStaffReady(draft.updatedName);
   goToStaff(I);
 
-  I.usePlaywrightTo("chon chi nhanh dau tien de loc", async ({ page }) => {
-    // Combobox dau tien la bo loc chi nhanh tren trang danh sach.
-    const filterSelect = page.getByRole("combobox").first();
-    await filterSelect.click();
-    // Option thu 2 tuong ung mot chi nhanh cu the; option dau la "tat ca".
-    await page.getByRole("option").nth(1).click();
-    await page.waitForLoadState("networkidle").catch(() => undefined);
-    await page.waitForTimeout(1000);
-  });
+  // Combobox dau tien la bo loc chi nhanh tren trang danh sach.
+  selectStaffFilterOption(I, 1, "chon chi nhanh dau tien de loc", 1000);
 
   // Staff vua tao phai van duoc hien trong nhom chi nhanh da chon.
   I.waitForCard(draft.updatedName);
 
-  I.usePlaywrightTo("reset loc ve tat ca chi nhanh", async ({ page }) => {
-    // Dua bo loc ve trang thai mac dinh de khong anh huong case sau.
-    const filterSelect = page.getByRole("combobox").first();
-    await filterSelect.click();
-    await page.getByRole("option").first().click();
-    await page.waitForLoadState("networkidle").catch(() => undefined);
-    await page.waitForTimeout(500);
-  });
+  // Dua bo loc ve trang thai mac dinh de khong anh huong case sau.
+  selectStaffFilterOption(I, 0, "reset loc ve tat ca chi nhanh", 500);
 
   I.waitForCard(draft.updatedName);
 });
