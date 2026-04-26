@@ -1,15 +1,16 @@
 {
-  "generatedAt": "2026-04-18T18:22:51.933Z",
+  "generatedAt": "2026-04-25T02:27:57.423Z",
   "apiBaseUrl": "http://localhost:5000",
   "scopesRequested": [
-    "environment"
+    "owner"
   ],
   "scopesResolved": [
-    "environment"
+    "environment",
+    "owner"
   ],
   "steps": {
     "environment": {
-      "requested": true,
+      "requested": false,
       "status": "ready",
       "details": {
         "adminEmail": "admin@s2o.com",
@@ -17,9 +18,13 @@
       }
     },
     "owner": {
-      "requested": false,
-      "status": "skipped",
-      "details": {}
+      "requested": true,
+      "status": "ready",
+      "details": {
+        "ownerEmail": "binhvo@s2o.com",
+        "ownerTenantId": "625b33fa-e68e-41c1-9ae1-24d0b35c7b96",
+        "ownerCanLogin": true
+      }
     },
     "branch": {
       "requested": false,
