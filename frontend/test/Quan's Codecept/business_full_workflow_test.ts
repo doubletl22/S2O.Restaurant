@@ -161,7 +161,12 @@ async function openComboboxOption(I: CodeceptJS.I, comboboxIndex: number, option
   await I.usePlaywrightTo(`choose combobox option ${optionLabel}`, async ({ page }) => {
     const comboboxes = page.getByRole("combobox");
     await comboboxes.nth(comboboxIndex).click();
-    const option = page.getByRole("option", { name: optionLabel });
+
+    const listbox = page.getByRole("listbox").last();
+    await listbox.waitFor({ state: "visible", timeout: 10000 }).catch(() => undefined);
+
+    const option = page.getByRole("option", { name: optionLabel, exact: true });
+    await option.waitFor({ state: "visible", timeout: 15000 });
     await option.click();
   });
 }
@@ -546,7 +551,12 @@ async function verifyTablesAndHistory(I: CodeceptJS.I) {
   await takeShot(I, openedInvoiceDetail ? "14a-history-invoice-detail" : "14a-history-empty-state");
 
   await I.usePlaywrightTo("slow down history with filters and chart mode", async ({ page }) => {
-    await page.keyboard.press("Escape");
+    const historyDialog = page.getByRole("dialog").last();
+
+    if (await historyDialog.isVisible().catch(() => false)) {
+      await page.keyboard.press("Escape");
+      await historyDialog.waitFor({ state: "hidden", timeout: 5000 }).catch(() => undefined);
+    }
 
     const now = new Date();
     const from = new Date(now);
@@ -554,7 +564,9 @@ async function verifyTablesAndHistory(I: CodeceptJS.I) {
     const nowYmd = formatDateYmd(now);
     const fromYmd = formatDateYmd(from);
 
-    await page.locator("#history-date").fill(nowYmd);
+    const historyDateInput = page.locator("#history-date");
+    await historyDateInput.waitFor({ state: "visible", timeout: 10000 });
+    await historyDateInput.fill(nowYmd);
     await page.locator("select[aria-label='Kiểu biểu đồ doanh thu']").selectOption("month");
 
     const fromDateInput = page.locator("input[aria-label='Từ ngày']");
