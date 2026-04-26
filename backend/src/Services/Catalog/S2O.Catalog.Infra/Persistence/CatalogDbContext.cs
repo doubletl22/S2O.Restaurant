@@ -40,7 +40,6 @@ public class CatalogDbContext : BaseDbContext, ICatalogDbContext
             .IsUnique();
 
         builder.Entity<Product>()
-            .HasIndex(p => new { p.TenantId, p.Name })
-            .IsUnique();
+            .HasIndex(p => new { p.TenantId, p.Name });
     }
 }

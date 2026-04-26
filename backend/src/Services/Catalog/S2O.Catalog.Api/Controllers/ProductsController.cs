@@ -42,7 +42,7 @@ public class ProductsController : ControllerBase
     // ===============================
     // GET: api/v1/products/{id}
     [HttpGet("{id}")]
-    [Authorize(Roles = "RestaurantOwner, Staff, Manager")]
+    [Authorize(Roles = "RestaurantOwner, Staff, RestaurantStaff, Manager")]
     public async Task<IActionResult> GetProductById(Guid id)
     {
         var result = await _sender.Send(new GetProductByIdQuery(id));
@@ -61,6 +61,9 @@ public class ProductsController : ControllerBase
     {
         var result = await _sender.Send(command);
 
+        if (!result.IsSuccess && result.Error?.Code == "Category.NotFound")
+            return NotFound(result.Error);
+
         return result.IsSuccess 
             ? Ok(result.Value) 
             : BadRequest(result.Error);
@@ -70,7 +73,7 @@ public class ProductsController : ControllerBase
     // 4. Cập nhật món (Owner + Staff)
     // ===============================
     [HttpPut("{id}")]
-    [Authorize(Roles = "RestaurantOwner, Staff")]
+    [Authorize(Roles = "RestaurantOwner, Staff, RestaurantStaff")]
     public async Task<IActionResult> UpdateProduct(Guid id, [FromForm] UpdateProductCommand command)
     {
         if (id != command.Id)

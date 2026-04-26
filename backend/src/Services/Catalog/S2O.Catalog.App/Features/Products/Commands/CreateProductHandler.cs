@@ -64,14 +64,13 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
             return Result<Guid>.Failure(new Error("Product.NameRequired", "Tên món không được để trống."));
         }
 
-        var normalizedNameLower = normalizedName.ToLower();
-        var duplicateExists = await _context.Products.AnyAsync(
-            p => p.TenantId == currentTenantId.Value && p.Name.ToLower() == normalizedNameLower,
+        var categoryExists = await _context.Categories.AnyAsync(
+            c => c.Id == request.CategoryId && c.TenantId == currentTenantId.Value,
             cancellationToken);
 
-        if (duplicateExists)
+        if (!categoryExists)
         {
-            return Result<Guid>.Failure(new Error("Product.DuplicateName", "Tên món đã tồn tại."));
+            return Result<Guid>.Failure(new Error("Category.NotFound", "Không tìm thấy danh mục hợp lệ."));
         }
 
         // ✅ Upload Image

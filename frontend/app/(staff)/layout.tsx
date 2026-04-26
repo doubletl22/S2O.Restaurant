@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { History, LogOut, Utensils, BellRing, Table2, ChefHat, HandPlatter } from "lucide-react";
+import { History, LogOut, Utensils, BellRing, Table2, ChefHat, HandPlatter, Soup } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { authService } from "@/services/auth.service";
 import { getRoles } from "@/lib/jwt";
@@ -30,6 +30,7 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
       return [
         { title: "Tiếp nhận (Manager)", href: "/staff/order-ticket", icon: BellRing },
         { title: "Các bàn", href: "/staff/tables", icon: Table2 },
+        { title: "Món ăn", href: "/staff/products", icon: Soup },
         { title: "Lịch sử", href: "/staff/history", icon: History },
       ];
     }
@@ -38,8 +39,11 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
       return [{ title: "Khu vực bếp", href: "/staff/kitchen", icon: ChefHat }];
     }
 
-    if (hasRole("Waiter") || hasRole("RestaurantStaff")) {
-      return [{ title: "Khu vực phục vụ", href: "/staff/service", icon: HandPlatter }];
+    if (hasRole("Waiter") || hasRole("RestaurantStaff") || hasRole("Staff")) {
+      return [
+        { title: "Khu vực phục vụ", href: "/staff/service", icon: HandPlatter },
+        { title: "Món ăn", href: "/staff/products", icon: Soup },
+      ];
     }
 
     return [];

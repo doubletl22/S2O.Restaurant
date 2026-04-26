@@ -48,7 +48,7 @@ export function proxy(request: NextRequest) {
       }
 
       // 3. Bảo vệ trang Staff
-      if (pathname.startsWith('/staff') && !hasRole('RestaurantStaff') && !hasRole('Chef') && !hasRole('Manager') && !hasRole('Waiter')) {
+       if (pathname.startsWith('/staff') && !hasRole('RestaurantStaff') && !hasRole('Staff') && !hasRole('Chef') && !hasRole('Manager') && !hasRole('Waiter')) {
            return NextResponse.redirect(new URL('/', request.url));
       }
 
@@ -62,7 +62,7 @@ export function proxy(request: NextRequest) {
         if (hasRole('Chef')) {
           return NextResponse.redirect(new URL('/staff/kitchen', request.url));
         }
-        if (hasRole('Waiter') || hasRole('RestaurantStaff')) {
+        if (hasRole('Waiter') || hasRole('RestaurantStaff') || hasRole('Staff')) {
           return NextResponse.redirect(new URL('/staff/service', request.url));
         }
         return NextResponse.redirect(new URL('/', request.url));

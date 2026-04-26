@@ -10,17 +10,48 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result
 {
     private readonly ICatalogDbContext _context;
     private readonly IFileStorageService _fileService; // [2] Inject Service
+    private readonly ICurrentUserService _currentUserService;
 
-    public UpdateProductHandler(ICatalogDbContext context, IFileStorageService fileService)
+    public UpdateProductHandler(
+        ICatalogDbContext context,
+        IFileStorageService fileService,
+        ICurrentUserService currentUserService)
     {
         _context = context;
         _fileService = fileService;
+        _currentUserService = currentUserService;
     }
 
     public async Task<Result<Guid>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        // 1. Tìm món ăn
-        var product = await _context.Products.FindAsync(new object[] { request.Id }, cancellationToken);
+        var currentTenantId = _currentUserService.TenantId;
+        if (!currentTenantId.HasValue || currentTenantId == Guid.Empty)
+        {
+            return Result<Guid>.Failure(new Error("Auth.NoTenant", "Không xác định được tenant của người dùng."));
+        }
+
+        // 1. Tìm món ăn theo mọi tenant để xử lý chéo tenant an toàn.
+        var productAnyTenant = await _context.Products
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+
+        if (productAnyTenant == null)
+        {
+            return Result<Guid>.Failure(new Error("Product.NotFound", "Không tìm thấy món ăn"));
+        }
+
+        // Không lộ dữ liệu tenant khác: trả NotFound thay vì lỗi hệ thống.
+        if (productAnyTenant.TenantId != currentTenantId.Value)
+        {
+            return Result<Guid>.Failure(new Error("Product.NotFound", "Không tìm thấy món ăn"));
+        }
+
+        var product = await _context.Products
+            .FirstOrDefaultAsync(
+                p => p.Id == request.Id && p.TenantId == currentTenantId.Value,
+                cancellationToken);
+
         if (product == null)
         {
             return Result<Guid>.Failure(new Error("Product.NotFound", "Không tìm thấy món ăn"));
@@ -32,16 +63,13 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result
             return Result<Guid>.Failure(new Error("Product.NameRequired", "Tên món không được để trống."));
         }
 
-        var normalizedNameLower = normalizedName.ToLower();
-        var duplicateExists = await _context.Products.AnyAsync(
-            p => p.TenantId == product.TenantId
-                 && p.Id != request.Id
-                 && p.Name.ToLower() == normalizedNameLower,
+        var categoryExists = await _context.Categories.AnyAsync(
+            c => c.Id == request.CategoryId && c.TenantId == currentTenantId.Value,
             cancellationToken);
 
-        if (duplicateExists)
+        if (!categoryExists)
         {
-            return Result<Guid>.Failure(new Error("Product.DuplicateName", "Tên món đã tồn tại."));
+            return Result<Guid>.Failure(new Error("Category.NotFound", "Không tìm thấy danh mục hợp lệ."));
         }
 
         // 2. Cập nhật thông tin text
@@ -86,7 +114,14 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result
 
         // 4. Lưu Database
         _context.Products.Update(product);
-        await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            return Result<Guid>.Failure(new Error("Product.UpdateFailed", "Không thể cập nhật món ăn."));
+        }
 
         return Result<Guid>.Success(product.Id);
     }

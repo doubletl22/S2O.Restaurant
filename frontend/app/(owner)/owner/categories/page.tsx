@@ -89,10 +89,14 @@ export default function CategoriesPage() {
   const confirmDelete = async () => {
     if (!categoryToDelete) return;
     try {
-      const res = await categoryService.delete(categoryToDelete);
-      if (res.isSuccess) {
+      const res: any = await categoryService.delete(categoryToDelete);
+
+      // DELETE currently returns 204 NoContent (undefined body), treat that as success.
+      const isDeleteSuccess = res === undefined || res?.isSuccess !== false;
+
+      if (isDeleteSuccess) {
         toast.success("Đã xóa danh mục");
-        loadData();
+        await loadData();
       } else {
         toast.error("Không thể xóa", { description: res.error?.message });
       }

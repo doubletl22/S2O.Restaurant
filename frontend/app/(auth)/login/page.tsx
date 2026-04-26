@@ -97,7 +97,7 @@ export default function LoginPage() {
         else if (hasRole("Chef")) {
           router.push("/staff/kitchen");
         }
-        else if (hasRole("Waiter") || hasRole("RestaurantStaff")) {
+        else if (hasRole("Waiter") || hasRole("RestaurantStaff") || hasRole("Staff")) {
           router.push("/staff/service");
         }
         else {
