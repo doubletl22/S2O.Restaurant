@@ -6,15 +6,15 @@ export const testData = {
   },
   owner: {
     // Tai khoan Owner dung cho cac test quan ly nha hang, staff va chi nhanh.
-    email: "quantran@s525o.com",
-    password: "Quan11209",
+    email: "binhvo@s2o.com",
+    password: "Binh2518",
   },
   newTenant: {
     // Mau du lieu tao nha hang moi trong cac test dang ky tenant.
     restaurantName: "Nha Hang S2O",
     ownerName: "Nguyen Van Chu",
-    email: "quantran@s525o.com",
-    password: "Quan11209",
+    email: "binhvo@s2o.com",
+    password: "Binh2518",
     address: "123 Nguyen Hue, Q1, TP.HCM",
     phoneNumber: "0909123456",
   },
