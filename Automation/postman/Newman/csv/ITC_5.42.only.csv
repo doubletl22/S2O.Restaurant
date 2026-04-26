@@ -1,2 +1,0 @@
-﻿"tc_id","description","raw_mode","content_type","restaurantName","ownerName","email","password","address","phoneNumber","planType","expected_status","expect_guid","expected_error_contains","run_login_check","expected_login_ok","expected_login_fail"
-"ITC_5.42","Duplicate restaurant name","NORMAL","application/json","<SEED_RESTAURANT_ITC_5_27>","<AUTO_OWNER>","<AUTO_EMAIL>","<VALID_PASSWORD>","123 Test Street, Ho Chi Minh City","0901234567","Free","200|400","TRUE","restaurant","FALSE","200","400|401"

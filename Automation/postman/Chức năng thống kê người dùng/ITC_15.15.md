@@ -277,9 +277,16 @@ pm.request.method = 'GET';
 pm.request.url = baseUrl + statsEndpoint + (params.length ? '?' + params.join('&') : '');
 
 if (String(authTokenRaw || '') === '<MISSING>') {
+  // Force no auth to avoid inherited bearer token from request-level auth settings.
+  pm.request.auth = { type: 'noauth' };
   pm.request.headers.remove('Authorization');
+  pm.variables.unset('auth_token_dynamic');
 } else {
   const tokenToUse = authToken || pm.environment.get('sysadmin_token') || '';
+  pm.request.auth = {
+    type: 'bearer',
+    bearer: [{ key: 'token', value: tokenToUse, type: 'string' }]
+  };
   pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${tokenToUse}` });
   pm.variables.set('auth_token_dynamic', tokenToUse);
 }

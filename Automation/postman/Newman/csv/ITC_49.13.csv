@@ -1,13 +1,13 @@
 tc_id,description,action,from_date,to_date,plan_type,status,auth_token,expected_status,expected_error_code,expected_fields,expected_total_delta,expected_active_delta,expected_locked_delta,max_response_time_ms
 ITC_49.13,Thong ke nha hang tham so mac dinh,STATS,,,,,,200,,TotalTenants|ActiveTenants|TotalRevenue|PlanTenantCounts|RevenueTrend,,,,
 ITC_49.14,Schema response thong ke nha hang,STATS,,,,,,200,,TotalTenants|ActiveTenants|TotalRevenue|PlanTenantCounts|RevenueTrend,,,,
-ITC_49.15,Thong ke theo trang thai Active/Locked,STATS,,,,,Active,200,,,TotalTenants|ActiveTenants,,,
-ITC_49.16,Thong ke theo goi dich vu,STATS,,,,Free,,200,,,PlanTenantCounts,,,
+ITC_49.15,Thong ke theo trang thai Active/Locked,STATS,,,,Active,,200,,TotalTenants|ActiveTenants,,,,
+ITC_49.16,Thong ke theo goi dich vu,STATS,,,Free,,,200,,PlanTenantCounts,,,,
 ITC_49.17,Thong ke theo from/to hop le,STATS,<TODAY-7>,<TODAY>,,,,200,,TotalTenants|TotalRevenue,,,,
 ITC_49.18,fromDate lon hon toDate,STATS,<TODAY>,<TODAY-7>,,,,400,INVALID_DATE_RANGE,,,,,
 ITC_49.19,Filter khong hop le (planType/status),STATS,,,InvalidPlan,InvalidStatus,,200,,TotalTenants|ActiveTenants,,,,
 ITC_49.20,Khong truyen token,STATS,,,,,<MISSING>,401,,,,,,
 ITC_49.21,Token khong du quyen,STATS,,,,,<STAFF_AUTHZ_TOKEN>,403,,,,,,
-ITC_49.22,So sanh truoc/sau tao nha hang,COMPARE_CREATE,,,,,,200,,,TotalTenants,1,,
-ITC_49.23,So sanh truoc/sau khoa nha hang,COMPARE_LOCK,,,,,,200,,,TotalTenants,,-1,1
+ITC_49.22,So sanh truoc/sau tao nha hang,COMPARE_CREATE,,,,,,200,,,1,,,
+ITC_49.23,So sanh truoc/sau khoa nha hang,COMPARE_LOCK,,,,,,200,,,,-1,1,
 ITC_49.24,Response time,STATS,,,,,,200,,TotalTenants|TotalRevenue,,,,2000

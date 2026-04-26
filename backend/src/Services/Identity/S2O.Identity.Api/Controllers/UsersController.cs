@@ -278,6 +278,17 @@ public class UsersController : ControllerBase
     [Authorize(Roles = "SystemAdmin,RestaurantOwner")]
     public async Task<IActionResult> DeleteUser(Guid id)
     {
+        var requesterUserId = GetRequesterUserId();
+        if (!requesterUserId.HasValue)
+        {
+            return Unauthorized(new Error("Auth.Unauthorized", "Không xác định được người dùng."));
+        }
+
+        if (requesterUserId.Value == id)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new Error("Users.Forbidden", "Không thể tự xóa tài khoản của chính mình."));
+        }
+
         var scopeError = await ValidateManagedUserScopeAsync(id);
         if (scopeError != null) return scopeError;
 
