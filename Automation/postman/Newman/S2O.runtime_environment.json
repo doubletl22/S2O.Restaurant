@@ -1,7 +1,7 @@
 {
   "_": {
     "postman_variable_scope": "environment",
-    "postman_exported_at": "2026-04-26T08:59:50.180Z",
+    "postman_exported_at": "2026-04-26T11:59:06.612Z",
     "postman_exported_using": "Newman/6.2.2"
   },
   "id": "57ac1d8c-2f1a-450a-9f60-acff4f9e4036",
@@ -14,7 +14,7 @@
     },
     {
       "type": "any",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHMyby5jb20iLCJzdWIiOiJjNThjNzAzZi1iOTAwLTRjZGEtYWYzZS05ZDcyMzhlOTYyMWIiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIiwidW5pcXVlX25hbWUiOiJhZG1pbkBzMm8uY29tIiwidGVuYW50X2lkIjoiIiwicm9sZSI6IlN5c3RlbUFkbWluIiwibmJmIjoxNzc3MTkzOTQ1LCJleHAiOjE3Nzc3OTg3NDUsImlhdCI6MTc3NzE5Mzk0NSwiaXNzIjoiUzJPLklkZW50aXR5IiwiYXVkIjoiUzJPLlJlc3RhdXJhbnQifQ.y07K7ZdqmHCVIY93YtE5fd1X_kCfl-Us9erkbwQuLV4",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHMyby5jb20iLCJzdWIiOiJjNThjNzAzZi1iOTAwLTRjZGEtYWYzZS05ZDcyMzhlOTYyMWIiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIiwidW5pcXVlX25hbWUiOiJhZG1pbkBzMm8uY29tIiwidGVuYW50X2lkIjoiIiwicm9sZSI6IlN5c3RlbUFkbWluIiwibmJmIjoxNzc3MjA0NzE1LCJleHAiOjE3Nzc4MDk1MTUsImlhdCI6MTc3NzIwNDcxNSwiaXNzIjoiUzJPLklkZW50aXR5IiwiYXVkIjoiUzJPLlJlc3RhdXJhbnQifQ.v5oc63q5v0DEUdts5nW0Avx_uzaz6c1qR91fxbQc9-E",
       "key": "token"
     },
     {
@@ -24,47 +24,47 @@
     },
     {
       "type": "any",
-      "value": "owner.itc527.177719394621240c3ag@test.com",
+      "value": "owner.itc527.1777204715717jzbr5z@test.com",
       "key": "seed_email_itc_5_27"
     },
     {
       "type": "any",
-      "value": "Restaurant ITC_5.27 1777193946212",
+      "value": "Restaurant ITC_5.27 1777204715717",
       "key": "seed_restaurant_itc_5_27"
     },
     {
       "type": "any",
-      "value": "4fec23d2-2625-4af1-8aab-11e303552dc8",
+      "value": "aba5d90d-86cc-4d0b-89a7-41b9676bf343",
       "key": "tenant_id_ITC_5.27"
     },
     {
       "type": "any",
-      "value": "cb07b9fa-a603-4d0f-944b-9b626a655af8",
+      "value": "4f82b4b1-67fc-43f3-93ce-3a7f2ea2f942",
       "key": "tenant_id_ITC_5.28"
     },
     {
       "type": "any",
-      "value": "7f451acf-ff5f-4ba5-9872-44816ca33301",
+      "value": "313d25b3-8e1a-4cda-8289-c3c66b7d801a",
       "key": "tenant_id_ITC_5.29"
     },
     {
       "type": "any",
-      "value": "96519bfa-70ab-46d1-a21e-7b34d090c83c",
+      "value": "9e62a782-08cf-46b0-911b-c25a58b21f65",
       "key": "tenant_id_ITC_5.38"
     },
     {
       "type": "any",
-      "value": "6dc17450-b089-48da-8691-572401f88e03",
+      "value": "e0397884-bf7e-453c-884e-125ff84ae820",
       "key": "tenant_id_ITC_5.39"
     },
     {
       "type": "any",
-      "value": "ead63469-16a8-4b78-ba70-ad1c84ffdf8a",
+      "value": "f8fbae10-46b3-4e08-9c18-c42d062830b8",
       "key": "tenant_id_ITC_5.40"
     },
     {
       "type": "any",
-      "value": "1682242e-8b0d-43d4-b222-fe6a5956c902",
+      "value": "fc9b1983-8b72-4046-a8e8-f35cc9a07617",
       "key": "tenant_id_ITC_5.42"
     },
     {
@@ -89,7 +89,7 @@
     },
     {
       "type": "any",
-      "value": "1ed13a6f-79dc-4f82-9708-9357eefb40da",
+      "value": "1ac00fc6-da2b-419d-ae86-f0e8d60c080f",
       "key": "tenant_id_ITC_5.48"
     },
     {
@@ -154,22 +154,22 @@
     },
     {
       "type": "any",
-      "value": "f4b0421e-8ae2-426e-8f22-9c0a216c48fc",
+      "value": "72adc016-7412-4de4-b0f4-c690834c3242",
       "key": "staff_id"
     },
     {
       "type": "any",
-      "value": "13255e40-4fbc-416b-aa3b-71928cf49480",
+      "value": "1f23b9a2-d6e1-468c-8981-14fe2ffd2fd7",
       "key": "owner_id"
     },
     {
       "type": "any",
-      "value": "842c5627-4048-47a2-aeef-88ef0b6ea146",
+      "value": "b97eed22-5c6e-47ae-bc7a-099d507f27e0",
       "key": "admin_id"
     },
     {
       "type": "any",
-      "value": "staff.auto.1777193956257.khz510@test.com",
+      "value": "staff.auto.1777204722938.f4y09g@test.com",
       "key": "staff_email"
     },
     {
@@ -189,22 +189,22 @@
     },
     {
       "type": "any",
-      "value": "owner.stats.1777193984082.iqa285@test.com",
+      "value": "owner.stats.1777204740658.dk4pdl@test.com",
       "key": "owner_email"
     },
     {
       "type": "any",
-      "value": "admin.auto.1777193956257.khz510@test.com",
+      "value": "admin.auto.1777204722938.f4y09g@test.com",
       "key": "admin_email"
     },
     {
       "type": "any",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHMyby5jb20iLCJzdWIiOiJjNThjNzAzZi1iOTAwLTRjZGEtYWYzZS05ZDcyMzhlOTYyMWIiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIiwidW5pcXVlX25hbWUiOiJhZG1pbkBzMm8uY29tIiwidGVuYW50X2lkIjoiIiwicm9sZSI6IlN5c3RlbUFkbWluIiwibmJmIjoxNzc3MTkzOTg5LCJleHAiOjE3Nzc3OTg3ODksImlhdCI6MTc3NzE5Mzk4OSwiaXNzIjoiUzJPLklkZW50aXR5IiwiYXVkIjoiUzJPLlJlc3RhdXJhbnQifQ.CEw9G5_uFS_SHW6-tpHAcbOaCChHiTsidJVsIv_k30o",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHMyby5jb20iLCJzdWIiOiJjNThjNzAzZi1iOTAwLTRjZGEtYWYzZS05ZDcyMzhlOTYyMWIiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIiwidW5pcXVlX25hbWUiOiJhZG1pbkBzMm8uY29tIiwidGVuYW50X2lkIjoiIiwicm9sZSI6IlN5c3RlbUFkbWluIiwibmJmIjoxNzc3MjA0NzQ2LCJleHAiOjE3Nzc4MDk1NDYsImlhdCI6MTc3NzIwNDc0NiwiaXNzIjoiUzJPLklkZW50aXR5IiwiYXVkIjoiUzJPLlJlc3RhdXJhbnQifQ.4snbIP2t0KS3oQf95xq29Y4EDYdsg_67Xx13g2Wqj2w",
       "key": "sysadmin_token"
     },
     {
       "type": "any",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im93bmVyLnN0YXRzLjE3NzcxOTM5ODQwODIuaXFhMjg1QHRlc3QuY29tIiwic3ViIjoiMjY1YmRkOGYtY2ExNi00NWFmLTkzYTYtMGQxMGQ4MjBiZTE0IiwiZ2l2ZW5fbmFtZSI6Ik93bmVyIFN0YXRzIDE3NzcxOTM5ODQwODIiLCJ1bmlxdWVfbmFtZSI6Im93bmVyLnN0YXRzLjE3NzcxOTM5ODQwODIuaXFhMjg1QHRlc3QuY29tIiwidGVuYW50X2lkIjoiNDZmYzdkNTktNWFhYS00YWMxLTk2MzEtMzRiMzVhMmYwNTUxIiwiYnJhbmNoX2lkIjoiN2VhOTNiMTktZmMzNC00MzQwLWI5YmEtZWZkMDRmNzJjNWQwIiwicm9sZSI6IlJlc3RhdXJhbnRPd25lciIsIm5iZiI6MTc3NzE5Mzk4NSwiZXhwIjoxNzc3Nzk4Nzg1LCJpYXQiOjE3NzcxOTM5ODUsImlzcyI6IlMyTy5JZGVudGl0eSIsImF1ZCI6IlMyTy5SZXN0YXVyYW50In0.BpHSMoZzO0NNfHGxDA1luZ7Sg7ddq1Tcu-zcQ2oRQHE",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im93bmVyLnN0YXRzLjE3NzcyMDQ3NDA2NTguZGs0cGRsQHRlc3QuY29tIiwic3ViIjoiNzU2OTczYzYtMzUwOC00OTljLWI4NTItYWU4OWQ4ZmYxMjJkIiwiZ2l2ZW5fbmFtZSI6Ik93bmVyIFN0YXRzIDE3NzcyMDQ3NDA2NTgiLCJ1bmlxdWVfbmFtZSI6Im93bmVyLnN0YXRzLjE3NzcyMDQ3NDA2NTguZGs0cGRsQHRlc3QuY29tIiwidGVuYW50X2lkIjoiYWVhYjIxZGMtODYxNy00ZGM5LWFkNzMtNzFmMjU5ODA0NTRmIiwiYnJhbmNoX2lkIjoiNjA3MGQ4NmMtNzYwMy00ZjcwLWE1OWItZjczOThmNGM2OGE1Iiwicm9sZSI6IlJlc3RhdXJhbnRPd25lciIsIm5iZiI6MTc3NzIwNDc0MiwiZXhwIjoxNzc3ODA5NTQyLCJpYXQiOjE3NzcyMDQ3NDIsImlzcyI6IlMyTy5JZGVudGl0eSIsImF1ZCI6IlMyTy5SZXN0YXVyYW50In0.NfgSVLRxhUQwSb_2RszUhviTHyeO-gi5Ypy8yPcQ-Fc",
       "key": "owner_token"
     },
     {
@@ -219,12 +219,12 @@
     },
     {
       "type": "any",
-      "value": "3bf4b87c-b371-44c6-bc62-ffa526d43017",
+      "value": "cfd89a5c-36ba-4e8d-b613-a71fde1efce9",
       "key": "admin_target_id"
     },
     {
       "type": "any",
-      "value": "admin.profile.1777193989766.jqjzzs@test.com",
+      "value": "admin.profile.1777204746239.7eg2ns@test.com",
       "key": "admin_target_email"
     },
     {
@@ -234,12 +234,12 @@
     },
     {
       "type": "any",
-      "value": "6c81b239-13e1-47bc-a341-cb20be0678b8",
+      "value": "a870a01b-2c8a-424e-aae1-3ac5f7b57ee8",
       "key": "admin_self_id"
     },
     {
       "type": "any",
-      "value": "admin.self.1777193961332.quq06d@test.com",
+      "value": "admin.self.1777204728056.1k8a1n@test.com",
       "key": "admin_self_email"
     },
     {
@@ -249,12 +249,12 @@
     },
     {
       "type": "any",
-      "value": "3c35b17e-40f9-4356-ad52-8bd5a6bf113e",
+      "value": "c8af4c27-d472-44b3-a1a3-a6409957c4b7",
       "key": "staff_delete_id"
     },
     {
       "type": "any",
-      "value": "staff.delete.1777193961332.quq06d@test.com",
+      "value": "staff.delete.1777204728056.1k8a1n@test.com",
       "key": "staff_delete_email"
     },
     {
@@ -264,12 +264,12 @@
     },
     {
       "type": "any",
-      "value": "033dc461-d91d-4011-b78d-5a165e73159e",
+      "value": "d0ad7b85-37b0-4d48-96a1-ba360ee2a535",
       "key": "staff_double_id"
     },
     {
       "type": "any",
-      "value": "staff.double.1777193961332.quq06d@test.com",
+      "value": "staff.double.1777204728056.1k8a1n@test.com",
       "key": "staff_double_email"
     },
     {
@@ -279,12 +279,12 @@
     },
     {
       "type": "any",
-      "value": "ca8e91fc-bb37-463b-bdd9-9efe7ea91f31",
+      "value": "d019d4b9-ff8d-48bb-a9e1-14a6079d2de5",
       "key": "staff_contract_id"
     },
     {
       "type": "any",
-      "value": "staff.contract.1777193964861.gjfbda@test.com",
+      "value": "staff.contract.1777204732138.0wx2kd@test.com",
       "key": "staff_contract_email"
     },
     {
@@ -294,12 +294,12 @@
     },
     {
       "type": "any",
-      "value": "12b5eacf-97c0-41be-9f03-f57d83b1ad2b",
+      "value": "bb16f6e8-7f16-4f88-a88e-15ab41bf2d76",
       "key": "staff_authz_id"
     },
     {
       "type": "any",
-      "value": "staff.authz.1777193984082.iqa285@test.com",
+      "value": "staff.authz.1777204740658.dk4pdl@test.com",
       "key": "staff_authz_email"
     },
     {
@@ -309,12 +309,12 @@
     },
     {
       "type": "any",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0YWZmLmF1dGh6LjE3NzcxOTM5ODQwODIuaXFhMjg1QHRlc3QuY29tIiwic3ViIjoiMTJiNWVhY2YtOTdjMC00MWJlLTlmMDMtZjU3ZDgzYjFhZDJiIiwiZ2l2ZW5fbmFtZSI6IlN0YWZmIEF1dGh6IDE3NzcxOTM5ODQwODIiLCJ1bmlxdWVfbmFtZSI6InN0YWZmLmF1dGh6LjE3NzcxOTM5ODQwODIuaXFhMjg1QHRlc3QuY29tIiwidGVuYW50X2lkIjoiNDZmYzdkNTktNWFhYS00YWMxLTk2MzEtMzRiMzVhMmYwNTUxIiwicm9sZSI6IlN0YWZmIiwibmJmIjoxNzc3MTkzOTg1LCJleHAiOjE3Nzc3OTg3ODUsImlhdCI6MTc3NzE5Mzk4NSwiaXNzIjoiUzJPLklkZW50aXR5IiwiYXVkIjoiUzJPLlJlc3RhdXJhbnQifQ.0HJ448d1OrSn54uP9lBTlH8SW3fCOS0KxQdZZCJAufk",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0YWZmLmF1dGh6LjE3NzcyMDQ3NDA2NTguZGs0cGRsQHRlc3QuY29tIiwic3ViIjoiYmIxNmY2ZTgtN2YxNi00Zjg4LWE4OGUtMTVhYjQxYmYyZDc2IiwiZ2l2ZW5fbmFtZSI6IlN0YWZmIEF1dGh6IDE3NzcyMDQ3NDA2NTgiLCJ1bmlxdWVfbmFtZSI6InN0YWZmLmF1dGh6LjE3NzcyMDQ3NDA2NTguZGs0cGRsQHRlc3QuY29tIiwidGVuYW50X2lkIjoiYWVhYjIxZGMtODYxNy00ZGM5LWFkNzMtNzFmMjU5ODA0NTRmIiwicm9sZSI6IlN0YWZmIiwibmJmIjoxNzc3MjA0NzQzLCJleHAiOjE3Nzc4MDk1NDMsImlhdCI6MTc3NzIwNDc0MywiaXNzIjoiUzJPLklkZW50aXR5IiwiYXVkIjoiUzJPLlJlc3RhdXJhbnQifQ.j0T3FYE2h5YGBsbnRBZahEZY3CvZfG1HOs4K4S3t5ec",
       "key": "staff_authz_token"
     },
     {
       "type": "any",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluLnNlbGYuMTc3NzE5Mzk2MTMzMi5xdXEwNmRAdGVzdC5jb20iLCJzdWIiOiI2YzgxYjIzOS0xM2UxLTQ3YmMtYTM0MS1jYjIwYmUwNjc4YjgiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIEF1dG8gMTc3NzE5Mzk2MTMzMiIsInVuaXF1ZV9uYW1lIjoiYWRtaW4uc2VsZi4xNzc3MTkzOTYxMzMyLnF1cTA2ZEB0ZXN0LmNvbSIsInRlbmFudF9pZCI6IiIsInJvbGUiOiJTeXN0ZW1BZG1pbiIsIm5iZiI6MTc3NzE5Mzk2MiwiZXhwIjoxNzc3Nzk4NzYyLCJpYXQiOjE3NzcxOTM5NjIsImlzcyI6IlMyTy5JZGVudGl0eSIsImF1ZCI6IlMyTy5SZXN0YXVyYW50In0.tnoZQoFDbwbcP6RUQPsUPMgi-omKDjJklGknwrqwxtg",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluLnNlbGYuMTc3NzIwNDcyODA1Ni4xazhhMW5AdGVzdC5jb20iLCJzdWIiOiJhODcwYTAxYi0yYzhhLTQyNGUtYWFlMS0zYWM1ZjdiNTdlZTgiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIEF1dG8gMTc3NzIwNDcyODA1NiIsInVuaXF1ZV9uYW1lIjoiYWRtaW4uc2VsZi4xNzc3MjA0NzI4MDU2LjFrOGExbkB0ZXN0LmNvbSIsInRlbmFudF9pZCI6IiIsInJvbGUiOiJTeXN0ZW1BZG1pbiIsIm5iZiI6MTc3NzIwNDcyOSwiZXhwIjoxNzc3ODA5NTI5LCJpYXQiOjE3NzcyMDQ3MjksImlzcyI6IlMyTy5JZGVudGl0eSIsImF1ZCI6IlMyTy5SZXN0YXVyYW50In0.hiSPfMdVunDSJWLPs9rk0QtPfsxMhW55oJyJtPQ6E9U",
       "key": "admin_self_token"
     },
     {
@@ -329,12 +329,12 @@
     },
     {
       "type": "any",
-      "value": "a2830e2a-4447-4487-b3e6-f28f1913c5cf",
+      "value": "92af729f-9f2e-4b71-89ba-a40fc06d219d",
       "key": "staff_reset_id"
     },
     {
       "type": "any",
-      "value": "staff.reset.1777193964861.gjfbda@test.com",
+      "value": "staff.reset.1777204732138.0wx2kd@test.com",
       "key": "staff_reset_email"
     },
     {
@@ -369,12 +369,12 @@
     },
     {
       "type": "any",
-      "value": "Stats Restaurant 1777193984082",
+      "value": "Stats Restaurant 1777204740658",
       "key": "tenant_lock_name"
     },
     {
       "type": "any",
-      "value": "46fc7d59-5aaa-4ac1-9631-34b35a2f0551",
+      "value": "aeab21dc-8617-4dc9-ad73-71f25980454f",
       "key": "tenant_lock_id"
     },
     {
@@ -384,11 +384,11 @@
     },
     {
       "type": "any",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluLnByb2ZpbGUuMTc3NzE5Mzk4OTc2Ni5qcWp6enNAdGVzdC5jb20iLCJzdWIiOiIzYmY0Yjg3Yy1iMzcxLTQ0YzYtYmM2Mi1mZmE1MjZkNDMwMTciLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIEF1dG8gMTc3NzE5Mzk4OTc2NiIsInVuaXF1ZV9uYW1lIjoiYWRtaW4ucHJvZmlsZS4xNzc3MTkzOTg5NzY2Lmpxanp6c0B0ZXN0LmNvbSIsInRlbmFudF9pZCI6IiIsInJvbGUiOiJTeXN0ZW1BZG1pbiIsIm5iZiI6MTc3NzE5Mzk5MCwiZXhwIjoxNzc3Nzk4NzkwLCJpYXQiOjE3NzcxOTM5OTAsImlzcyI6IlMyTy5JZGVudGl0eSIsImF1ZCI6IlMyTy5SZXN0YXVyYW50In0.5nWa-PmXJzde1AQTIZGdulSzOxgxvYlAgfqYVaMGLpQ",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluLnByb2ZpbGUuMTc3NzIwNDc0NjIzOS43ZWcybnNAdGVzdC5jb20iLCJzdWIiOiJjZmQ4OWE1Yy0zNmJhLTRlOGQtYjYxMy1hNzFmZGUxZWZjZTkiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIEF1dG8gMTc3NzIwNDc0NjIzOSIsInVuaXF1ZV9uYW1lIjoiYWRtaW4ucHJvZmlsZS4xNzc3MjA0NzQ2MjM5LjdlZzJuc0B0ZXN0LmNvbSIsInRlbmFudF9pZCI6IiIsInJvbGUiOiJTeXN0ZW1BZG1pbiIsIm5iZiI6MTc3NzIwNDc0NiwiZXhwIjoxNzc3ODA5NTQ2LCJpYXQiOjE3NzcyMDQ3NDYsImlzcyI6IlMyTy5JZGVudGl0eSIsImF1ZCI6IlMyTy5SZXN0YXVyYW50In0.cvQxeDCPdO0GpfoVcYDDcuErQ4Atyu_fyBP3u0Xom_Q",
       "key": "admin_target_token"
     }
   ],
   "_postman_variable_scope": "environment",
-  "_postman_exported_at": "2026-04-26T08:59:53.004Z",
+  "_postman_exported_at": "2026-04-26T11:59:09.311Z",
   "_postman_exported_using": "Newman/6.2.2"
 }
