@@ -1,0 +1,17 @@
+tc_id,description,action,user_id,auth_token,email,old_password,new_password,expected_status,expected_text_contains,expected_login_new,max_response_time_ms
+ITC_13.19,Reset password staff valid,RESET,<STAFF_RESET_ID>,<SYSADMIN_TOKEN>,,<STAFF_RESET_PASSWORD>,<STAFF_RESET_NEW_PASSWORD>,200,,,
+ITC_13.20,Login staff with old password after reset,LOGIN_OLD,,,<STAFF_RESET_EMAIL>,<STAFF_RESET_PASSWORD>,,401,invalidpassword,,
+ITC_13.21,Login staff with new password after reset,LOGIN_NEW,,,<STAFF_RESET_EMAIL>,,<STAFF_RESET_NEW_PASSWORD>,200,,,
+ITC_13.22,Reset password owner valid,RESET,<OWNER_ID>,<SYSADMIN_TOKEN>,,<OWNER_PASSWORD>,<OWNER_NEW_PASSWORD>,200,,,
+ITC_13.23,Login owner with old and new password,LOGIN_BOTH,,,<OWNER_EMAIL>,<OWNER_PASSWORD>,<OWNER_NEW_PASSWORD>,401,invalidpassword,200,
+ITC_13.24,Reset password systemadmin target valid,RESET,<ADMIN_TARGET_ID>,<SYSADMIN_TOKEN>,,<ADMIN_TARGET_PASSWORD>,<ADMIN_TARGET_NEW_PASSWORD>,200,,,
+ITC_13.25,Login systemadmin with old and new password,LOGIN_BOTH,,,<ADMIN_TARGET_EMAIL>,<ADMIN_TARGET_PASSWORD>,<ADMIN_TARGET_NEW_PASSWORD>,401,invalidpassword,200,
+ITC_13.26,Reset password with new password empty,RESET,<STAFF_RESET_ID>,<SYSADMIN_TOKEN>,,<STAFF_RESET_PASSWORD>,<EMPTY>,400,resetfailed,,
+ITC_13.27,Reset password with new password too short,RESET,<STAFF_RESET_ID>,<SYSADMIN_TOKEN>,,<STAFF_RESET_PASSWORD>,123,400,resetfailed,,
+ITC_13.28,Reset password with user not found,RESET,<NOT_FOUND_ID>,<SYSADMIN_TOKEN>,,<STAFF_RESET_PASSWORD>,<STAFF_RESET_NEW_PASSWORD>,404,users.notfound,,
+ITC_13.29,Reset password with insufficient permission,RESET,<STAFF_RESET_ID>,<STAFF_AUTHZ_TOKEN>,,<STAFF_RESET_PASSWORD>,<STAFF_RESET_NEW_PASSWORD>,401|403,,,
+ITC_13.30,Reset password contract response time,RESET,<STAFF_CONTRACT_ID>,<SYSADMIN_TOKEN>,,<STAFF_CONTRACT_PASSWORD>,<STAFF_CONTRACT_NEW_PASSWORD>,200,,,1500
+ITC_13.31,Reset password with invalid userId format,RESET,<INVALID_GUID>,<SYSADMIN_TOKEN>,,<STAFF_RESET_PASSWORD>,<STAFF_RESET_NEW_PASSWORD>,400|404,,,
+ITC_13.32,Reset password with missing Authorization header,RESET,<STAFF_RESET_ID>,<MISSING>,,<STAFF_RESET_PASSWORD>,<STAFF_RESET_NEW_PASSWORD>,401,,,
+ITC_13.33,Reset password with invalid token,RESET,<STAFF_RESET_ID>,<INVALID_TOKEN>,,<STAFF_RESET_PASSWORD>,<STAFF_RESET_NEW_PASSWORD>,401,,,
+ITC_13.34,Reset password with whitespace new password,RESET,<STAFF_RESET_ID>,<SYSADMIN_TOKEN>,,<STAFF_RESET_PASSWORD>,<WS>,400,resetfailed,,

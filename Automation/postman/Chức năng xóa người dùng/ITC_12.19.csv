@@ -1,0 +1,13 @@
+tc_id,description,action,user_id,auth_token,email,password,expected_status,expected_text_contains,run_login_check,expected_login_ok,expected_login_fail,expected_status_2,expected_text_contains_2,max_response_time_ms
+ITC_12.19,Delete staff valid,DELETE,<STAFF_DELETE_ID>,<SYSADMIN_TOKEN>,,,204,,FALSE,,,,,
+ITC_12.20,Login staff after delete,LOGIN,,,<STAFF_DELETE_EMAIL>,<STAFF_DELETE_PASSWORD>,401,usernotfound,FALSE,,,,,
+ITC_12.21,Delete owner valid,DELETE,<OWNER_ID>,<SYSADMIN_TOKEN>,,,204,,FALSE,,,,,
+ITC_12.22,Login owner after delete,LOGIN,,,<OWNER_EMAIL>,<OWNER_PASSWORD>,401,usernotfound,FALSE,,,,,
+ITC_12.23,Delete admin target valid,DELETE,<ADMIN_TARGET_ID>,<SYSADMIN_TOKEN>,,,204,,FALSE,,,,,
+ITC_12.24,Login admin target after delete,LOGIN,,,<ADMIN_TARGET_EMAIL>,<ADMIN_TARGET_PASSWORD>,401,usernotfound,FALSE,,,,,
+ITC_12.25,Delete user not found,DELETE,00000000-0000-0000-0000-000000000000,<SYSADMIN_TOKEN>,,,404,notfound,FALSE,,,,,
+ITC_12.26,Delete userId invalid format,DELETE,<INVALID_GUID>,<SYSADMIN_TOKEN>,,,400|404,,FALSE,,,,,
+ITC_12.27,Delete same user twice,DELETE_TWICE,<STAFF_DOUBLE_ID>,<SYSADMIN_TOKEN>,,,204,,FALSE,,,404,notfound,
+ITC_12.28,Delete with insufficient permission,DELETE,<STAFF_CONTRACT_ID>,<STAFF_AUTHZ_TOKEN>,,,401|403,,FALSE,,,,,
+ITC_12.29,Delete self account,DELETE,<ADMIN_SELF_ID>,<ADMIN_SELF_TOKEN>,,,401|403,,FALSE,,,,,
+ITC_12.30,Delete contract response time,DELETE,<STAFF_CONTRACT_ID>,<SYSADMIN_TOKEN>,,,204,,FALSE,,,,,1500

@@ -7,6 +7,7 @@ using S2O.Identity.App.Features.Users.Commands;
 using S2O.Identity.Domain.Entities;
 using S2O.Identity.Infra.Persistence;
 using S2O.Shared.Kernel.Results;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims; 
 
 namespace S2O.Identity.Api.Controllers;
@@ -19,6 +20,8 @@ public class UsersController : ControllerBase
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ISender _sender;
     private readonly AuthDbContext _context;
+    private const int MinPasswordLength = 6;
+    private const int MaxPasswordLength = 50;
 
     public UsersController(UserManager<ApplicationUser> userManager, ISender sender, AuthDbContext context)
     {
@@ -33,6 +36,17 @@ public class UsersController : ControllerBase
         string FullName,
         string Role,
         Guid? TenantId 
+    );
+
+    public record ChangePasswordRequest(
+        string CurrentPassword,
+        string NewPassword,
+        string ConfirmPassword
+    );
+
+    public record UpdateProfileRequest(
+        string FullName,
+        string? PhoneNumber
     );
 
     [HttpPost]
@@ -137,6 +151,126 @@ public class UsersController : ControllerBase
 
         if (result.IsFailure) return BadRequest(result.Error);
         return Ok(result.Value);
+    }
+
+    [HttpPost("me/change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new Error("User.InvalidRequest", "Payload không hợp lệ."));
+        }
+
+        var currentPassword = request.CurrentPassword?.Trim();
+        var newPassword = request.NewPassword?.Trim();
+        var confirmPassword = request.ConfirmPassword?.Trim();
+
+        if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword))
+        {
+            return BadRequest(new Error("User.InvalidRequest", "Mật khẩu hiện tại và mật khẩu mới là bắt buộc."));
+        }
+
+        if (!string.Equals(newPassword, confirmPassword, StringComparison.Ordinal))
+        {
+            return BadRequest(new Error("User.PasswordMismatch", "Xác nhận mật khẩu không khớp."));
+        }
+
+        if (newPassword.Length < MinPasswordLength || newPassword.Length > MaxPasswordLength)
+        {
+            return BadRequest(new Error("User.PasswordInvalid", $"Mật khẩu phải có độ dài từ {MinPasswordLength} đến {MaxPasswordLength} ký tự."));
+        }
+
+        var requesterUserId = GetRequesterUserId();
+        if (!requesterUserId.HasValue)
+        {
+            return Unauthorized(new Error("Auth.Unauthorized", "Không xác định được người dùng."));
+        }
+
+        var user = await _userManager.FindByIdAsync(requesterUserId.Value.ToString());
+        if (user == null)
+        {
+            return Unauthorized(new Error("Auth.Unauthorized", "Không tìm thấy người dùng."));
+        }
+
+        var changeResult = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        if (!changeResult.Succeeded)
+        {
+            var hasMismatch = changeResult.Errors.Any(error => string.Equals(error.Code, "PasswordMismatch", StringComparison.OrdinalIgnoreCase));
+            if (hasMismatch)
+            {
+                return BadRequest(new Error("Auth.InvalidPassword", "Mật khẩu hiện tại không đúng."));
+            }
+
+            return BadRequest(new Error("User.PasswordChangeFailed", BuildIdentityErrorMessage(changeResult.Errors)));
+        }
+
+        return Ok(new { Message = "Đổi mật khẩu thành công." });
+    }
+
+    [HttpGet("me")]
+    public async Task<IActionResult> GetProfile()
+    {
+        var requesterUserId = GetRequesterUserId();
+        if (!requesterUserId.HasValue)
+        {
+            return Unauthorized(new Error("Auth.Unauthorized", "Không xác định được người dùng."));
+        }
+
+        var user = await _userManager.FindByIdAsync(requesterUserId.Value.ToString());
+        if (user == null)
+        {
+            return Unauthorized(new Error("Auth.Unauthorized", "Không tìm thấy người dùng."));
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+
+        return Ok(new
+        {
+            user.Id,
+            user.FullName,
+            user.Email,
+            user.PhoneNumber,
+            Roles = roles
+        });
+    }
+
+    [HttpPut("me")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new Error("User.InvalidRequest", "Payload không hợp lệ."));
+        }
+
+        var fullName = request.FullName?.Trim();
+        if (string.IsNullOrWhiteSpace(fullName))
+        {
+            return BadRequest(new Error("User.InvalidFullName", "Họ tên không hợp lệ."));
+        }
+
+        var requesterUserId = GetRequesterUserId();
+        if (!requesterUserId.HasValue)
+        {
+            return Unauthorized(new Error("Auth.Unauthorized", "Không xác định được người dùng."));
+        }
+
+        var user = await _userManager.FindByIdAsync(requesterUserId.Value.ToString());
+        if (user == null)
+        {
+            return Unauthorized(new Error("Auth.Unauthorized", "Không tìm thấy người dùng."));
+        }
+
+        user.FullName = fullName;
+        var phoneNumber = request.PhoneNumber?.Trim();
+        user.PhoneNumber = string.IsNullOrWhiteSpace(phoneNumber) ? null : phoneNumber;
+
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            return BadRequest(new Error("User.ProfileUpdateFailed", BuildIdentityErrorMessage(updateResult.Errors)));
+        }
+
+        return Ok(new { Message = "Cập nhật hồ sơ thành công." });
     }
 
     // DELETE: api/users/{id}
@@ -277,6 +411,15 @@ public class UsersController : ControllerBase
             ?? User.FindFirst("TenantId")?.Value;
 
         return Guid.TryParse(tenantClaim, out var tenantId) ? tenantId : null;
+    }
+
+    private Guid? GetRequesterUserId()
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub)
+            ?? User.FindFirstValue("sub");
+
+        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     private static string? NormalizeRole(string? role)

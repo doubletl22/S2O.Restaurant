@@ -1,0 +1,43 @@
+tc_id,description,raw_mode,content_type,restaurantName,ownerName,email,password,address,phoneNumber,planType,expected_status,expect_guid,expected_error_contains,run_login_check,expected_login_ok,expected_login_fail
+ITC_5.27,Plan Free valid,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,200,TRUE,,FALSE,200,400|401
+ITC_5.28,Plan Premium valid,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Premium,200,TRUE,,FALSE,200,400|401
+ITC_5.29,Plan Enterprise valid,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Enterprise,200,TRUE,,FALSE,200,400|401
+ITC_5.30,Missing restaurantName,NORMAL,application/json,<MISSING>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,restaurant,FALSE,200,400|401
+ITC_5.31,Missing ownerName,NORMAL,application/json,<AUTO_RESTAURANT>,<MISSING>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,owner,FALSE,200,400|401
+ITC_5.32,Missing address,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,<MISSING>,0901234567,Free,400,FALSE,address,FALSE,200,400|401
+ITC_5.33,Missing phoneNumber,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",<MISSING>,Free,400,FALSE,phone,FALSE,200,400|401
+ITC_5.34,Missing email,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<MISSING>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,email,FALSE,200,400|401
+ITC_5.35,Missing password,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<MISSING>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,password,FALSE,200,400|401
+ITC_5.36,Invalid email format,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,invalid-email-format,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,email,FALSE,200,400|401
+ITC_5.37,Password 5 chars,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,Pass1,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,password,FALSE,200,400|401
+ITC_5.38,Password 6 chars,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,Pass12,"123 Test Street, Ho Chi Minh City",0901234567,Free,200,TRUE,,FALSE,200,400|401
+ITC_5.39,Password 28 chars,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,ValidPassword1WithMoreLength2!,"123 Test Street, Ho Chi Minh City",0901234567,Free,200,TRUE,,FALSE,200,400|401
+ITC_5.40,Password 50 chars,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,ValidPassword1WithMoreLengthXXXXXXXXXXXXXXXXXXXX1,"123 Test Street, Ho Chi Minh City",0901234567,Free,200,TRUE,,FALSE,200,400|401
+ITC_5.41,Duplicate email,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<SEED_EMAIL_ITC_5_27>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400|409,FALSE,email,FALSE,200,400|401
+ITC_5.42,Duplicate restaurant name,NORMAL,application/json,<SEED_RESTAURANT_ITC_5_27>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,200|400,TRUE,restaurant,FALSE,200,400|401
+ITC_5.43,Invalid plan type,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,SUPER_VIP,400|200,FALSE,plan,FALSE,200,400|401
+ITC_5.44,Invalid phone format,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",ABC-XYZ-PHONE,Free,400|200,FALSE,phone,FALSE,200,400|401
+ITC_5.45,restaurantName whitespace only,NORMAL,application/json,<WS>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,restaurant,FALSE,200,400|401
+ITC_5.46,address whitespace only,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,<WS>,0901234567,Free,400,FALSE,address,FALSE,200,400|401
+ITC_5.47,Invalid JSON and wrong content type,INVALID_JSON,text/plain,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400|415,FALSE,unsupported,FALSE,200,400|401
+ITC_5.48,Register then login success and wrong password,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,200,TRUE,,TRUE,200,400|401
+ITC_5.49,Email whitespace only,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<WS>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,email,FALSE,200,400|401
+ITC_5.50,OwnerName whitespace only,NORMAL,application/json,<AUTO_RESTAURANT>,<WS>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,owner,FALSE,200,400|401
+ITC_5.51,PhoneNumber whitespace only,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",<WS>,Free,400,FALSE,phone,FALSE,200,400|401
+ITC_5.52,PlanType whitespace only,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,<WS>,400,FALSE,plan,FALSE,200,400|401
+ITC_5.53,RestaurantName empty,NORMAL,application/json,<EMPTY>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,restaurant,FALSE,200,400|401
+ITC_5.54,OwnerName empty,NORMAL,application/json,<AUTO_RESTAURANT>,<EMPTY>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,owner,FALSE,200,400|401
+ITC_5.55,Email empty,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<EMPTY>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,email,FALSE,200,400|401
+ITC_5.56,Password empty,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<EMPTY>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,password,FALSE,200,400|401
+ITC_5.57,Address empty,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,<EMPTY>,0901234567,Free,400,FALSE,address,FALSE,200,400|401
+ITC_5.58,PhoneNumber empty,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",<EMPTY>,Free,400,FALSE,phone,FALSE,200,400|401
+ITC_5.59,PlanType empty,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,<EMPTY>,400,FALSE,plan,FALSE,200,400|401
+ITC_5.60,RestaurantName null,NORMAL,application/json,<NULL>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,restaurant,FALSE,200,400|401
+ITC_5.61,OwnerName null,NORMAL,application/json,<AUTO_RESTAURANT>,<NULL>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,owner,FALSE,200,400|401
+ITC_5.62,Email null,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<NULL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,email,FALSE,200,400|401
+ITC_5.63,Password null,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<NULL>,"123 Test Street, Ho Chi Minh City",0901234567,Free,400,FALSE,password,FALSE,200,400|401
+ITC_5.64,Address null,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,<NULL>,0901234567,Free,400,FALSE,address,FALSE,200,400|401
+ITC_5.65,PhoneNumber null,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",<NULL>,Free,400,FALSE,phone,FALSE,200,400|401
+ITC_5.66,PlanType null,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",0901234567,<NULL>,400,FALSE,plan,FALSE,200,400|401
+ITC_5.67,PhoneNumber too short,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",1234567,Free,400,FALSE,phone,FALSE,200,400|401
+ITC_5.68,PhoneNumber too long,NORMAL,application/json,<AUTO_RESTAURANT>,<AUTO_OWNER>,<AUTO_EMAIL>,<VALID_PASSWORD>,"123 Test Street, Ho Chi Minh City",09012345678901234567,Free,400,FALSE,phone,FALSE,200,400|401

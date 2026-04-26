@@ -1,0 +1,16 @@
+{
+  "name": "s2o-newman-runner",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "scenario": "node run-scenario.js",
+    "scenario:continue": "node run-scenario.js --continue-on-error",
+    "scenario:writeback": "node run-scenario.js --write-back-environment",
+    "scenario:all": "node run-scenario.js --continue-on-error --write-back-environment"
+  },
+  "devDependencies": {
+    "csv-parse": "^5.5.6",
+    "docx": "^9.0.3",
+    "newman": "^6.2.2"
+  }
+}

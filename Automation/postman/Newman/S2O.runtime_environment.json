@@ -1,0 +1,394 @@
+{
+  "_": {
+    "postman_variable_scope": "environment",
+    "postman_exported_at": "2026-04-26T02:54:38.486Z",
+    "postman_exported_using": "Newman/6.2.2"
+  },
+  "id": "57ac1d8c-2f1a-450a-9f60-acff4f9e4036",
+  "name": "S2O",
+  "values": [
+    {
+      "type": "any",
+      "value": "http://localhost:5000",
+      "key": "base_url"
+    },
+    {
+      "type": "any",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHMyby5jb20iLCJzdWIiOiJjNThjNzAzZi1iOTAwLTRjZGEtYWYzZS05ZDcyMzhlOTYyMWIiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIiwidW5pcXVlX25hbWUiOiJhZG1pbkBzMm8uY29tIiwidGVuYW50X2lkIjoiIiwicm9sZSI6IlN5c3RlbUFkbWluIiwibmJmIjoxNzc3MTcyMDUxLCJleHAiOjE3Nzc3NzY4NTEsImlhdCI6MTc3NzE3MjA1MSwiaXNzIjoiUzJPLklkZW50aXR5IiwiYXVkIjoiUzJPLlJlc3RhdXJhbnQifQ.r5rK2YH8O1svpO1CPuncQCBwXBTuQal7kLs-UHbAJEA",
+      "key": "token"
+    },
+    {
+      "type": "any",
+      "value": "",
+      "key": "request_body_dynamic"
+    },
+    {
+      "type": "any",
+      "value": "owner.itc527.17771720520569vbgd1@test.com",
+      "key": "seed_email_itc_5_27"
+    },
+    {
+      "type": "any",
+      "value": "Restaurant ITC_5.27 1777172052056",
+      "key": "seed_restaurant_itc_5_27"
+    },
+    {
+      "type": "any",
+      "value": "be85f5ab-4c26-420d-af7b-e1952e2fc59c",
+      "key": "tenant_id_ITC_5.27"
+    },
+    {
+      "type": "any",
+      "value": "e933c2aa-77b4-4a3c-ba41-43fdfbac2a77",
+      "key": "tenant_id_ITC_5.28"
+    },
+    {
+      "type": "any",
+      "value": "3b804d69-afcb-4a73-acb3-52e51b090833",
+      "key": "tenant_id_ITC_5.29"
+    },
+    {
+      "type": "any",
+      "value": "dce8a75a-555d-4b04-b88c-f906905192fd",
+      "key": "tenant_id_ITC_5.38"
+    },
+    {
+      "type": "any",
+      "value": "24f85d8d-890d-406e-b463-bde0830754a6",
+      "key": "tenant_id_ITC_5.39"
+    },
+    {
+      "type": "any",
+      "value": "90ef68e8-63c1-4faa-932e-591f4f3500f0",
+      "key": "tenant_id_ITC_5.40"
+    },
+    {
+      "type": "any",
+      "value": "5f29e0c6-5d88-4a77-b7c0-37adb6e6d5cc",
+      "key": "tenant_id_ITC_5.42"
+    },
+    {
+      "type": "any",
+      "value": "7f129a26-b085-4ac0-8df9-367eace49420",
+      "key": "tenant_id_ITC_5.43"
+    },
+    {
+      "type": "any",
+      "value": "6b320b06-127c-4d40-ad0e-52957c598662",
+      "key": "tenant_id_ITC_5.44"
+    },
+    {
+      "type": "any",
+      "value": "b9defcb4-6113-4e28-baab-588b8c6d573b",
+      "key": "tenant_id_ITC_5.45"
+    },
+    {
+      "type": "any",
+      "value": "da9b38ec-a1cf-42be-821a-25926070279a",
+      "key": "tenant_id_ITC_5.46"
+    },
+    {
+      "type": "any",
+      "value": "14dd86bb-b04e-4349-8868-05e408c78180",
+      "key": "tenant_id_ITC_5.48"
+    },
+    {
+      "type": "any",
+      "value": "a7a69cca-cb33-4ecc-8507-6a2ec391290c",
+      "key": "tenant_id_ITC_5.50"
+    },
+    {
+      "type": "any",
+      "value": "101b4d9d-4f4e-4de9-85f1-c99f71b5daf5",
+      "key": "tenant_id_ITC_5.51"
+    },
+    {
+      "type": "any",
+      "value": "2cdaa53e-7002-47f4-a11b-23b2367b82bc",
+      "key": "tenant_id_ITC_5.52"
+    },
+    {
+      "type": "any",
+      "value": "08b9ba4a-0aef-49bd-a433-beddb44e6a91",
+      "key": "tenant_id_ITC_5.53"
+    },
+    {
+      "type": "any",
+      "value": "930236d0-ecfc-4d34-8ef5-42ff2251df00",
+      "key": "tenant_id_ITC_5.54"
+    },
+    {
+      "type": "any",
+      "value": "543ec614-6cdc-4e3c-9c74-5d7e97a51df3",
+      "key": "tenant_id_ITC_5.57"
+    },
+    {
+      "type": "any",
+      "value": "887b0392-5fa2-40a7-b6e3-1b7660981890",
+      "key": "tenant_id_ITC_5.58"
+    },
+    {
+      "type": "any",
+      "value": "f2b0478b-5839-440e-89e1-1ea72275bf8f",
+      "key": "tenant_id_ITC_5.59"
+    },
+    {
+      "type": "any",
+      "value": "20fda1d3-10ed-46ab-b3e8-6bd56f44e777",
+      "key": "tenant_id_ITC_5.67"
+    },
+    {
+      "type": "any",
+      "value": "81f41195-ca0a-46fc-9247-0205e75fe568",
+      "key": "tenant_id_ITC_5.68"
+    },
+    {
+      "type": "any",
+      "value": "",
+      "key": "tenant_id_ITC_5.69"
+    },
+    {
+      "type": "any",
+      "value": "",
+      "key": "tenant_id_ITC_5.70"
+    },
+    {
+      "type": "any",
+      "value": "392580df-c734-4f77-abef-261f43898762",
+      "key": "staff_id"
+    },
+    {
+      "type": "any",
+      "value": "8317f15f-cccb-4ca9-bb0f-26125b1cc9b0",
+      "key": "owner_id"
+    },
+    {
+      "type": "any",
+      "value": "85472c45-0b27-4ac7-aff6-eab760f3d82b",
+      "key": "admin_id"
+    },
+    {
+      "type": "any",
+      "value": "staff.auto.1777172060751.76fs2e@test.com",
+      "key": "staff_email"
+    },
+    {
+      "type": "any",
+      "value": "ValidPass123!",
+      "key": "staff_password"
+    },
+    {
+      "type": "any",
+      "value": "ValidPass123!",
+      "key": "owner_password"
+    },
+    {
+      "type": "any",
+      "value": "Admin@123",
+      "key": "admin_password"
+    },
+    {
+      "type": "any",
+      "value": "owner.stats.1777172075072.6l6z5q@test.com",
+      "key": "owner_email"
+    },
+    {
+      "type": "any",
+      "value": "admin.auto.1777172060751.76fs2e@test.com",
+      "key": "admin_email"
+    },
+    {
+      "type": "any",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHMyby5jb20iLCJzdWIiOiJjNThjNzAzZi1iOTAwLTRjZGEtYWYzZS05ZDcyMzhlOTYyMWIiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIiwidW5pcXVlX25hbWUiOiJhZG1pbkBzMm8uY29tIiwidGVuYW50X2lkIjoiIiwicm9sZSI6IlN5c3RlbUFkbWluIiwibmJmIjoxNzc3MTcyMDc4LCJleHAiOjE3Nzc3NzY4NzgsImlhdCI6MTc3NzE3MjA3OCwiaXNzIjoiUzJPLklkZW50aXR5IiwiYXVkIjoiUzJPLlJlc3RhdXJhbnQifQ.LC9Xp3v0huFikh26BFqE7nkvqpQayYVz59CaDAgICcQ",
+      "key": "sysadmin_token"
+    },
+    {
+      "type": "any",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im93bmVyLnN0YXRzLjE3NzcxNzIwNzUwNzIuNmw2ejVxQHRlc3QuY29tIiwic3ViIjoiNGMzNGM0OTQtNzY0Ny00Y2UyLTlmNzctM2Y4YjM4MzdjZTFmIiwiZ2l2ZW5fbmFtZSI6Ik93bmVyIFN0YXRzIDE3NzcxNzIwNzUwNzIiLCJ1bmlxdWVfbmFtZSI6Im93bmVyLnN0YXRzLjE3NzcxNzIwNzUwNzIuNmw2ejVxQHRlc3QuY29tIiwidGVuYW50X2lkIjoiOTgxOTYzMTktZDYwOS00NGUzLWIwNWMtYWE3Mjg5ZjFmNmE0IiwiYnJhbmNoX2lkIjoiOTQxZWZlZmItZDY3Ny00MWEzLTg4YzAtZTEzNWM5NmVhN2QwIiwicm9sZSI6IlJlc3RhdXJhbnRPd25lciIsIm5iZiI6MTc3NzE3MjA3NSwiZXhwIjoxNzc3Nzc2ODc1LCJpYXQiOjE3NzcxNzIwNzUsImlzcyI6IlMyTy5JZGVudGl0eSIsImF1ZCI6IlMyTy5SZXN0YXVyYW50In0.05p0T1pv0T-idfARaLRPluMi_OoBpiwi6klaLWQ7GhQ",
+      "key": "owner_token"
+    },
+    {
+      "type": "any",
+      "value": "admin@s2o.com",
+      "key": "seed_admin_email"
+    },
+    {
+      "type": "any",
+      "value": "Admin@123",
+      "key": "seed_admin_password"
+    },
+    {
+      "type": "any",
+      "value": "d0e56996-22a3-4b34-bbe6-1fb6890e992c",
+      "key": "admin_target_id"
+    },
+    {
+      "type": "any",
+      "value": "admin.profile.1777172078160.jfledu@test.com",
+      "key": "admin_target_email"
+    },
+    {
+      "type": "any",
+      "value": "Admin@123",
+      "key": "admin_target_password"
+    },
+    {
+      "type": "any",
+      "value": "dfe29797-8c05-41d3-b00a-14486b2ba51b",
+      "key": "admin_self_id"
+    },
+    {
+      "type": "any",
+      "value": "admin.self.1777172064854.vwbkct@test.com",
+      "key": "admin_self_email"
+    },
+    {
+      "type": "any",
+      "value": "Admin@123",
+      "key": "admin_self_password"
+    },
+    {
+      "type": "any",
+      "value": "033aca76-ee58-4169-a86b-102327e0350b",
+      "key": "staff_delete_id"
+    },
+    {
+      "type": "any",
+      "value": "staff.delete.1777172064854.vwbkct@test.com",
+      "key": "staff_delete_email"
+    },
+    {
+      "type": "any",
+      "value": "ValidPass123!",
+      "key": "staff_delete_password"
+    },
+    {
+      "type": "any",
+      "value": "cc03005c-fe90-470b-aa34-015d7c145c19",
+      "key": "staff_double_id"
+    },
+    {
+      "type": "any",
+      "value": "staff.double.1777172064854.vwbkct@test.com",
+      "key": "staff_double_email"
+    },
+    {
+      "type": "any",
+      "value": "ValidPass123!",
+      "key": "staff_double_password"
+    },
+    {
+      "type": "any",
+      "value": "36754bf9-6550-404d-88c2-370e44ca3a57",
+      "key": "staff_contract_id"
+    },
+    {
+      "type": "any",
+      "value": "staff.contract.1777172068352.piob4p@test.com",
+      "key": "staff_contract_email"
+    },
+    {
+      "type": "any",
+      "value": "ValidPass123!",
+      "key": "staff_contract_password"
+    },
+    {
+      "type": "any",
+      "value": "c991758d-3a95-4470-ac56-8a105ebb731b",
+      "key": "staff_authz_id"
+    },
+    {
+      "type": "any",
+      "value": "staff.authz.1777172075072.6l6z5q@test.com",
+      "key": "staff_authz_email"
+    },
+    {
+      "type": "any",
+      "value": "ValidPass123!",
+      "key": "staff_authz_password"
+    },
+    {
+      "type": "any",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0YWZmLmF1dGh6LjE3NzcxNzIwNzUwNzIuNmw2ejVxQHRlc3QuY29tIiwic3ViIjoiYzk5MTc1OGQtM2E5NS00NDcwLWFjNTYtOGExMDVlYmI3MzFiIiwiZ2l2ZW5fbmFtZSI6IlN0YWZmIEF1dGh6IDE3NzcxNzIwNzUwNzIiLCJ1bmlxdWVfbmFtZSI6InN0YWZmLmF1dGh6LjE3NzcxNzIwNzUwNzIuNmw2ejVxQHRlc3QuY29tIiwidGVuYW50X2lkIjoiOTgxOTYzMTktZDYwOS00NGUzLWIwNWMtYWE3Mjg5ZjFmNmE0Iiwicm9sZSI6IlN0YWZmIiwibmJmIjoxNzc3MTcyMDc1LCJleHAiOjE3Nzc3NzY4NzUsImlhdCI6MTc3NzE3MjA3NSwiaXNzIjoiUzJPLklkZW50aXR5IiwiYXVkIjoiUzJPLlJlc3RhdXJhbnQifQ.ioqzeRwMwl93iRTH6u9DIQD55s54-fZvK7q5XeCz3EM",
+      "key": "staff_authz_token"
+    },
+    {
+      "type": "any",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluLnNlbGYuMTc3NzE3MjA2NDg1NC52d2JrY3RAdGVzdC5jb20iLCJzdWIiOiJkZmUyOTc5Ny04YzA1LTQxZDMtYjAwYS0xNDQ4NmIyYmE1MWIiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIEF1dG8gMTc3NzE3MjA2NDg1NCIsInVuaXF1ZV9uYW1lIjoiYWRtaW4uc2VsZi4xNzc3MTcyMDY0ODU0LnZ3YmtjdEB0ZXN0LmNvbSIsInRlbmFudF9pZCI6IiIsInJvbGUiOiJTeXN0ZW1BZG1pbiIsIm5iZiI6MTc3NzE3MjA2NSwiZXhwIjoxNzc3Nzc2ODY1LCJpYXQiOjE3NzcxNzIwNjUsImlzcyI6IlMyTy5JZGVudGl0eSIsImF1ZCI6IlMyTy5SZXN0YXVyYW50In0.b2xNTVvhFBtuuxfSVDkT1UElHt7uQFhwfnew3TJAvcE",
+      "key": "admin_self_token"
+    },
+    {
+      "type": "any",
+      "value": "AdminNew123!",
+      "key": "admin_target_new_password"
+    },
+    {
+      "type": "any",
+      "value": "OwnerNew123!",
+      "key": "owner_new_password"
+    },
+    {
+      "type": "any",
+      "value": "73dcffa4-8409-4a0b-8740-f5c5db4f7f92",
+      "key": "staff_reset_id"
+    },
+    {
+      "type": "any",
+      "value": "staff.reset.1777172068352.piob4p@test.com",
+      "key": "staff_reset_email"
+    },
+    {
+      "type": "any",
+      "value": "ValidPass123!",
+      "key": "staff_reset_password"
+    },
+    {
+      "type": "any",
+      "value": "StaffNew123!",
+      "key": "staff_reset_new_password"
+    },
+    {
+      "type": "any",
+      "value": "StaffContract123!",
+      "key": "staff_contract_new_password"
+    },
+    {
+      "type": "any",
+      "value": "",
+      "key": "staff_lock_id"
+    },
+    {
+      "type": "any",
+      "value": "",
+      "key": "staff_lock_email"
+    },
+    {
+      "type": "any",
+      "value": "",
+      "key": "staff_lock_password"
+    },
+    {
+      "type": "any",
+      "value": "Stats Restaurant 1777172075072",
+      "key": "tenant_lock_name"
+    },
+    {
+      "type": "any",
+      "value": "98196319-d609-44e3-b05c-aa7289f1f6a4",
+      "key": "tenant_lock_id"
+    },
+    {
+      "type": "any",
+      "value": "AdminNew456!",
+      "key": "admin_target_new_password_2"
+    },
+    {
+      "type": "any",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluLnByb2ZpbGUuMTc3NzE3MjA3ODE2MC5qZmxlZHVAdGVzdC5jb20iLCJzdWIiOiJkMGU1Njk5Ni0yMmEzLTRiMzQtYmJlNi0xZmI2ODkwZTk5MmMiLCJnaXZlbl9uYW1lIjoiU3lzdGVtIEFkbWluIEF1dG8gMTc3NzE3MjA3ODE2MCIsInVuaXF1ZV9uYW1lIjoiYWRtaW4ucHJvZmlsZS4xNzc3MTcyMDc4MTYwLmpmbGVkdUB0ZXN0LmNvbSIsInRlbmFudF9pZCI6IiIsInJvbGUiOiJTeXN0ZW1BZG1pbiIsIm5iZiI6MTc3NzE3MjA3OCwiZXhwIjoxNzc3Nzc2ODc4LCJpYXQiOjE3NzcxNzIwNzgsImlzcyI6IlMyTy5JZGVudGl0eSIsImF1ZCI6IlMyTy5SZXN0YXVyYW50In0.Pqshxw5cWAeGgNKXFMqzMR4KMVbR-DWLmyXaR_orUt8",
+      "key": "admin_target_token"
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2026-04-26T02:54:40.632Z",
+  "_postman_exported_using": "Newman/6.2.2"
+}

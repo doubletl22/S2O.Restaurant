@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { User, Lock, Bell, Moon, Smartphone, LogOut } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,8 +11,116 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { authService } from "@/services/auth.service";
 
 export default function SettingsPage() {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [roleLabel, setRoleLabel] = useState("Chủ nhà hàng");
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  const getErrorMessage = (error: any): string => {
+    if (!error) return "Thao tác thất bại";
+    if (typeof error === "object") {
+      if (typeof error.description === "string") return error.description;
+      if (typeof error.detail === "string") return error.detail;
+      if (typeof error.title === "string") return error.title;
+      if (typeof error.message === "string") return error.message;
+    }
+    return "Thao tác thất bại";
+  };
+
+  const resolveRoleLabel = (roles?: string[]) => {
+    if (!roles || roles.length === 0) return "Chủ nhà hàng";
+    if (roles.includes("RestaurantOwner") || roles.includes("Owner")) return "Chủ nhà hàng";
+    if (roles.includes("SystemAdmin")) return "Quản lý hệ thống";
+    return roles[0];
+  };
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      setIsProfileLoading(true);
+      try {
+        const profile = await authService.getProfile();
+        setFullName(profile.fullName || "");
+        setEmail(profile.email || "");
+        setPhoneNumber(profile.phoneNumber || "");
+        setRoleLabel(resolveRoleLabel(profile.roles));
+      } catch (error: any) {
+        const message = getErrorMessage(error);
+        toast.error("Không thể tải hồ sơ", { description: message });
+      } finally {
+        setIsProfileLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  const handleSaveProfile = async () => {
+    if (!fullName.trim()) {
+      toast.error("Họ và tên không hợp lệ.");
+      return;
+    }
+
+    setIsSavingProfile(true);
+    try {
+      await authService.updateProfile({
+        fullName: fullName.trim(),
+        phoneNumber: phoneNumber.trim(),
+      });
+      toast.success("Cập nhật hồ sơ thành công.");
+
+      const storedUser = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+      if (storedUser) {
+        const parsed = JSON.parse(storedUser);
+        parsed.fullName = fullName.trim();
+        localStorage.setItem("user", JSON.stringify(parsed));
+      }
+    } catch (error: any) {
+      const message = getErrorMessage(error);
+      toast.error("Cập nhật hồ sơ thất bại", { description: message });
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error("Vui lòng nhập đầy đủ thông tin mật khẩu.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("Xác nhận mật khẩu không khớp.");
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      await authService.changePassword({
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      });
+      toast.success("Đổi mật khẩu thành công.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      const message = getErrorMessage(error);
+      toast.error("Đổi mật khẩu thất bại", { description: message });
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div>
@@ -37,7 +146,14 @@ export default function SettingsPage() {
               <div className="flex items-center gap-4">
                 <Avatar className="w-20 h-20 border-4 border-white shadow-lg">
                   <AvatarImage src="/images/avatar-placeholder.jpg" />
-                  <AvatarFallback className="text-xl bg-orange-100 text-orange-600">AD</AvatarFallback>
+                  <AvatarFallback className="text-xl bg-orange-100 text-orange-600">
+                    {(fullName || "AD")
+                      .split(" ")
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .map(word => word[0]?.toUpperCase())
+                      .join("")}
+                  </AvatarFallback>
                 </Avatar>
                 <Button variant="outline" size="sm">Thay đổi ảnh</Button>
               </div>
@@ -45,24 +161,38 @@ export default function SettingsPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Họ và tên</Label>
-                  <Input defaultValue="Nguyen Van Admin" />
+                  <Input
+                    value={fullName}
+                    onChange={(event) => setFullName(event.target.value)}
+                    disabled={isProfileLoading || isSavingProfile}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Email</Label>
-                  <Input defaultValue="admin@s2o.vn" disabled className="bg-gray-50" />
+                  <Input value={email} disabled className="bg-gray-50" />
                 </div>
                 <div className="space-y-2">
                   <Label>Số điện thoại</Label>
-                  <Input defaultValue="0987654321" />
+                  <Input
+                    value={phoneNumber}
+                    onChange={(event) => setPhoneNumber(event.target.value)}
+                    disabled={isProfileLoading || isSavingProfile}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Chức vụ</Label>
-                  <Input defaultValue="Quản lý hệ thống" disabled className="bg-gray-50" />
+                  <Input value={roleLabel} disabled className="bg-gray-50" />
                 </div>
               </div>
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
-              <Button className="bg-linear-to-r from-(--g1) to-(--g2) text-white">Lưu thay đổi</Button>
+              <Button
+                className="bg-linear-to-r from-(--g1) to-(--g2) text-white"
+                onClick={handleSaveProfile}
+                disabled={isProfileLoading || isSavingProfile}
+              >
+                {isSavingProfile ? "Đang lưu..." : "Lưu thay đổi"}
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -74,24 +204,42 @@ export default function SettingsPage() {
               <CardTitle>Đổi mật khẩu</CardTitle>
               <CardDescription>Để bảo mật, vui lòng không chia sẻ mật khẩu cho người khác.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Mật khẩu hiện tại</Label>
-                <Input type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label>Mật khẩu mới</Label>
-                <Input type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label>Xác nhận mật khẩu mới</Label>
-                <Input type="password" />
-              </div>
-            </CardContent>
-            <CardFooter className="border-t px-6 py-4">
-              <Button variant="outline">Cập nhật mật khẩu</Button>
-            </CardFooter>
-          </Card>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Mật khẩu hiện tại</Label>
+                  <Input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(event) => setCurrentPassword(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Mật khẩu mới</Label>
+                  <Input
+                    type="password"
+                    value={newPassword}
+                    onChange={(event) => setNewPassword(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Xác nhận mật khẩu mới</Label>
+                  <Input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(event) => setConfirmPassword(event.target.value)}
+                  />
+                </div>
+              </CardContent>
+              <CardFooter className="border-t px-6 py-4">
+                <Button
+                  variant="outline"
+                  onClick={handleChangePassword}
+                  disabled={isChangingPassword}
+                >
+                  {isChangingPassword ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
+                </Button>
+              </CardFooter>
+            </Card>
 
           <Card className="border-red-100 bg-red-50/50">
             <CardHeader>

@@ -1,5 +1,5 @@
 import http from "@/lib/http";
-import { LoginBody, RegisterTenantBody, LoginResponse, LoginRequest } from "@/lib/types";
+import { LoginBody, RegisterTenantBody, LoginResponse, LoginRequest, ChangePasswordRequest, UpdateProfileRequest, UserProfile } from "@/lib/types";
 
 export const authService = {
   // Login: /api/v1/auth/login
@@ -17,6 +17,28 @@ export const authService = {
   // Refresh Token
   refreshToken: async () => {
     const response = await http.post("/api/v1/auth/refresh-token");
+    return response;
+  },
+
+  getProfile: async (): Promise<UserProfile> => {
+    const response = await http.get<any>("/api/users/me");
+    const payload = response?.value ?? response?.Value ?? response ?? {};
+    return {
+      id: payload.id ?? payload.Id ?? "",
+      fullName: payload.fullName ?? payload.FullName ?? "",
+      email: payload.email ?? payload.Email ?? "",
+      phoneNumber: payload.phoneNumber ?? payload.PhoneNumber,
+      roles: payload.roles ?? payload.Roles ?? [],
+    };
+  },
+
+  updateProfile: async (payload: UpdateProfileRequest) => {
+    const response = await http.put("/api/users/me", payload);
+    return response;
+  },
+
+  changePassword: async (payload: ChangePasswordRequest) => {
+    const response = await http.post("/api/users/me/change-password", payload);
     return response;
   },
   

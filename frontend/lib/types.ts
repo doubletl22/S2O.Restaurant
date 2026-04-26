@@ -32,7 +32,19 @@ export interface UserProfile {
   id: string;
   fullName: string;
   email: string;
+  phoneNumber?: string;
   roles: string[]; // Backend phải trả về mảng role
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface UpdateProfileRequest {
+  fullName: string;
+  phoneNumber?: string;
 }
 
 export interface RegisterTenantRequest {

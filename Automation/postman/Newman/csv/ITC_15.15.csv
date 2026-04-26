@@ -1,0 +1,13 @@
+tc_id,description,action,from_date,to_date,auth_token,expected_status,expected_error_code,expected_fields,max_response_time_ms
+ITC_15.15,Thong ke nguoi dung tham so mac dinh,STATS,,,,200,,TotalUsers|IsIdentityAvailable,
+ITC_15.16,Schema response thong ke nguoi dung,STATS,,,,200,,TotalUsers|IsIdentityAvailable,
+ITC_15.17,Co TotalUsers va IsIdentityAvailable,STATS,,,,200,,TotalUsers|IsIdentityAvailable,
+ITC_15.18,Thong ke theo from/to hop le,STATS,<TODAY-7>,<TODAY>,,200,,TotalUsers|IsIdentityAvailable,
+ITC_15.19,fromDate lon hon toDate,STATS,<TODAY>,<TODAY-7>,,400,INVALID_DATE_RANGE,,
+ITC_15.20,fromDate sai format,STATS,2025/99/99,1/1/2025,,400,,,
+ITC_15.21,Chi truyen fromDate,STATS,<TODAY-30>,,,200,,TotalUsers|IsIdentityAvailable,
+ITC_15.22,Chi truyen toDate,STATS,,<TODAY>,,200,,TotalUsers|IsIdentityAvailable,
+ITC_15.23,Token khong du quyen,STATS,,,<STAFF_AUTHZ_TOKEN>,403,,,
+ITC_15.24,Khong truyen token,STATS,,,<MISSING>,401,,,
+ITC_15.25,Tuong lai (from/to),STATS,<TODAY+30>,<TODAY+31>,,200,,TotalUsers|IsIdentityAvailable,
+ITC_15.26,Response time,STATS,,,,200,,TotalUsers|IsIdentityAvailable,2000
