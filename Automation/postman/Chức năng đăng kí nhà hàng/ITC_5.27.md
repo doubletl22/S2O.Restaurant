@@ -225,8 +225,16 @@ const guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
 const actualIsGuid = typeof response === 'string' && guidRegex.test(response);
 
 const statusPass = expectedStatuses.includes(pm.response.code);
-const guidPass = expectGuid ? actualIsGuid : !actualIsGuid;
-const errorPass = expectedErrorContains ? errorText.includes(expectedErrorContains) : true;
+const hasSuccessExpected = expectedStatuses.includes(200);
+const hasErrorExpected = expectedStatuses.some((x) => x >= 400);
+
+let guidPass = expectGuid ? actualIsGuid : !actualIsGuid;
+if (hasSuccessExpected && hasErrorExpected) {
+  guidPass = pm.response.code === 200 ? actualIsGuid : true;
+}
+
+const shouldCheckErrorToken = expectedErrorContains && (pm.response.code >= 400 || !hasSuccessExpected);
+const errorPass = shouldCheckErrorToken ? errorText.includes(expectedErrorContains) : true;
 
 pm.test(tcId + ': status code match expected list', function () {
   pm.expect(statusPass, 'Expected statuses: ' + expectedStatuses.join('|') + ', actual: ' + pm.response.code).to.eql(true);
