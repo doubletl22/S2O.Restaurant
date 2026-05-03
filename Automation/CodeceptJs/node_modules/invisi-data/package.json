@@ -1,0 +1,46 @@
+{
+  "name": "invisi-data",
+  "version": "1.2.0",
+  "description": "Invisible data at ease",
+  "main": "index.js",
+  "scripts": {
+    "buildcjs": "rollup index.js --file index.cjs --format cjs",
+    "test": "mocha index_test.js test/extended-tests.js",
+    "test:basic": "mocha index_test.js",
+    "test:extended": "mocha test/extended-tests.js"
+  },
+  "keywords": [
+    "invisible",
+    "mask",
+    "hide",
+    "obsfucate"
+  ],
+  "author": "kobenguyent",
+  "license": "MIT",
+  "type": "module",
+  "types": "types.d.ts",
+  "devDependencies": {
+    "chai": "^5.1.2",
+    "mocha": "^11.0.1",
+    "rollup": "^4.24.4"
+  },
+  "exports": {
+    "import": "./index.js",
+    "require": "./index.cjs"
+  },
+  "files": [
+    "index.cjs",
+    "index.js",
+    "patterns.js",
+    "README.md",
+    "types.d.ts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kobenguyent/invisi-data.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kobenguyent/invisi-data/issues"
+  },
+  "homepage": "https://github.com/kobenguyent/invisi-data#readme"
+}

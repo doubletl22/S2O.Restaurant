@@ -1,0 +1,29 @@
+{
+  "name": "s2o-codeceptjs-itc5",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:e2e": "codeceptjs run --steps",
+    "test:itc5": "codeceptjs run itc5_restaurant_registration_test.js --steps",
+    "test:itc5:headless": "cross-env HEADLESS=true codeceptjs run itc5_restaurant_registration_test.js --steps",
+    "test:itc10": "codeceptjs run itc10_user_lock_unlock_test.js --steps",
+    "test:itc10:headless": "cross-env HEADLESS=true codeceptjs run itc10_user_lock_unlock_test.js --steps",
+    "test:itc12": "codeceptjs run itc12_user_delete_test.js --steps",
+    "test:itc12:headless": "cross-env HEADLESS=true codeceptjs run itc12_user_delete_test.js --steps",
+    "test:itc13": "codeceptjs run itc13_user_change_password_test.js --steps",
+    "test:itc13:headless": "cross-env HEADLESS=true codeceptjs run itc13_user_change_password_test.js --steps",
+    "test:itc15": "codeceptjs run itc15_user_statistics_test.js --steps",
+    "test:itc15:headless": "cross-env HEADLESS=true codeceptjs run itc15_user_statistics_test.js --steps",
+    "test:itc49": "codeceptjs run itc49_restaurant_statistics_test.js --steps",
+    "test:itc49:headless": "cross-env HEADLESS=true codeceptjs run itc49_restaurant_statistics_test.js --steps",
+    "test:full": "codeceptjs run itc_full_master_test.js --steps",
+    "test:full:headless": "cross-env HEADLESS=true codeceptjs run itc_full_master_test.js --steps",
+    "test:comprehensive": "codeceptjs run itc_comprehensive_test.js --steps",
+    "test:comprehensive:headless": "cross-env HEADLESS=true codeceptjs run itc_comprehensive_test.js --steps"
+  },
+  "devDependencies": {
+    "codeceptjs": "^3.7.7",
+    "cross-env": "^10.1.0",
+    "playwright": "^1.58.2"
+  }
+}
